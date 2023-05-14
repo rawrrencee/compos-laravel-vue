@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<style>
+    .dvh-full {
+        min-block-size: 100vh;
+        min-block-size: 100dvh;
+    }
+</style>
+
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="compos" class="h-full">
 
 <head>
@@ -17,7 +24,7 @@
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased h-full">
+<body class="font-sans antialiased dvh-full h-full">
     @inertia
 </body>
 
