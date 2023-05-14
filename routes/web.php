@@ -115,9 +115,14 @@ Route::middleware([
                 return Inertia::render('Error/404');
             })->name('admin/infrastructure');
 
-            Route::get('/companies', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/infrastructure/companies');
+            Route::prefix('companies')->group(function () {
+                Route::get('/', function () {
+                    return Inertia::render('Admin/Infrastructure/Companies/Overview');
+                })->name('admin/infrastructure/companies');
+                Route::get('/add', function () {
+                    return Inertia::render('Admin/Infrastructure/Companies/AddNewCompany');
+                })->name('admin/infrastructure/companies/add');
+            });
 
             Route::get('/stores', function () {
                 return Inertia::render('Error/404');
@@ -169,8 +174,11 @@ Route::middleware([
 
             Route::prefix('employees')->group(function () {
                 Route::get('/', function () {
-                    return Inertia::render('Admin/Users/Employees/Employees');
+                    return Inertia::render('Admin/Users/Employees/Overview');
                 })->name('admin/users/employees');
+                Route::get('/add', function () {
+                    return Inertia::render('Admin/Users/Employees/AddNewEmployee');
+                })->name('admin/users/employees/add');
 
                 Route::get('/salaries', function () {
                     return Inertia::render('Error/404');

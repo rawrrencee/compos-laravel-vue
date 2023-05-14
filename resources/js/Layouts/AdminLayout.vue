@@ -4,24 +4,24 @@ import AdminSecondaryNavigation from "@/Components/AdminLayout/AdminSecondaryNav
 import AdminSidebar from "@/Components/AdminLayout/AdminSidebar.vue";
 import AdminStickyTopBar from "@/Components/AdminLayout/AdminStickyTopBar.vue";
 import {
-Dialog,
-DialogPanel,
-TransitionChild,
-TransitionRoot,
+    Dialog,
+    DialogPanel,
+    TransitionChild,
+    TransitionRoot,
 } from "@headlessui/vue";
 import {
-BanknotesIcon,
-BuildingStorefrontIcon,
-ChartPieIcon,
-ClockIcon,
-CurrencyDollarIcon,
-DocumentChartBarIcon,
-FolderIcon,
-HomeIcon,
-HomeModernIcon,
-TableCellsIcon,
-UserGroupIcon,
-XMarkIcon,
+    BanknotesIcon,
+    BuildingStorefrontIcon,
+    ChartPieIcon,
+    ClockIcon,
+    CurrencyDollarIcon,
+    DocumentChartBarIcon,
+    FolderIcon,
+    HomeIcon,
+    HomeModernIcon,
+    TableCellsIcon,
+    UserGroupIcon,
+    XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import { ref, watch } from "vue";
 
@@ -142,7 +142,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
 </script>
 
 <template>
-    <div>
+    <div class="h-full flex flex-col">
         <TransitionRoot as="template" :show="isMobileSidebarOpen">
             <Dialog
                 as="div"
@@ -195,7 +195,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
                                             >Close sidebar</span
                                         >
                                         <XMarkIcon
-                                            class="h-6 w-6 text-gray-800"
+                                            class="h-6 w-6 text-gray-900"
                                             aria-hidden="true"
                                         />
                                     </button>
@@ -240,7 +240,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
         <div
             :class="[
                 isDesktopNarrowSidebarShown ? 'lg:pl-20' : 'lg:pl-72',
-                'transition-[padding] ease-in-out duration-150',
+                'transition-[padding] ease-in-out duration-150 h-full flex flex-col',
             ]"
         >
             <AdminStickyTopBar
@@ -268,7 +268,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="grow">
                 <slot />
             </main>
         </div>

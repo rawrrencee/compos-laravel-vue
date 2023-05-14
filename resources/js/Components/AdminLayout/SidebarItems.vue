@@ -1,9 +1,9 @@
 <script setup>
 import {
-Disclosure,
-DisclosureButton,
-DisclosurePanel,
-TransitionRoot,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    TransitionRoot,
 } from "@headlessui/vue";
 import { ChevronRightIcon } from "@heroicons/vue/20/solid";
 import { Link } from "@inertiajs/vue3";
@@ -86,7 +86,7 @@ const currentRoute = ref(route().current());
                                 isCurrent(subItem, currentRoute)
                                     ? 'font-semibold'
                                     : '',
-                                'hover:text-indigo-400 block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700',
+                                'hover:text-secondary block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700',
                             ]"
                         >
                             {{ subItem.name }}</Link
