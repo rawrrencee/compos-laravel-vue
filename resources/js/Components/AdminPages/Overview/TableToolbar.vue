@@ -8,16 +8,14 @@ import {
     XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import { Link } from "@inertiajs/vue3";
-import { computed } from "vue";
 
 const props = defineProps({
     selectedItems: Array,
     addNewUrl: String,
+    showEditDeleteBtn: Boolean,
 });
 
 defineEmits(["buttonClicked"]);
-
-const showEditDeleteBtn = computed(() => props.selectedItems.length > 0);
 </script>
 
 <template>
