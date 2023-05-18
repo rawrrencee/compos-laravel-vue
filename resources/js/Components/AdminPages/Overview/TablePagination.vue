@@ -93,7 +93,6 @@ const pagesArray = computed(() => {
                                             '500',
                                             '1000',
                                             '2000',
-                                            '5000',
                                         ]"
                                         :key="selectOption"
                                     >
