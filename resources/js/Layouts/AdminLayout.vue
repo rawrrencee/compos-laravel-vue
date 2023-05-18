@@ -24,6 +24,7 @@ import {
     XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import { ref, watch } from "vue";
+import AdminAlert from "../Components/AdminLayout/AdminAlert.vue";
 
 // #region Page Setup
 defineProps({
@@ -250,7 +251,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
                 v-model:is-mobile-sidebar-open="isMobileSidebarOpen"
             />
 
-            <header v-if="$slots.header" class="bg-white shadow">
+            <header v-if="$slots.header" class="bg-white shadow z-10">
                 <div
                     :class="[
                         secondaryNavigation?.length > 0 ? 'pb-4' : 'pb-6',
@@ -268,6 +269,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
             </header>
 
             <!-- Page Content -->
+            <AdminAlert />
             <main class="grow">
                 <slot />
             </main>

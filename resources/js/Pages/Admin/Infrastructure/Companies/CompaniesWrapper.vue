@@ -10,13 +10,17 @@ const secondaryNavigation = [
                 name: "Add New Company",
                 href: "admin/infrastructure/companies/add",
             },
+            {
+                name: "Edit Company",
+                href: "admin/infrastructure/companies/edit",
+            },
         ],
     },
 ];
 </script>
 
 <template>
-    <AdminLayout title="Companies" :secondary-navigation="secondaryNavigation">
+    <AdminLayout :secondary-navigation="secondaryNavigation">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-900 leading-tight">
                 Companies

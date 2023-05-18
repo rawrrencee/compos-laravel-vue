@@ -36,7 +36,7 @@ const secondaryNavigation = [
 </script>
 
 <template>
-    <AdminLayout title="Employees" :secondary-navigation="secondaryNavigation">
+    <AdminLayout :secondary-navigation="secondaryNavigation">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-900 leading-tight">
                 Employees

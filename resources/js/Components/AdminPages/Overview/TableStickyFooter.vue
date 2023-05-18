@@ -16,7 +16,7 @@ defineEmits(["buttonClicked"]);
 </script>
 
 <template>
-    <div class="bottom-0 sticky py-4 px-4 sm:hidden">
+    <div class="bottom-0 sticky py-4 px-4 sm:hidden z-40">
         <div class="grid grid-cols-2 gap-2" v-if="showEditDeleteBtn">
             <button
                 type="button"

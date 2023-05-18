@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-    <div class="pb-4 grow">
+    <div class="grow pb-4">
         <div
             class="ring-1 ring-gray-200 sm:mx-0 sm:rounded-lg overflow-x-scroll"
         >

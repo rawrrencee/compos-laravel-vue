@@ -11,7 +11,7 @@ const secondaryNavigation = [
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" :secondary-navigation="secondaryNavigation">
+    <AdminLayout :secondary-navigation="secondaryNavigation">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Users

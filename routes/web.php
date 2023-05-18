@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use \App\Http\Controllers\CompanyController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,6 +25,10 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/404', function () {
+    return Inertia::render('Error/404');
+})->name('404');
 
 Route::middleware([
     'auth:sanctum',
@@ -116,12 +122,15 @@ Route::middleware([
             })->name('admin/infrastructure');
 
             Route::prefix('companies')->group(function () {
-                Route::get('/', function () {
-                    return Inertia::render('Admin/Infrastructure/Companies/Overview');
-                })->name('admin/infrastructure/companies');
+                Route::get('/', [CompanyController::class, 'index'])->name('admin/infrastructure/companies');
+
                 Route::get('/add', function () {
-                    return Inertia::render('Admin/Infrastructure/Companies/AddNewCompany');
+                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany');
                 })->name('admin/infrastructure/companies/add');
+                Route::post('/add', [CompanyController::class, 'store'])->name('admin/infrastructure/companies/add.store');
+
+                Route::get('/edit', [CompanyController::class, 'edit'])->name('admin/infrastructure/companies/edit');
+                Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
             });
 
             Route::get('/stores', function () {

@@ -1,11 +1,13 @@
 <script setup>
 import EmployeesWrapper from "@/Pages/Admin/Users/Employees/EmployeesWrapper.vue";
 import { TransitionRoot } from "@headlessui/vue";
+import { EyeIcon } from "@heroicons/vue/24/outline";
 import {
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    EyeIcon,
-} from "@heroicons/vue/24/outline";
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+} from "@heroicons/vue/24/solid";
 import { Head } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import TableMain from "../../../../Components/AdminPages/Overview/TableMain.vue";
@@ -127,6 +129,33 @@ const indeterminate = computed(
 const showEditDeleteBtn = computed(() => selectedPeople.value.length > 0);
 const onToolbarBtnClicked = (event) => {
     console.log("tableToolbarBtnClicked", event);
+};
+
+const currentPage = ref(9);
+const totalPages = ref(10);
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value = currentPage.value + 1;
+    }
+};
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value = currentPage.value - 1;
+    }
+};
+
+const pagesArray = computed(() => {
+    let start = Math.max(currentPage.value - 1, 1);
+    let end = Math.min(start + 2, totalPages.value);
+
+    if (currentPage.value > totalPages.value - 1) {
+        start = Math.max(totalPages.value - 2, 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+});
+const goToPage = (nextPageNumber) => {
+    currentPage.value = nextPageNumber;
 };
 </script>
 
@@ -288,74 +317,56 @@ const onToolbarBtnClicked = (event) => {
             </TableMain>
 
             <div
-                class="flex flex-col gap-2 sm:gap-0 sm:flex-1 sm:flex-row items-center justify-center sm:justify-between pb-10"
+                class="py-4 flex flex-col items-center gap-4 justify-center sm:flex-row sm:justify-between"
             >
-                <div>
-                    <p class="text-sm text-gray-700">
-                        Showing
-                        {{ " " }}
-                        <span class="font-medium">1</span>
-                        {{ " " }}
-                        to
-                        {{ " " }}
-                        <span class="font-medium">10</span>
-                        {{ " " }}
-                        of
-                        {{ " " }}
-                        <span class="font-medium">97</span>
-                        {{ " " }}
-                        results
-                    </p>
-                </div>
-                <div>
-                    <nav
-                        class="isolate inline-flex -space-x-px"
-                        aria-label="Pagination"
+                <div>Showing 1 - 10 of 97 results</div>
+                <div
+                    class="flex items-center justify-center sm:justify-end gap-2"
+                >
+                    <button
+                        :disabled="currentPage === 1"
+                        @click="() => goToPage(1)"
+                        class="btn btn-sm btn-ghost"
                     >
-                        <div
-                            class="btn-group border border-gray-200 rounded-md shadow-sm"
-                        >
+                        <ChevronDoubleLeftIcon class="h-3 w-3" />
+                    </button>
+                    <button
+                        :disabled="currentPage === 1"
+                        @click="() => prevPage()"
+                        class="btn btn-sm btn-ghost"
+                    >
+                        <ChevronLeftIcon class="h-3 w-3" />
+                    </button>
+                    <div class="flex gap-2">
+                        <template v-for="page in pagesArray" :key="page">
                             <button
-                                class="btn btn-link hover:bg-gray-100 disabled:bg-white"
-                                :disabled="true"
+                                :class="[
+                                    page === currentPage ? '' : 'btn-ghost',
+                                    'btn btn-sm',
+                                ]"
+                                @click="() => goToPage(page)"
                             >
-                                <ArrowLeftIcon class="h-3 w-3" />
+                                {{ page }}
                             </button>
-                            <button
-                                class="btn btn-link hover:bg-gray-100 disabled:bg-white"
-                            >
-                                1
-                            </button>
-                            <button
-                                class="hidden sm:inline-flex btn btn-link hover:bg-gray-100 disabled:bg-white"
-                            >
-                                2
-                            </button>
-                            <button
-                                class="btn btn-link hover:bg-gray-100 disabled:bg-white"
-                            >
-                                ...
-                            </button>
-                            <button
-                                class="hidden sm:inline-flex btn btn-link hover:bg-gray-100 disabled:bg-white"
-                            >
-                                99
-                            </button>
-                            <button
-                                class="btn btn-link hover:bg-gray-100 disabled:bg-white"
-                            >
-                                100
-                            </button>
-                            <button
-                                class="btn btn-link hover:bg-gray-100 disabled:bg-white"
-                                :disabled="true"
-                            >
-                                <ArrowRightIcon class="h-3 w-3" />
-                            </button>
-                        </div>
-                    </nav>
+                        </template>
+                    </div>
+                    <button
+                        :disabled="currentPage === totalPages"
+                        @click="() => nextPage()"
+                        class="btn btn-sm btn-ghost"
+                    >
+                        <ChevronRightIcon class="h-3 w-3" />
+                    </button>
+                    <button
+                        :disabled="currentPage === totalPages"
+                        @click="() => goToPage(totalPages)"
+                        class="btn btn-sm btn-ghost"
+                    >
+                        <ChevronDoubleRightIcon class="h-3 w-3" />
+                    </button>
                 </div>
             </div>
+
             <TableStickyFooter
                 :selected-items="selectedPeople"
                 :show-edit-delete-btn="showEditDeleteBtn"

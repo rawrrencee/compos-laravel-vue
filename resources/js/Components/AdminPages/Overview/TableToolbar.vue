@@ -1,7 +1,5 @@
 <script setup>
 import {
-    BarsArrowDownIcon,
-    BarsArrowUpIcon,
     FunnelIcon,
     PencilIcon,
     PlusCircleIcon,
@@ -13,6 +11,7 @@ const props = defineProps({
     selectedItems: Array,
     addNewUrl: String,
     showEditDeleteBtn: Boolean,
+    showFilters: Boolean,
 });
 
 defineEmits(["buttonClicked"]);
@@ -51,22 +50,9 @@ defineEmits(["buttonClicked"]);
                 class="px-1 flex gap-2 items-center text-gray-400 hover:text-gray-700"
                 @click="$emit('buttonClicked', { action: 'filter' })"
             >
-                <FunnelIcon class="h-5 w-5" />
-                <span>Filter</span>
-            </button>
-            <button
-                type="button"
-                class="px-1 flex gap-2 items-center"
-                @click="$emit('buttonClicked', { action: 'sort' })"
-            >
-                <BarsArrowUpIcon
-                    class="h-5 w-5 text-gray-400 hover:text-gray-700"
-                    v-if="false"
-                />
-                <BarsArrowDownIcon
-                    class="h-5 w-5 text-gray-400 hover:text-gray-700"
-                />
-                <span class="text-gray-400 hover:text-gray-700">Sort By</span>
+                <FunnelIcon class="h-5 w-5" v-if="!showFilters" />
+                <XMarkIcon class="h-5 w-5 text-gray-900" v-else />
+                <span :class="showFilters ? 'text-gray-900' : ''">Filter</span>
             </button>
         </div>
         <Link as="button" :href="route(addNewUrl)" class="hidden sm:btn">
@@ -75,5 +61,8 @@ defineEmits(["buttonClicked"]);
                 <span>Add New</span>
             </div>
         </Link>
+    </div>
+    <div class="pb-4" v-if="showFilters">
+        <slot name="filter" />
     </div>
 </template>
