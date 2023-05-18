@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommonController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +36,8 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    Route::get('/photo', [CommonController::class, 'showPhoto'])->name('photo');
+
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
@@ -131,6 +134,8 @@ Route::middleware([
 
                 Route::get('/edit', [CompanyController::class, 'edit'])->name('admin/infrastructure/companies/edit');
                 Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
+
+                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
             });
 
             Route::get('/stores', function () {

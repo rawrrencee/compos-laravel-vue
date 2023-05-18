@@ -62,7 +62,5 @@ defineEmits(["buttonClicked"]);
             </div>
         </Link>
     </div>
-    <div class="pb-4" v-if="showFilters">
-        <slot name="filter" />
-    </div>
+    <slot name="filter" />
 </template>

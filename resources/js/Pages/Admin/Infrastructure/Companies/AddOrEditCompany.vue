@@ -1,7 +1,9 @@
 <script setup>
 import CompaniesWrapper from "@/Pages/Admin/Infrastructure/Companies/CompaniesWrapper.vue";
-import { UserCircleIcon } from "@heroicons/vue/24/solid";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { getImgSrcFromPath } from "@/Util/Photo";
+import { PhotoIcon, XMarkIcon } from "@heroicons/vue/24/outline";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const props = defineProps({
     errorMessage: String,
@@ -17,15 +19,37 @@ const companyForm = useForm({
     phone_number: props.company?.phone_number ?? "",
     mobile_number: props.company?.mobile_number ?? "",
     website: props.company?.website ?? "",
+    img_url: props.company?.img_url ?? "",
+    company_photo: null,
 });
-
+const photoPreview = ref(null);
+const photoInput = ref(null);
+const updatePhotoPreview = () => {
+    const photo = photoInput.value.files[0];
+    if (!photo) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        photoPreview.value = e.target.result;
+    };
+    reader.readAsDataURL(photo);
+};
 const submit = () => {
     if (!props.company) {
-        companyForm.post(route("admin/infrastructure/companies/add.store"));
+        companyForm
+            .transform((data) => ({
+                ...data,
+                ...(photoInput.value && {
+                    company_photo: photoInput.value.files[0],
+                }),
+            }))
+            .post(route("admin/infrastructure/companies/add.store"));
     } else {
         companyForm
             .transform((data) => ({
                 ...data,
+                ...(photoInput.value && {
+                    company_photo: photoInput.value.files[0],
+                }),
                 id: props.company.id,
             }))
             .post(route("admin/infrastructure/companies/edit.update"));
@@ -74,23 +98,115 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="col-span-full">
+                <div class="sm:col-span-4">
                     <label
-                        for="photo"
+                        for="company_photo"
                         class="block text-sm font-medium leading-6 text-gray-900"
-                        >Photo</label
+                        >Company Photo</label
                     >
-                    <div class="mt-2 flex items-center gap-x-3">
-                        <UserCircleIcon
-                            class="h-12 w-12 text-gray-300"
-                            aria-hidden="true"
-                        />
-                        <button
-                            type="button"
-                            class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    <div
+                        class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 max-w-lg"
+                    >
+                        <div
+                            class="text-center flex flex-col gap-2 justify-center"
                         >
-                            Change
-                        </button>
+                            <div
+                                v-if="!photoPreview"
+                                class="mt-2 flex flex-col gap-4 items-center"
+                            >
+                                <img
+                                    v-if="company?.img_url || company?.img_path"
+                                    :src="
+                                        company?.img_path
+                                            ? getImgSrcFromPath(
+                                                  company?.img_path
+                                              )
+                                            : company?.img_url
+                                    "
+                                    class="rounded-lg h-20 w-20 object-cover"
+                                />
+                                <PhotoIcon
+                                    class="mx-auto h-12 w-12 text-gray-300"
+                                    aria-hidden="true"
+                                    v-else
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-ghost btn-sm"
+                                    v-if="company?.img_path"
+                                    :disabled="
+                                        !!company?.img_url && !company?.img_path
+                                    "
+                                    @click="
+                                        () => {
+                                            router.post(
+                                                route(
+                                                    'admin/infrastructure/companies/photo.delete'
+                                                ),
+                                                {
+                                                    id: company?.id,
+                                                    img_path: company?.img_path,
+                                                }
+                                            );
+                                        }
+                                    "
+                                >
+                                    <div class="flex gap-2 items-center">
+                                        <XMarkIcon class="h-3 w-3" />
+                                        <span>Remove</span>
+                                    </div>
+                                </button>
+                                <span
+                                    class="text-gray-600 text-xs"
+                                    v-if="
+                                        company?.img_url && !company?.img_path
+                                    "
+                                    >Image populated from Image URL (filled in
+                                    below)</span
+                                >
+                            </div>
+                            <div v-else class="self-center">
+                                <span
+                                    class="block rounded-lg w-20 h-20 bg-cover bg-no-repeat bg-center"
+                                    :style="
+                                        'background-image: url(\'' +
+                                        photoPreview +
+                                        '\');'
+                                    "
+                                />
+                            </div>
+                            <div class="flex flex-col">
+                                <div
+                                    class="flex text-sm leading-6 justify-center"
+                                >
+                                    <label
+                                        for="company_photo"
+                                        class="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-secondary"
+                                    >
+                                        <span
+                                            >Click to upload
+                                            {{
+                                                company?.img_path
+                                                    ? "another"
+                                                    : "a new"
+                                            }}
+                                            file</span
+                                        >
+                                        <input
+                                            id="company_photo"
+                                            name="company_photo"
+                                            type="file"
+                                            class="sr-only"
+                                            ref="photoInput"
+                                            @change="updatePhotoPreview"
+                                        />
+                                    </label>
+                                </div>
+                                <p class="text-xs leading-5 text-gray-600">
+                                    PNG or JPG up to 10MB
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -147,15 +263,24 @@ const submit = () => {
                         class="block text-sm font-medium leading-6 text-gray-900"
                         >Email</label
                     >
-                    <div class="mt-2">
+                    <div class="mt-2 flex flex-col gap-1">
                         <input
                             id="email"
-                            name="email"
                             type="email"
-                            autocomplete="email"
+                            name="email"
                             class="input input-bordered w-full max-w-lg"
                             v-model="companyForm.email"
+                            :class="
+                                companyForm.errors.email ? 'border-error' : ''
+                            "
+                            @input="() => companyForm.clearErrors('email')"
                         />
+                        <span
+                            v-if="companyForm.errors.email"
+                            class="text-error"
+                        >
+                            {{ companyForm.errors.email }}
+                        </span>
                     </div>
                 </div>
                 <div class="sm:col-span-4">
@@ -203,6 +328,22 @@ const submit = () => {
                             name="website"
                             class="input input-bordered w-full max-w-lg"
                             v-model="companyForm.website"
+                        />
+                    </div>
+                </div>
+                <div class="sm:col-span-4">
+                    <label
+                        for="img_url"
+                        class="block text-sm font-medium leading-6 text-gray-900"
+                        >Image URL</label
+                    >
+                    <div class="mt-2">
+                        <input
+                            id="img_url"
+                            type="text"
+                            name="img_url"
+                            class="input input-bordered w-full max-w-lg"
+                            v-model="companyForm.img_url"
                         />
                     </div>
                 </div>

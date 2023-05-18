@@ -22,5 +22,6 @@ class Company extends Model
         'website',
         'active',
         'img_url',
+        'img_path'
     ];
 }

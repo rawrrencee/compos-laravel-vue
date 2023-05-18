@@ -12,6 +12,13 @@ use Inertia\Inertia;
 
 class CompanyController extends Controller
 {
+    protected $CommonController;
+
+    public function __construct(CommonController $CommonController)
+    {
+        $this->CommonController = $CommonController;
+    }
+
     public function index(Request $request)
     {
         $request['sortBy'] = $request['sortBy'] ?? 'company_name';
@@ -62,8 +69,14 @@ class CompanyController extends Controller
             'email' => 'nullable|email',
             'website' => 'nullable|url',
             'img_url' => 'nullable|url',
-            'active' => 'required|boolean'
+            'active' => 'required|boolean',
+            'company_photo' => 'nullable|image',
         ]);
+        error_log(json_encode($request));
+        if (isset($request['company_photo'])) {
+            $path = $request->file('company_photo')->store('company-photos', 'private');
+            $request['img_path'] = $path;
+        }
 
         try {
             DB::beginTransaction();
@@ -108,10 +121,15 @@ class CompanyController extends Controller
             'email' => 'nullable|email',
             'website' => 'nullable|url',
             'img_url' => 'nullable|url',
-            'active' => 'required|boolean'
+            'active' => 'required|boolean',
+            'company_photo' => 'nullable|image',
         ]);
 
         $company = Company::find($request['id']);
+        if (isset($request['company_photo'])) {
+            $path = $request->file('company_photo')->store('company-photos', 'private');
+            $request['img_path'] = $path;
+        }
 
         try {
             DB::beginTransaction();
@@ -131,5 +149,37 @@ class CompanyController extends Controller
                 'errorMessage' => 'Failed to update company: ' . $e->getMessage(),
             ]);
         }
+    }
+
+    public function deletePhoto(Request $request)
+    {
+        $company = Company::find($request['id']);
+
+        if (isset($company)) {
+            $isDeleted = $this->CommonController->deletePhoto($request['img_path']);
+            if ($isDeleted) {
+                try {
+                    DB::beginTransaction();
+                    $company->update(['img_path' => null]);
+                    DB::commit();
+
+                    return redirect()->back()
+                        ->with('show', true)
+                        ->with('status', 'success')
+                        ->with('message', 'Company updated successfully.');
+                } catch (\Exception $e) {
+                    DB::rollBack();
+
+                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
+                        'errorMessage' => 'Failed to update company: ' . $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()
+            ->with('show', true)
+            ->with('status', 'error')
+            ->with('message', 'No image was deleted or company was not found.');
     }
 }

@@ -1,5 +1,6 @@
 <script setup>
 import CompaniesWrapper from "@/Pages/Admin/Infrastructure/Companies/CompaniesWrapper.vue";
+import { TransitionRoot } from "@headlessui/vue";
 import { EyeIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
@@ -138,9 +139,18 @@ const resetFilters = (controlName, value) => {
                 :show-filters="showFilters"
                 @button-clicked="onToolbarBtnClicked"
             >
-                <template #filter v-if="showFilters">
-                    <div
-                        class="p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-2"
+                <template #filter>
+                    <TransitionRoot
+                        appear
+                        :show="showFilters"
+                        as="div"
+                        class="mb-4 p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-2"
+                        enter="transition duration-300"
+                        enter-from="opacity-0 -translate-y-4"
+                        enter-to="opacity-100 translate-y-0"
+                        leave="transition duration-300"
+                        leave-from="opacity-100 translate-y-0"
+                        leave-to="opacity-0 -translate-y-4"
                     >
                         <div class="grid gap-2">
                             <label
@@ -195,7 +205,7 @@ const resetFilters = (controlName, value) => {
                                 Apply
                             </button>
                         </div>
-                    </div>
+                    </TransitionRoot>
                 </template>
             </TableToolbar>
             <TableMain>
@@ -301,7 +311,10 @@ const resetFilters = (controlName, value) => {
                             <dl class="font-normal lg:hidden">
                                 <dt class="sr-only">Active</dt>
                                 <dd class="mt-1 truncate text-gray-700">
-                                    {{ company.active }}
+                                    <ColouredBadge
+                                        :data="company.active"
+                                        data-type="boolean"
+                                    />
                                 </dd>
                                 <dt class="sr-only sm:hidden">Created At</dt>
                                 <dd

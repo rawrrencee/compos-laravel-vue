@@ -112,7 +112,7 @@ const pagesArray = computed(() => {
                                     </template>
                                 </select>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 my-2">
+                            <div class="grid grid-cols-2 gap-2 my-2">
                                 <button
                                     type="button"
                                     class="btn btn-sm"

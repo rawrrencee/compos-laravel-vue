@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('mobile_number')->nullable();
             $table->string('website')->nullable();
+            $table->string('img_path')->nullable();
             $table->string('img_url')->nullable();
             $table->tinyInteger('active')->default(0);
             $table->timestamps();
