@@ -126,6 +126,12 @@ class CompanyController extends Controller
         ]);
 
         $company = Company::find($request['id']);
+        if (isset($company['img_path'])) {
+            $isDeleted = $this->CommonController->deletePhoto($company['img_path']);
+            if ($isDeleted) {
+                $request['img_path'] = null;
+            }
+        }
         if (isset($request['company_photo'])) {
             $path = $request->file('company_photo')->store('company-photos', 'private');
             $request['img_path'] = $path;
