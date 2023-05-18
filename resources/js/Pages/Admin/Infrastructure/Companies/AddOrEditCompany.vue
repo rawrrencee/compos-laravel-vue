@@ -349,7 +349,9 @@ const submit = () => {
                 </div>
             </div>
 
-            <div class="py-4 bg-white border-t-2 border-gray-100">
+            <div
+                class="bottom-0 sticky py-4 bg-white border-t-2 border-gray-100"
+            >
                 <div
                     class="grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:items-stretch"
                 >
