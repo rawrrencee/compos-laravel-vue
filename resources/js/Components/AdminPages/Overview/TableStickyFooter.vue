@@ -1,5 +1,5 @@
 <script setup>
-import { PencilIcon, PlusCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, PencilIcon, PlusCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -27,11 +27,16 @@ defineEmits(['buttonClicked']);
         </div>
       </button>
     </div>
-    <Link as="button" :href="route(addNewUrl)" class="btn btn-block" v-else>
-      <div class="flex gap-2 items-center">
-        <PlusCircleIcon class="w-5 h-5" />
-        <span>Add New</span>
-      </div>
-    </Link>
+    <div class="btn-group flex">
+      <Link as="button" :href="route(addNewUrl)" class="btn grow">
+        <div class="flex gap-2 items-center">
+          <PlusCircleIcon class="w-5 h-5" />
+          <span>Add New</span>
+        </div>
+      </Link>
+      <button type="button" class="btn">
+        <EllipsisVerticalIcon class="h-4 w-4" />
+      </button>
+    </div>
   </div>
 </template>

@@ -21,8 +21,8 @@ class CompanyController extends Controller
 
     public function index(Request $request)
     {
-        $request['sortBy'] = $request['sortBy'] ?? 'company_name';
-        $request['orderBy'] = $request['orderBy'] ?? 'asc';
+        $request['sortBy'] = $request['sortBy'] ?? 'created_at';
+        $request['orderBy'] = $request['orderBy'] ?? 'desc';
         $request['perPage'] = $request['perPage'] ?? '10';
 
         $validator = Validator::make($request->all(), [
@@ -56,6 +56,24 @@ class CompanyController extends Controller
         }
 
         return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => ['company_name' => $company_name, 'show_deleted' => $show_deleted]]);
+    }
+
+    public function view(Request $request)
+    {
+        $id = intval($request['id']);
+        if ($id === 0) {
+            return redirect()->route('404');
+        }
+        $company = Company::whereId($id)->first();
+
+        if (!isset($company)) {
+            return Inertia::render('Admin/Infrastructure/Companies/Overview')
+                ->with('show', true)
+                ->with('status', 'error')
+                ->with('message', 'An error occurred.');
+        }
+
+        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['viewCompany' => $company]);
     }
 
     public function store(Request $request)
@@ -131,7 +149,7 @@ class CompanyController extends Controller
                 $request['img_path'] = null;
             }
         }
-        if (isset($request['company_photo'])) {
+        if (!empty($request['company_photo'])) {
             $path = $request->file('company_photo')->store('company-photos', 'private');
             $request['img_path'] = $path;
         }
@@ -162,7 +180,7 @@ class CompanyController extends Controller
 
         if (isset($company)) {
             $isDeleted = $this->CommonController->deletePhoto($request['img_path']);
-            if ($isDeleted) {
+            if ($isDeleted || !$isDeleted && !empty($company->img_path)) {
                 try {
                     DB::beginTransaction();
                     $company->update(['img_path' => null]);
@@ -171,7 +189,7 @@ class CompanyController extends Controller
                     return redirect()->back()
                         ->with('show', true)
                         ->with('status', 'success')
-                        ->with('message', 'Company updated successfully.');
+                        ->with('message', 'Photo removed successfully.');
                 } catch (\Exception $e) {
                     DB::rollBack();
 

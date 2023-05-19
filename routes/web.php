@@ -135,6 +135,10 @@ Route::middleware([
                 Route::get('/edit', [CompanyController::class, 'edit'])->name('admin/infrastructure/companies/edit');
                 Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
 
+                Route::get('/view', function () {
+                    return redirect()->route('admin/infrastructure/companies');
+                });
+                Route::post('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
                 Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
             });
 
@@ -221,3 +225,7 @@ Route::middleware([
         });
     });
 });
+
+// Route::fallback(function () {
+//     return Inertia::render('Error/404');
+// });

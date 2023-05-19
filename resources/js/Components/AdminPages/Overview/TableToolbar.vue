@@ -1,5 +1,5 @@
 <script setup>
-import { FunnelIcon, PencilIcon, PlusCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { EllipsisVerticalIcon, FunnelIcon, PencilIcon, PlusCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -7,6 +7,7 @@ const props = defineProps({
   addNewUrl: String,
   showEditDeleteBtn: Boolean,
   showFilters: Boolean,
+  appliedFilterCount: Number,
 });
 
 defineEmits(['buttonClicked']);
@@ -36,15 +37,22 @@ defineEmits(['buttonClicked']);
       >
         <FunnelIcon class="h-5 w-5" v-if="!showFilters" />
         <XMarkIcon class="h-5 w-5 text-gray-900" v-else />
-        <span :class="showFilters ? 'text-gray-900' : ''">Filter</span>
+        <span :class="showFilters ? 'text-gray-900' : ''"
+          >Filter{{ appliedFilterCount > 0 ? `s (${appliedFilterCount})` : '' }}</span
+        >
       </button>
     </div>
-    <Link as="button" :href="route(addNewUrl)" class="hidden sm:btn">
-      <div class="flex gap-2 items-center">
-        <PlusCircleIcon class="w-5 h-5" />
-        <span>Add New</span>
-      </div>
-    </Link>
+    <div class="hidden sm:btn-group">
+      <Link as="button" :href="route(addNewUrl)" class="btn">
+        <div class="flex gap-2 items-center">
+          <PlusCircleIcon class="w-5 h-5" />
+          <span>Add New</span>
+        </div>
+      </Link>
+      <button type="button" class="btn">
+        <EllipsisVerticalIcon class="h-4 w-4" />
+      </button>
+    </div>
   </div>
   <slot name="filter" />
 </template>

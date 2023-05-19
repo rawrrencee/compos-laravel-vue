@@ -1,7 +1,9 @@
 <script setup>
 import CompaniesWrapper from '@/Pages/Admin/Infrastructure/Companies/CompaniesWrapper.vue';
-import { TransitionRoot } from '@headlessui/vue';
-import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { openInNewWindow } from '@/Util/Common';
+import { getImgSrcFromPath } from '@/Util/Photo';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { EyeIcon, PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import ColouredBadge from '../../../../Components/AdminPages/ColouredBadge.vue';
@@ -25,6 +27,7 @@ const props = defineProps({
   sortBy: String,
   orderBy: String,
   tableFilterOptions: Object,
+  viewCompany: Object | undefined,
 });
 const tableFilterOptions = useForm({
   company_name: props?.tableFilterOptions?.company_name ?? '',
@@ -34,19 +37,28 @@ const moduleUrl = 'admin/infrastructure/companies';
 const addNewUrl = `${moduleUrl}/add`;
 const editUrl = `${moduleUrl}/edit`;
 const tableHeaderTitles = [
-  { id: 'company_name', title: 'Company Name' },
-  { id: 'active', title: 'Active' },
-  { id: 'created_at', title: 'Created At' },
+  { key: 'company_name', title: 'Company Name' },
+  { key: 'active', title: 'Active' },
+  { key: 'created_at', title: 'Created At' },
+];
+const viewCompanyLabels = [
+  { key: 'address_1', title: 'Address Line 1' },
+  { key: 'address_2', title: 'Address Line 2' },
+  { key: 'phone_number', title: 'Phone Number' },
+  { key: 'mobile_number', title: 'Mobile Number' },
+  { key: 'website_url', title: 'Website URL' },
+  { key: 'img_url', title: 'Image URL' },
 ];
 // #endregion Page Variables
 
 // #region Ref variables
+const isViewDialogOpen = ref(false);
+const selectedTableRows = ref([]);
 const showFilters = ref(false);
 const tableSortOptions = ref({
   sortBy: props?.sortBy ?? 'company_name',
   orderBy: props?.orderBy ?? 'asc',
 });
-const selectedTableRows = ref([]);
 // #endregion Ref variables
 
 // #region Computed variables
@@ -54,6 +66,12 @@ const indeterminate = computed(
   () => selectedTableRows.value.length > 0 && selectedTableRows.value.length < props?.paginatedResults?.data.length
 );
 const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
+const appliedFilterCount = computed(() => {
+  let count = 0;
+  if (tableFilterOptions.company_name?.length > 0) count++;
+  if (tableFilterOptions.show_deleted) count++;
+  return count;
+});
 // #endregion Computed variables
 
 // #region Functions
@@ -76,15 +94,15 @@ const onGoToPageClicked = (data) => {
   });
 };
 const onTableHeaderClicked = (title) => {
-  const id = tableHeaderTitles.find((th) => th.title === title)?.id;
+  const key = tableHeaderTitles.find((th) => th.title === title)?.key;
 
   let orderBy = 'asc';
-  if (id === tableSortOptions.value.sortBy && tableSortOptions.value.orderBy === 'asc') {
+  if (key === tableSortOptions.value.sortBy && tableSortOptions.value.orderBy === 'asc') {
     orderBy = 'desc';
   }
 
   tableSortOptions.value = {
-    sortBy: id,
+    sortBy: key,
     orderBy,
   };
   onGoToPageClicked({ page: 1, perPage: props?.paginatedResults?.per_page });
@@ -98,8 +116,7 @@ const onToolbarBtnClicked = (event) => {
       break;
   }
 };
-
-const resetFilters = (controlName, value) => {
+const onResetFiltersClicked = (controlName, value) => {
   if (controlName) {
     tableFilterOptions.defaults(controlName, value);
     tableFilterOptions.reset(controlName);
@@ -111,6 +128,22 @@ const resetFilters = (controlName, value) => {
     tableFilterOptions.reset();
   }
   onGoToPageClicked();
+};
+const onViewDialogCloseClicked = () => {
+  isViewDialogOpen.value = false;
+};
+const onViewItemClicked = (id) => {
+  router.post(
+    route('admin/infrastructure/companies/view'),
+    { id },
+    {
+      only: ['viewCompany'],
+      preserveScroll: true,
+      onSuccess: () => {
+        isViewDialogOpen.value = true;
+      },
+    }
+  );
 };
 // #endregion Functions
 </script>
@@ -124,6 +157,7 @@ const resetFilters = (controlName, value) => {
         :show-edit-delete-btn="showEditDeleteBtn"
         :add-new-url="addNewUrl"
         :show-filters="showFilters"
+        :applied-filter-count="appliedFilterCount"
         @button-clicked="onToolbarBtnClicked"
       >
         <template #filter>
@@ -151,7 +185,7 @@ const resetFilters = (controlName, value) => {
                 <button
                   type="button"
                   class="btn btn-square btn-outline border-gray-300 btn-sm"
-                  @click="() => resetFilters('company_name', '')"
+                  @click="() => onResetFiltersClicked('company_name', '')"
                 >
                   <XMarkIcon class="h-3 w-3" />
                 </button>
@@ -162,7 +196,7 @@ const resetFilters = (controlName, value) => {
               <input type="checkbox" name="show_deleted" class="toggle" v-model="tableFilterOptions.show_deleted" />
             </div>
             <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
-              <button type="button" class="btn btn-sm" @click="() => resetFilters()">Reset</button>
+              <button type="button" class="btn btn-sm" @click="() => onResetFiltersClicked()">Reset</button>
               <button type="button" class="btn btn-sm btn-primary" @click="() => onGoToPageClicked()">Apply</button>
             </div>
           </TransitionRoot>
@@ -183,10 +217,10 @@ const resetFilters = (controlName, value) => {
                 @change="selectedTableRows = $event.target.checked ? paginatedResults?.data.map((c) => c.id) : []"
               />
             </th>
-            <template v-for="(header, i) of tableHeaderTitles" :key="header.id">
+            <template v-for="(header, i) of tableHeaderTitles" :key="header.key">
               <TableSortableHeader
                 :title="header.title"
-                :toggle-sort="tableSortOptions.sortBy === header.id ? tableSortOptions.orderBy : null"
+                :toggle-sort="tableSortOptions.sortBy === header.key ? tableSortOptions.orderBy : null"
                 :class="[
                   i === 0
                     ? 'pr-3 sm:w-96'
@@ -232,12 +266,12 @@ const resetFilters = (controlName, value) => {
                 selectedTableRows.includes(company.id) ? 'text-primary' : 'text-gray-900',
               ]"
             >
-              <a href="#" class="btn btn-link btn-sm pl-0 normal-case">
+              <button type="button" class="btn btn-link btn-sm pl-0 normal-case" @click="onViewItemClicked(company.id)">
                 <div class="flex gap-2 items-center">
                   <span>{{ company.company_name }}</span>
                   <EyeIcon class="h-5 w-5" />
                 </div>
-              </a>
+              </button>
               <dl class="font-normal lg:hidden">
                 <dt class="sr-only">Active</dt>
                 <dd class="mt-1 truncate text-gray-700">
@@ -281,5 +315,120 @@ const resetFilters = (controlName, value) => {
       />
     </div>
     <Error404 :show="!paginatedResults" />
+    <TransitionRoot as="template" :show="isViewDialogOpen">
+      <Dialog as="div" class="relative z-40" @close="() => onViewDialogCloseClicked()">
+        <div class="fixed inset-0" />
+
+        <div class="fixed inset-0 overflow-hidden">
+          <div class="absolute inset-0 overflow-hidden">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+              <TransitionChild
+                as="template"
+                enter="transform transition ease-in-out duration-300"
+                enter-from="translate-x-full"
+                enter-to="translate-x-0"
+                leave="transform transition ease-in-out duration-300"
+                leave-from="translate-x-0"
+                leave-to="translate-x-full"
+              >
+                <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
+                  <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                    <div class="sticky top-0 bg-white px-4 py-6 sm:px-6">
+                      <div class="flex items-start justify-between">
+                        <DialogTitle class="text-base font-semibold leading-6 text-gray-900">View</DialogTitle>
+                        <div class="ml-3 flex h-7 items-center">
+                          <button
+                            type="button"
+                            class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
+                            @click="() => onViewDialogCloseClicked()"
+                          >
+                            <span class="sr-only">Close panel</span>
+                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Main -->
+                    <div class="divide-y divide-gray-200">
+                      <div class="pb-6">
+                        <div class="h-24 bg-primary sm:h-20 lg:h-28" />
+                        <div class="lg:-mt-15 -mt-12 flow-root px-4 sm:-mt-8 sm:flex sm:items-end sm:px-6">
+                          <div>
+                            <div class="-m-1 flex">
+                              <div class="inline-flex overflow-hidden rounded-lg border-4 border-white">
+                                <img
+                                  v-if="viewCompany?.img_url || viewCompany?.img_path"
+                                  :src="
+                                    viewCompany?.img_path
+                                      ? getImgSrcFromPath(viewCompany?.img_path)
+                                      : viewCompany?.img_url
+                                  "
+                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 object-cover"
+                                />
+                                <PhotoIcon
+                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300"
+                                  aria-hidden="true"
+                                  v-else
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mt-6 sm:ml-6 sm:flex-1">
+                            <div>
+                              <div class="flex flex-col items-start gap-1">
+                                <h3 class="text-xl font-bold text-gray-900 sm:text-2xl">
+                                  {{ viewCompany.company_name }}
+                                </h3>
+                                <ColouredBadge :data="viewCompany.active" data-type="boolean" />
+                              </div>
+                            </div>
+                            <div class="mt-5 flex flex-wrap space-y-3 sm:space-x-3 sm:space-y-0">
+                              <Link
+                                :href="route(editUrl, { id: viewCompany.id })"
+                                :replace="true"
+                                as="button"
+                                class="btn btn-sm btn-block btn-primary sm:max-w-[7rem]"
+                              >
+                                Edit
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="px-4 py-5 sm:px-0 sm:py-0">
+                        <dl class="space-y-8 sm:space-y-0 sm:divide-y sm:divide-gray-200">
+                          <template v-for="label in viewCompanyLabels" :key="label.key">
+                            <div class="sm:flex sm:px-6 sm:py-5">
+                              <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0 lg:w-48">
+                                {{ label.title }}
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:ml-6 sm:mt-0">
+                                <template v-if="['img_url', 'website_url'].includes(label.key)">
+                                  <a
+                                    :href="viewCompany[label.key]"
+                                    v-if="viewCompany[label.key]"
+                                    class="link"
+                                    @click.prevent="openInNewWindow(viewCompany[label.key])"
+                                    >{{ viewCompany[label.key] }}</a
+                                  >
+                                  <span v-else>Unavailable</span>
+                                </template>
+                                <template v-else>
+                                  {{ viewCompany[label.key] ?? 'Unavailable' }}
+                                </template>
+                              </dd>
+                            </div>
+                          </template>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </CompaniesWrapper>
 </template>
