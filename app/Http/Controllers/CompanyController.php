@@ -72,7 +72,6 @@ class CompanyController extends Controller
             'active' => 'required|boolean',
             'company_photo' => 'nullable|image',
         ]);
-        error_log(json_encode($request));
         if (isset($request['company_photo'])) {
             $path = $request->file('company_photo')->store('company-photos', 'private');
             $request['img_path'] = $path;
