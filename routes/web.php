@@ -140,6 +140,8 @@ Route::middleware([
                 });
                 Route::post('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
                 Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
+
+                Route::get('/export', [CompanyController::class, 'exportCsv'])->name('admin/infrastructure/companies/export');
             });
 
             Route::get('/stores', function () {

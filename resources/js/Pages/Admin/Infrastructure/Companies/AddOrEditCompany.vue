@@ -171,16 +171,10 @@ const deletePhoto = () => {
 
       <div class="bottom-0 sticky py-4 bg-white border-t-2 border-gray-100">
         <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:items-stretch">
-          <Link
-            type="button"
-            class="btn sm:grow sm:basis-0 sm:flex-1 sm:max-w-[10rem] sm:min-w-fit"
-            :href="route('admin/infrastructure/companies')"
-          >
+          <Link type="button" class="btn sm:grow sm:max-w-[10rem]" :href="route('admin/infrastructure/companies')">
             Cancel
           </Link>
-          <button type="submit" class="btn btn-primary sm:grow sm:basis-0 sm:flex-1 sm:max-w-[10rem] sm:min-w-fit">
-            Save
-          </button>
+          <button type="submit" class="btn btn-primary sm:grow sm:max-w-[10rem]">Save</button>
         </div>
       </div>
     </form>

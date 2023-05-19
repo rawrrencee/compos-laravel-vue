@@ -205,4 +205,57 @@ class CompanyController extends Controller
             ->with('status', 'error')
             ->with('message', 'No image was deleted or company was not found.');
     }
+
+    public function exportCsv(Request $request)
+    {
+        // Define the CSV header
+        $header = [
+            'company_name',
+            'address_1',
+            'address_2',
+            'email',
+            'phone_number',
+            'mobile_number',
+            'website',
+            'img_path',
+            'img_url',
+            'active'
+        ];
+
+        // Open a memory "file" for write
+        $file = fopen('php://memory', 'w');
+
+        // Insert the CSV header
+        fputcsv($file, $header);
+
+        if ($request['with_data']) {
+            // Fetch companies
+            $companies = Company::all();
+
+            // Insert the companies data
+            foreach ($companies as $company) {
+                $row = [
+                    $company->company_name,
+                    $company->address_1,
+                    $company->address_2,
+                    $company->email,
+                    $company->phone_number,
+                    $company->mobile_number,
+                    $company->website,
+                    $company->img_path,
+                    $company->img_url,
+                    $company->active
+                ];
+                fputcsv($file, $row);
+            }
+        }
+
+        // Reset the file pointer to the start of the file
+        fseek($file, 0);
+
+        // Return a CSV file for download
+        return response()->streamDownload(function () use ($file) {
+            fpassthru($file);
+        }, 'companies.csv');
+    }
 }

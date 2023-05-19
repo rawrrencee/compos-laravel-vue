@@ -3,7 +3,7 @@ import CompaniesWrapper from '@/Pages/Admin/Infrastructure/Companies/CompaniesWr
 import { openInNewWindow } from '@/Util/Common';
 import { getImgSrcFromPath } from '@/Util/Photo';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { EyeIcon, PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { ArrowDownCircleIcon, EyeIcon, PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import ColouredBadge from '../../../../Components/AdminPages/ColouredBadge.vue';
@@ -36,6 +36,7 @@ const tableFilterOptions = useForm({
 const moduleUrl = 'admin/infrastructure/companies';
 const addNewUrl = `${moduleUrl}/add`;
 const editUrl = `${moduleUrl}/edit`;
+const exportUrl = `${route('admin/infrastructure/companies/export')}`;
 const tableHeaderTitles = [
   { key: 'company_name', title: 'Company Name' },
   { key: 'active', title: 'Active' },
@@ -52,6 +53,7 @@ const viewCompanyLabels = [
 // #endregion Page Variables
 
 // #region Ref variables
+const isImportDialogOpen = ref(false);
 const isViewDialogOpen = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
@@ -93,6 +95,9 @@ const onGoToPageClicked = (data) => {
     preserveScroll: true,
   });
 };
+const onImportDialogCloseClicked = () => {
+  isImportDialogOpen.value = false;
+};
 const onTableHeaderClicked = (title) => {
   const key = tableHeaderTitles.find((th) => th.title === title)?.key;
 
@@ -111,6 +116,9 @@ const onToolbarBtnClicked = (event) => {
   switch (event.action) {
     case 'filter':
       showFilters.value = !showFilters.value;
+      break;
+    case 'import':
+      isImportDialogOpen.value = true;
       break;
     default:
       break;
@@ -158,6 +166,7 @@ const onViewItemClicked = (id) => {
         :add-new-url="addNewUrl"
         :show-filters="showFilters"
         :applied-filter-count="appliedFilterCount"
+        :export-url="`${exportUrl}?with_data=1`"
         @button-clicked="onToolbarBtnClicked"
       >
         <template #filter>
@@ -311,12 +320,13 @@ const onViewItemClicked = (id) => {
         :selected-items="selectedTableRows"
         :show-edit-delete-btn="showEditDeleteBtn"
         :add-new-url="addNewUrl"
+        :export-url="`${exportUrl}?with_data=1`"
         @button-clicked="onToolbarBtnClicked"
       />
     </div>
     <Error404 :show="!paginatedResults" />
     <TransitionRoot as="template" :show="isViewDialogOpen">
-      <Dialog as="div" class="relative z-40" @close="() => onViewDialogCloseClicked()">
+      <Dialog as="div" class="relative z-40" @close="onViewDialogCloseClicked">
         <div class="fixed inset-0" />
 
         <div class="fixed inset-0 overflow-hidden">
@@ -340,7 +350,7 @@ const onViewItemClicked = (id) => {
                           <button
                             type="button"
                             class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
-                            @click="() => onViewDialogCloseClicked()"
+                            @click="onViewDialogCloseClicked"
                           >
                             <span class="sr-only">Close panel</span>
                             <XMarkIcon class="h-6 w-6" aria-hidden="true" />
@@ -366,7 +376,7 @@ const onViewItemClicked = (id) => {
                                   class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 object-cover"
                                 />
                                 <PhotoIcon
-                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300"
+                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300 bg-white"
                                   aria-hidden="true"
                                   v-else
                                 />
@@ -423,6 +433,88 @@ const onViewItemClicked = (id) => {
                       </div>
                     </div>
                   </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+    <TransitionRoot as="template" :show="isImportDialogOpen">
+      <Dialog as="div" class="relative z-40" @close="onImportDialogCloseClicked">
+        <div class="fixed inset-0" aria-hidden="true" />
+
+        <div class="fixed inset-0 overflow-hidden">
+          <div class="absolute inset-0 overflow-hidden">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+              <TransitionChild
+                as="template"
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enter-from="translate-x-full"
+                enter-to="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leave-from="translate-x-0"
+                leave-to="translate-x-full"
+              >
+                <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
+                  <form class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                    <div class="h-0 flex-1 overflow-y-auto">
+                      <div class="bg-primary px-4 py-6 sm:px-6">
+                        <div class="flex items-center justify-between">
+                          <DialogTitle class="text-base font-semibold leading-6 text-white">Import CSV</DialogTitle>
+                          <div class="ml-3 flex h-7 items-center">
+                            <button
+                              type="button"
+                              class="rounded-md bg-primary text-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                              @click="onImportDialogCloseClicked"
+                            >
+                              <span class="sr-only">Close panel</span>
+                              <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                            </button>
+                          </div>
+                        </div>
+                        <div class="mt-1">
+                          <p class="text-sm text-secondary">
+                            Download the CSV template, fill it up and upload the file to import new data.
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex flex-1 flex-col justify-between">
+                        <div class="divide-y divide-gray-200 px-4 sm:px-6">
+                          <div class="space-y-6 pb-5 pt-6">
+                            <div>
+                              <label for="project-name" class="block text-sm font-medium leading-6 text-gray-900"
+                                >Template</label
+                              >
+                              <div class="mt-2">
+                                <a :href="exportUrl" class="btn btn-sm flex gap-2 w-fit">
+                                  <ArrowDownCircleIcon class="h-4 w-4" />
+                                  <span>Download (.csv)</span>
+                                </a>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label for="import_csv" class="block text-sm font-medium leading-6 text-gray-900"
+                                >File (.csv)</label
+                              >
+                              <input
+                                type="file"
+                                name="import_csv"
+                                class="file-input file-input-sm file-input-bordered w-full max-w-xs mt-2"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:flex sm:flex-shrink-0 gap-2 justify-end px-4 py-4">
+                      <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="onImportDialogCloseClicked">
+                        Cancel
+                      </button>
+                      <button type="button" class="btn btn-primary sm:grow sm:max-w-[10rem]">Import</button>
+                    </div>
+                  </form>
                 </DialogPanel>
               </TransitionChild>
             </div>
