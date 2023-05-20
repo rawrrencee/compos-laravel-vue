@@ -358,7 +358,6 @@ class CompanyController extends Controller
                     'phone_number' => 'nullable|max:255',
                     'mobile_number' => 'nullable|max:255',
                     'website' => 'nullable|url|max:255',
-                    'img_path' => 'nullable|max:255',
                     'img_url' => 'nullable|url|max:255',
                     'active' => 'required|in:0,1',
                 ])->validate();
@@ -366,14 +365,13 @@ class CompanyController extends Controller
                 // Create the company
                 Company::create([
                     'company_name' => $row['company_name'],
-                    'address_1' => $row['address_1'],
-                    'address_2' => $row['address_2'],
-                    'email' => $row['email'],
-                    'phone_number' => $row['phone_number'],
-                    'mobile_number' => $row['mobile_number'],
-                    'website' => $row['website'],
-                    'img_path' => $row['img_path'],
-                    'img_url' => $row['img_url'],
+                    'address_1' => empty($row['address_1']) ? null : $row['address_1'],
+                    'address_2' => empty($row['address_2']) ? null : $row['address_2'],
+                    'email' => empty($row['email']) ? null : $row['email'],
+                    'phone_number' => empty($row['phone_number']) ? null : $row['phone_number'],
+                    'mobile_number' => empty($row['mobile_number']) ? null : $row['mobile_number'],
+                    'website' => empty($row['website']) ? null : $row['website'],
+                    'img_url' => empty($row['img_url']) ? null : $row['img_url'],
                     'active' => $row['active'],
                 ]);
             }
@@ -410,7 +408,6 @@ class CompanyController extends Controller
             'phone_number',
             'mobile_number',
             'website',
-            'img_path',
             'img_url',
             'active'
         ];
@@ -441,7 +438,6 @@ class CompanyController extends Controller
                     $company->phone_number,
                     $company->mobile_number,
                     $company->website,
-                    $company->img_path,
                     $company->img_url,
                     $company->active,
                     $company->created_at,
