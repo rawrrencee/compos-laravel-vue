@@ -25,7 +25,7 @@ const secondaryNavigation = [
       <h2 class="font-semibold text-xl text-gray-900 leading-tight">Companies</h2>
     </template>
 
-    <div class="h-full sm:px-6 lg:px-8">
+    <div class="h-full">
       <slot />
     </div>
   </AdminLayout>

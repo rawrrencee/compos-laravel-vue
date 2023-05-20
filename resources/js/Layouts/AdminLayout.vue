@@ -228,7 +228,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
       </header>
 
       <!-- Page Content -->
-      <AdminAlert />
+      <AdminAlert v-if="$page.props.flash.type === 'default'" :flash="$page.props.flash" />
       <main class="grow">
         <slot />
       </main>

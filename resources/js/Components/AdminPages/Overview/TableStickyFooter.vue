@@ -14,7 +14,7 @@ const props = defineProps({
   selectedItems: Array,
   addNewUrl: String,
   showEditDeleteBtn: Boolean,
-  exportUrl: String,
+  isLoading: Boolean,
 });
 
 defineEmits(['buttonClicked']);
@@ -23,21 +23,31 @@ defineEmits(['buttonClicked']);
 <template>
   <div class="bottom-0 sticky py-4 px-4 sm:hidden z-40">
     <div class="grid grid-cols-2 gap-2" v-if="showEditDeleteBtn">
-      <button type="button" class="btn btn-block btn-primary" @click="$emit('buttonClicked', { action: 'edit' })">
+      <button
+        type="button"
+        class="btn btn-block btn-primary"
+        :class="isLoading ? 'loading' : ''"
+        @click="$emit('buttonClicked', { action: 'edit' })"
+      >
         <div class="flex gap-2 items-center">
           <PencilIcon class="w-5 h-5" />
           <span>Edit ({{ selectedItems.length }})</span>
         </div>
       </button>
-      <button type="button" class="btn btn-block btn-error" @click="$emit('buttonClicked', { action: 'delete' })">
+      <button
+        type="button"
+        class="btn btn-block btn-error"
+        :class="isLoading ? 'loading' : ''"
+        @click="$emit('buttonClicked', { action: 'delete' })"
+      >
         <div class="flex gap-2 items-center">
           <XMarkIcon class="w-5 h-5" />
           <span>Delete ({{ selectedItems.length }})</span>
         </div>
       </button>
     </div>
-    <div class="btn-group flex">
-      <Link as="button" :href="route(addNewUrl)" class="btn grow">
+    <div class="btn-group flex" v-else>
+      <Link as="button" :href="route(addNewUrl)" class="btn grow" :class="isLoading ? 'loading' : ''">
         <div class="flex gap-2 items-center">
           <PlusCircleIcon class="w-5 h-5" />
           <span>Add New</span>
@@ -73,17 +83,18 @@ defineEmits(['buttonClicked']);
                   <span>Import (.csv)</span>
                 </button>
               </MenuItem>
-              <MenuItem v-slot="{ active }" v-if="!!exportUrl">
-                <a
+              <MenuItem v-slot="{ active }">
+                <button
+                  type="button"
                   :class="[
                     active ? 'bg-primary text-white' : 'text-gray-900',
                     'group flex w-full gap-2 items-center rounded-b-md px-3 py-3 text-xs font-semibold uppercase',
                   ]"
-                  :href="exportUrl"
+                  @click="$emit('buttonClicked', { action: 'export' })"
                 >
                   <ArrowDownOnSquareIcon class="h-5 w-5" />
                   <span>Export all (.csv)</span>
-                </a>
+                </button>
               </MenuItem>
             </MenuItems>
           </transition>

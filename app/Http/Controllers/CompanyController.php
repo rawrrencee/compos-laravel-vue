@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class CompanyController extends Controller
@@ -34,7 +35,15 @@ class CompanyController extends Controller
                 'required',
                 Rule::in(['asc', 'desc'])
             ],
-            'perPage' => 'numeric|max:5000',
+            'perPage' => 'numeric|max:2000',
+            'tableFilterOptions.show_deleted' => [
+                'nullable',
+                Rule::in(['only_non_deleted', 'only_deleted', 'both'])
+            ],
+            'tableFilterOptions.show_active' => [
+                'nullable',
+                Rule::in(['only_non_active', 'only_active', 'both'])
+            ]
         ]);
 
         if ($validator->fails()) {
@@ -43,7 +52,6 @@ class CompanyController extends Controller
 
         // Filters
         $company_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['company_name']  ?? null : null;
-        $show_deleted = isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['show_deleted']) ? ($request['tableFilterOptions']['show_deleted'] === 'false' ? false : true) : null;
 
         $companies = Company::query();
         if (!empty($company_name)) {
@@ -51,11 +59,36 @@ class CompanyController extends Controller
                 $q->where('company_name', 'like', '%' . $company_name . '%');
             });
         }
-        if ($show_deleted) {
-            $companies->onlyTrashed();
+
+        if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['show_deleted'])) {
+            switch ($request['tableFilterOptions']['show_deleted']) {
+                case 'only_deleted':
+                    $companies->onlyTrashed();
+                    break;
+                case 'both':
+                    $companies->withTrashed();
+                    break;
+                case 'only_non_deleted':
+                default:
+                    break;
+            }
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => ['company_name' => $company_name, 'show_deleted' => $show_deleted]]);
+        if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['show_active'])) {
+            switch ($request['tableFilterOptions']['show_active']) {
+                case 'only_active':
+                    $companies->where('active', '=', '1');
+                    break;
+                case 'only_non_active':
+                    $companies->where('active', '=', '0');
+                    break;
+                case 'both':
+                default:
+                    break;
+            }
+        }
+
+        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
     }
 
     public function view(Request $request)
@@ -64,11 +97,12 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::whereId($id)->first();
+        $company = Company::withTrashed()->where('id', '=', $id)->first();
 
         if (!isset($company)) {
             return Inertia::render('Admin/Infrastructure/Companies/Overview')
                 ->with('show', true)
+                ->with('type', 'default')
                 ->with('status', 'error')
                 ->with('message', 'An error occurred.');
         }
@@ -90,7 +124,8 @@ class CompanyController extends Controller
             'active' => 'required|boolean',
             'company_photo' => 'nullable|image',
         ]);
-        if (isset($request['company_photo'])) {
+
+        if (!empty($request['company_photo'])) {
             $path = $request->file('company_photo')->store('company-photos', 'private');
             $request['img_path'] = $path;
         }
@@ -102,6 +137,7 @@ class CompanyController extends Controller
 
             return redirect()->route('admin/infrastructure/companies')
                 ->with('show', true)
+                ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Company created successfully.')
                 ->with('route', 'admin/infrastructure/companies/edit')
@@ -110,7 +146,7 @@ class CompanyController extends Controller
             DB::rollBack();
 
             return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
-                'errorMessage' => 'Failed to create company: ' . $e->getMessage(),
+                'errorMessage' => 'Failed to create record: ' . $e->getMessage(),
             ]);
         }
     }
@@ -161,6 +197,7 @@ class CompanyController extends Controller
 
             return redirect()->route('admin/infrastructure/companies')
                 ->with('show', true)
+                ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Company updated successfully.')
                 ->with('route', 'admin/infrastructure/companies/edit')
@@ -168,9 +205,67 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
-                'errorMessage' => 'Failed to update company: ' . $e->getMessage(),
-            ]);
+            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'success')
+                ->with('message', 'Failed to update record: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkUpdate(Request $request)
+    {
+        try {
+            // Extract companies data from the request
+            $companies = $request->all();
+
+            // Start a DB transaction
+            DB::beginTransaction();
+
+            // Loop through each company data
+            foreach ($companies as $companyData) {
+                // Validate the data
+                $validator = Validator::make($companyData, [
+                    'id' => 'required|exists:companies,id',
+                    'company_name' => 'required|max:255',
+                    'address_1' => 'nullable|max:255',
+                    'address_2' => 'nullable|max:255',
+                    'phone_number' => 'nullable|max:255',
+                    'mobile_number' => 'nullable|max:255',
+                    'email' => 'nullable|email',
+                    'website' => 'nullable|url',
+                    'img_url' => 'nullable|url',
+                    'active' => 'required|boolean',
+                ]);
+
+                // If validation fails, stop and return error
+                if ($validator->fails()) {
+                    throw new ValidationException($validator);
+                }
+
+                // If validation passes, locate the company and update
+                $company = Company::find($companyData['id']);
+                $company->update($companyData);
+            }
+
+            // If all updates are successful, commit the transaction
+            DB::commit();
+
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'success')
+                ->with('message', count($companies) . ' companies bulk edited successfully.');
+        } catch (\Exception $e) {
+            // If anything goes wrong, rollback the transaction
+            DB::rollback();
+
+            // Then return the error
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'dialog')
+                ->with('status', 'error')
+                ->with('message', 'Failed to bulk edit records: ' . $e->getMessage());
         }
     }
 
@@ -188,23 +283,112 @@ class CompanyController extends Controller
 
                     return redirect()->back()
                         ->with('show', true)
+                        ->with('type', 'default')
                         ->with('status', 'success')
                         ->with('message', 'Photo removed successfully.');
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
-                        'errorMessage' => 'Failed to update company: ' . $e->getMessage(),
-                    ]);
+                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+                        ->with('show', true)
+                        ->with('type', 'default')
+                        ->with('status', 'success')
+                        ->with('message', 'Failed to update record: ' . $e->getMessage());
                 }
             }
         }
 
         return redirect()->back()
             ->with('show', true)
+            ->with('type', 'default')
             ->with('status', 'error')
             ->with('message', 'No image was deleted or company was not found.');
     }
+
+    public function importCsv(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'import_file' => 'required|mimes:csv,txt'
+        ]);
+
+        // Read the CSV file
+        $path = $request->file('import_file')->getRealPath();
+        $file = fopen($path, 'r');
+
+        // Get the header row
+        $header = fgetcsv($file);
+
+        // Read the rest of the data
+        $data = [];
+        while (($row = fgetcsv($file)) !== false) {
+            $data[] = array_combine($header, $row);
+        }
+
+        fclose($file);
+
+        if (count($data) == 0) {
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'dialog')
+                ->with('status', 'error')
+                ->with('message', 'Unable to import data as none was provided.');
+        }
+
+        // Begin a database transaction
+        DB::beginTransaction();
+
+        try {
+            foreach ($data as $row) {
+                // Validate the row
+                Validator::make($row, [
+                    'company_name' => 'required|max:255',
+                    'address_1' => 'nullable|max:255',
+                    'address_2' => 'nullable|max:255',
+                    'email' => 'nullable|email|max:255',
+                    'phone_number' => 'nullable|max:255',
+                    'mobile_number' => 'nullable|max:255',
+                    'website' => 'nullable|url|max:255',
+                    'img_path' => 'nullable|max:255',
+                    'img_url' => 'nullable|url|max:255',
+                    'active' => 'required|in:0,1',
+                ])->validate();
+
+                // Create the company
+                Company::create([
+                    'company_name' => $row['company_name'],
+                    'address_1' => $row['address_1'],
+                    'address_2' => $row['address_2'],
+                    'email' => $row['email'],
+                    'phone_number' => $row['phone_number'],
+                    'mobile_number' => $row['mobile_number'],
+                    'website' => $row['website'],
+                    'img_path' => $row['img_path'],
+                    'img_url' => $row['img_url'],
+                    'active' => $row['active'],
+                ]);
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'dialog')
+                ->with('status', 'success')
+                ->with('message', count($data) . ' companies imported successfully.');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of errors
+            DB::rollBack();
+
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'dialog')
+                ->with('status', 'error')
+                ->with('message', 'Failed to update record: ' . $e->getMessage());
+        }
+    }
+
 
     public function exportCsv(Request $request)
     {
@@ -222,6 +406,11 @@ class CompanyController extends Controller
             'active'
         ];
 
+        if ($request['with_data']) {
+            array_unshift($header, 'id');
+            array_push($header, 'created_at', 'updated_at', 'deleted_at');
+        }
+
         // Open a memory "file" for write
         $file = fopen('php://memory', 'w');
 
@@ -230,11 +419,12 @@ class CompanyController extends Controller
 
         if ($request['with_data']) {
             // Fetch companies
-            $companies = Company::all();
+            $companies = Company::withTrashed()->get();
 
             // Insert the companies data
             foreach ($companies as $company) {
                 $row = [
+                    $company->id,
                     $company->company_name,
                     $company->address_1,
                     $company->address_2,
@@ -244,7 +434,10 @@ class CompanyController extends Controller
                     $company->website,
                     $company->img_path,
                     $company->img_url,
-                    $company->active
+                    $company->active,
+                    $company->created_at,
+                    $company->updated_at,
+                    $company->deleted_at,
                 ];
                 fputcsv($file, $row);
             }
@@ -257,5 +450,42 @@ class CompanyController extends Controller
         return response()->streamDownload(function () use ($file) {
             fpassthru($file);
         }, 'companies.csv');
+    }
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:companies,id',
+        ]);
+
+        // Retrieve the ids
+        $ids = $request->get('ids');
+
+        DB::beginTransaction();
+
+        try {
+            // Delete the records
+            $deletedCount = Company::destroy($ids);
+
+            DB::commit();
+
+            $context = 'companies';
+            if ($deletedCount == 1) $context = 'company';
+
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'success')
+                ->with('message', $deletedCount . ' ' . $context . ' deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'error')
+                ->with('message', 'Failed to delete record: ' . $e->getMessage());
+        }
     }
 }

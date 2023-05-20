@@ -2,10 +2,28 @@
 import CompaniesWrapper from '@/Pages/Admin/Infrastructure/Companies/CompaniesWrapper.vue';
 import { openInNewWindow } from '@/Util/Common';
 import { getImgSrcFromPath } from '@/Util/Photo';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { ArrowDownCircleIcon, EyeIcon, PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  TransitionChild,
+  TransitionRoot,
+} from '@headlessui/vue';
+import {
+  ArrowDownCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EyeIcon,
+  PhotoIcon,
+  XMarkIcon,
+} from '@heroicons/vue/24/outline';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
+import { computed, ref, watch } from 'vue';
+import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
 import ColouredBadge from '../../../../Components/AdminPages/ColouredBadge.vue';
 import Error404 from '../../../../Components/AdminPages/Error404.vue';
 import NoResults from '../../../../Components/AdminPages/NoResults.vue';
@@ -31,7 +49,11 @@ const props = defineProps({
 });
 const tableFilterOptions = useForm({
   company_name: props?.tableFilterOptions?.company_name ?? '',
-  show_deleted: props?.tableFilterOptions?.show_deleted === null ? false : !!props?.tableFilterOptions?.show_deleted,
+  show_deleted: props?.tableFilterOptions?.show_deleted ?? 'only_non_deleted',
+  show_active: props?.tableFilterOptions?.show_active ?? 'both',
+});
+const importForm = useForm({
+  import_file: null,
 });
 const moduleUrl = 'admin/infrastructure/companies';
 const addNewUrl = `${moduleUrl}/add`;
@@ -50,10 +72,24 @@ const viewCompanyLabels = [
   { key: 'website_url', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
 ];
+const inputFields = [
+  { key: 'company_name', title: 'Company Name' },
+  { key: 'active', title: 'Active' },
+  { key: 'address_1', title: 'Address Line 1' },
+  { key: 'address_2', title: 'Address Line 2' },
+  { key: 'phone_number', title: 'Phone Number' },
+  { key: 'mobile_number', title: 'Mobile Number' },
+  { key: 'website', title: 'Website URL' },
+  { key: 'img_url', title: 'Image URL' },
+];
 // #endregion Page Variables
 
 // #region Ref variables
+const isEditDialogOpen = ref(false);
+const editCompanyForms = ref([]);
+const editBulkActive = ref(false);
 const isImportDialogOpen = ref(false);
+const isLoading = ref(false);
 const isViewDialogOpen = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
@@ -71,12 +107,72 @@ const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
 const appliedFilterCount = computed(() => {
   let count = 0;
   if (tableFilterOptions.company_name?.length > 0) count++;
-  if (tableFilterOptions.show_deleted) count++;
+  if (tableFilterOptions.show_deleted !== 'only_non_deleted') count++;
+  if (tableFilterOptions.show_active !== 'both') count++;
   return count;
 });
 // #endregion Computed variables
 
 // #region Functions
+const onBulkEditSaveClicked = () => {
+  const bulkEditForm = useForm({ companies: [] });
+  bulkEditForm
+    .transform(() =>
+      editCompanyForms.value.map((company) => ({
+        id: company.id,
+        company_name: company.company_name ?? '',
+        active: !company.active ? false : true,
+        address_1: company.address_1 ?? '',
+        address_2: company.address_2 ?? '',
+        email: company.email ?? '',
+        phone_number: company.phone_number ?? '',
+        mobile_number: company.mobile_number ?? '',
+        website: company.website ?? '',
+        img_url: company.img_url ?? '',
+      }))
+    )
+    .post(route('admin/infrastructure/companies/edit.bulk'), {
+      onStart: () => (isLoading.value = true),
+      onFinish: () => {
+        isLoading.value = false;
+        onEditDialogCloseClicked(false);
+      },
+    });
+};
+const onDeleteRowsClicked = (rows) => {
+  router.post(
+    route('admin/infrastructure/companies/delete'),
+    { ids: rows },
+    {
+      onStart: () => (isLoading.value = true),
+      onFinish: () => {
+        isLoading.value = false;
+        selectedTableRows.value = [];
+      },
+    }
+  );
+};
+const onDownloadFileClicked = (url, data) => {
+  axios({
+    url,
+    method: 'POST',
+    responseType: 'blob',
+    data,
+  }).then((response) => {
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'companies.csv');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+};
+const onEditDialogCloseClicked = (shouldHideAlert = true) => {
+  isEditDialogOpen.value = false;
+  editCompanyForms.value = [];
+  if (shouldHideAlert) usePage().props.flash.show = null;
+};
 const onGoToPageClicked = (data) => {
   router.visit(props?.paginatedResults?.path, {
     data: {
@@ -88,6 +184,7 @@ const onGoToPageClicked = (data) => {
       tableFilterOptions: {
         company_name: !!tableFilterOptions?.company_name ? tableFilterOptions.company_name : undefined,
         show_deleted: tableFilterOptions.show_deleted,
+        show_active: tableFilterOptions.show_active,
       },
     },
     only: ['paginatedResults', 'sortBy', 'orderBy', 'tableFilterOptions'],
@@ -97,6 +194,16 @@ const onGoToPageClicked = (data) => {
 };
 const onImportDialogCloseClicked = () => {
   isImportDialogOpen.value = false;
+  usePage().props.flash.show = null;
+};
+const onImportFileAdded = (event) => {
+  importForm.import_file = event.target.files[0];
+};
+const onImportFileSaveClicked = () => {
+  importForm.post(route('admin/infrastructure/companies/import'), {
+    onStart: () => (isLoading.value = true),
+    onFinish: () => (isLoading.value = false),
+  });
 };
 const onTableHeaderClicked = (title) => {
   const key = tableHeaderTitles.find((th) => th.title === title)?.key;
@@ -114,11 +221,45 @@ const onTableHeaderClicked = (title) => {
 };
 const onToolbarBtnClicked = (event) => {
   switch (event.action) {
+    case 'delete':
+      if (
+        confirm(
+          `Are you sure you want to delete ${selectedTableRows.value.length} record${
+            selectedTableRows.value.length === 1 ? '' : 's'
+          }?`
+        )
+      ) {
+        onDeleteRowsClicked(selectedTableRows.value);
+      }
+      break;
+    case 'edit':
+      editCompanyForms.value = selectedTableRows.value.map((r) => {
+        const company = props.paginatedResults.data.find((d) => d.id === r);
+        return useForm({
+          id: company.id,
+          company_name: company.company_name ?? '',
+          active: !company.active ? false : true,
+          address_1: company.address_1 ?? '',
+          address_2: company.address_2 ?? '',
+          email: company.email ?? '',
+          phone_number: company.phone_number ?? '',
+          mobile_number: company.mobile_number ?? '',
+          website: company.website ?? '',
+          img_url: company.img_url ?? '',
+        });
+      });
+      isEditDialogOpen.value = true;
+      break;
     case 'filter':
       showFilters.value = !showFilters.value;
       break;
     case 'import':
       isImportDialogOpen.value = true;
+      break;
+    case 'export':
+      if (confirm('This action may take a long time depending on the amount of data. Do not close the browser.')) {
+        onDownloadFileClicked(exportUrl, { with_data: true });
+      }
       break;
     default:
       break;
@@ -154,19 +295,25 @@ const onViewItemClicked = (id) => {
   );
 };
 // #endregion Functions
+
+// #region Watchers
+watch(editBulkActive, (val) => {
+  editCompanyForms.value.forEach((companyForm) => (companyForm.active = val));
+});
+// #endregion Watchers
 </script>
 
 <template>
   <CompaniesWrapper>
     <Head title="Overview" />
-    <div class="h-full flex flex-col" v-if="paginatedResults?.data.length >= 0">
+    <div class="h-full flex flex-col sm:px-6 lg:px-8" v-if="paginatedResults?.data.length >= 0">
       <TableToolbar
         :selected-items="selectedTableRows"
         :show-edit-delete-btn="showEditDeleteBtn"
         :add-new-url="addNewUrl"
         :show-filters="showFilters"
         :applied-filter-count="appliedFilterCount"
-        :export-url="`${exportUrl}?with_data=1`"
+        :is-loading="isLoading"
         @button-clicked="onToolbarBtnClicked"
       >
         <template #filter>
@@ -174,7 +321,6 @@ const onViewItemClicked = (id) => {
             appear
             :show="showFilters"
             as="div"
-            class="mb-4 p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-2"
             enter="transition duration-300"
             enter-from="opacity-0 -translate-y-4"
             enter-to="opacity-100 translate-y-0"
@@ -182,32 +328,53 @@ const onViewItemClicked = (id) => {
             leave-from="opacity-100 translate-y-0"
             leave-to="opacity-0 -translate-y-4"
           >
-            <div class="grid gap-2">
-              <label for="company_name" class="block text-sm font-medium leading-6 text-gray-900">Company Name</label>
-              <div class="input-group">
-                <input
-                  type="text"
-                  name="company_name"
-                  class="input input-bordered input-sm w-full"
-                  v-model="tableFilterOptions.company_name"
-                />
-                <button
-                  type="button"
-                  class="btn btn-square btn-outline border-gray-300 btn-sm"
-                  @click="() => onResetFiltersClicked('company_name', '')"
-                >
-                  <XMarkIcon class="h-3 w-3" />
-                </button>
+            <form
+              class="mb-4 p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-3"
+              @submit.prevent="onGoToPageClicked"
+            >
+              <div class="grid gap-2">
+                <label for="company_name" class="block text-sm font-medium leading-6 text-gray-900">Company Name</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    name="company_name"
+                    class="input input-bordered input-sm w-full"
+                    v-model="tableFilterOptions.company_name"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-square btn-outline border-gray-300 btn-sm"
+                    @click="onResetFiltersClicked('company_name', '')"
+                  >
+                    <XMarkIcon class="h-3 w-3" />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="grid gap-2">
-              <label for="show_deleted" class="block text-sm font-medium leading-6 text-gray-900">Show Deleted</label>
-              <input type="checkbox" name="show_deleted" class="toggle" v-model="tableFilterOptions.show_deleted" />
-            </div>
-            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
-              <button type="button" class="btn btn-sm" @click="() => onResetFiltersClicked()">Reset</button>
-              <button type="button" class="btn btn-sm btn-primary" @click="() => onGoToPageClicked()">Apply</button>
-            </div>
+              <div class="grid gap-2">
+                <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900"
+                  >Show Deleted Items</label
+                >
+                <select class="select select-bordered select-sm w-full" v-model="tableFilterOptions.show_deleted">
+                  <option value="only_non_deleted">Only non-deleted</option>
+                  <option value="only_deleted">Only deleted</option>
+                  <option value="both">Both deleted and non-deleted</option>
+                </select>
+              </div>
+              <div class="grid gap-2">
+                <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900"
+                  >Show Active Items</label
+                >
+                <select class="select select-bordered select-sm w-full" v-model="tableFilterOptions.show_active">
+                  <option value="only_active">Only active</option>
+                  <option value="only_non_active">Only non-active</option>
+                  <option value="both">Both active and non-active</option>
+                </select>
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <button type="button" class="btn btn-sm" @click="onResetFiltersClicked">Reset</button>
+                <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+              </div>
+            </form>
           </TransitionRoot>
         </template>
       </TableToolbar>
@@ -223,7 +390,11 @@ const onViewItemClicked = (id) => {
                   (selectedTableRows.length > 0 && selectedTableRows.length === paginatedResults?.data.length)
                 "
                 :indeterminate="indeterminate"
-                @change="selectedTableRows = $event.target.checked ? paginatedResults?.data.map((c) => c.id) : []"
+                @change="
+                  selectedTableRows = $event.target.checked
+                    ? paginatedResults?.data.filter((c) => !c.deleted_at).map((c) => c.id)
+                    : []
+                "
               />
             </th>
             <template v-for="(header, i) of tableHeaderTitles" :key="header.key">
@@ -255,7 +426,11 @@ const onViewItemClicked = (id) => {
           <tr
             v-for="company in paginatedResults?.data"
             :key="company.id"
-            :class="[selectedTableRows.includes(company.id) && 'bg-gray-50']"
+            :class="[
+              selectedTableRows.includes(company.id) && 'bg-gray-50',
+              !!company.deleted_at && 'bg-red-50 hover:bg-red-100',
+              'hover:bg-gray-50',
+            ]"
           >
             <td class="relative px-7 w-4 sm:w-12 sm:px-6">
               <div
@@ -266,24 +441,31 @@ const onViewItemClicked = (id) => {
                 type="checkbox"
                 class="checkbox absolute left-4 top-1/2 -mt-2 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
                 :value="company.id"
+                :disabled="!!company.deleted_at"
                 v-model="selectedTableRows"
               />
             </td>
             <td
               :class="[
-                'whitespace-nowrap py-4 pr-3 text-sm font-medium',
+                'py-4 pr-3 text-sm font-medium',
                 selectedTableRows.includes(company.id) ? 'text-primary' : 'text-gray-900',
               ]"
             >
-              <button type="button" class="btn btn-link btn-sm pl-0 normal-case" @click="onViewItemClicked(company.id)">
+              <button
+                type="button"
+                class="link text-primary font-semibold text-left"
+                @click="onViewItemClicked(company.id)"
+              >
                 <div class="flex gap-2 items-center">
-                  <span>{{ company.company_name }}</span>
-                  <EyeIcon class="h-5 w-5" />
+                  <span :class="company.company_name?.length > 50 ? 'break-all' : 'break-words'">{{
+                    company.company_name
+                  }}</span>
+                  <EyeIcon class="h-5 w-5 flex-shrink-0" />
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
                 <dt class="sr-only">Active</dt>
-                <dd class="mt-1 truncate text-gray-700">
+                <dd class="mt-2 truncate text-gray-700">
                   <ColouredBadge :data="company.active" data-type="boolean" />
                 </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
@@ -320,7 +502,7 @@ const onViewItemClicked = (id) => {
         :selected-items="selectedTableRows"
         :show-edit-delete-btn="showEditDeleteBtn"
         :add-new-url="addNewUrl"
-        :export-url="`${exportUrl}?with_data=1`"
+        :is-loading="isLoading"
         @button-clicked="onToolbarBtnClicked"
       />
     </div>
@@ -349,7 +531,7 @@ const onViewItemClicked = (id) => {
                         <div class="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
+                            class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-primary"
                             @click="onViewDialogCloseClicked"
                           >
                             <span class="sr-only">Close panel</span>
@@ -457,7 +639,10 @@ const onViewItemClicked = (id) => {
                 leave-to="translate-x-full"
               >
                 <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
-                  <form class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <form
+                    class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                    @submit.prevent="onImportFileSaveClicked"
+                  >
                     <div class="h-0 flex-1 overflow-y-auto">
                       <div class="bg-primary px-4 py-6 sm:px-6">
                         <div class="flex items-center justify-between">
@@ -479,30 +664,47 @@ const onViewItemClicked = (id) => {
                           </p>
                         </div>
                       </div>
+                      <AdminAlert v-if="$page.props.flash.type === 'dialog'" :flash="$page.props.flash" />
                       <div class="flex flex-1 flex-col justify-between">
                         <div class="divide-y divide-gray-200 px-4 sm:px-6">
                           <div class="space-y-6 pb-5 pt-6">
+                            <div class="flex flex-col text-sm">
+                              <span class="font-medium leading-6 text-gray-900">Note</span>
+                              <span class="mt-2">Please leave blanks for data that is empty.</span>
+                              <span>Use 1 or 0 for true or false.</span>
+                              <span>Do not use NULL or NA to represent empty values.</span>
+                            </div>
                             <div>
                               <label for="project-name" class="block text-sm font-medium leading-6 text-gray-900"
                                 >Template</label
                               >
                               <div class="mt-2">
-                                <a :href="exportUrl" class="btn btn-sm flex gap-2 w-fit">
+                                <button
+                                  type="button"
+                                  class="btn btn-sm flex gap-2"
+                                  @click="onDownloadFileClicked(exportUrl)"
+                                >
                                   <ArrowDownCircleIcon class="h-4 w-4" />
                                   <span>Download (.csv)</span>
-                                </a>
+                                </button>
                               </div>
                             </div>
 
-                            <div>
+                            <div class="flex flex-col gap-2">
                               <label for="import_csv" class="block text-sm font-medium leading-6 text-gray-900"
                                 >File (.csv)</label
                               >
                               <input
                                 type="file"
                                 name="import_csv"
-                                class="file-input file-input-sm file-input-bordered w-full max-w-xs mt-2"
+                                accept=".csv, .txt"
+                                class="file-input file-input-sm file-input-bordered w-full max-w-xs"
+                                :class="importForm.errors.import_file ? 'file-input-error' : ''"
+                                @change="onImportFileAdded"
                               />
+                              <span class="text-error" v-if="importForm.errors.import_file">{{
+                                importForm.errors.import_file
+                              }}</span>
                             </div>
                           </div>
                         </div>
@@ -512,7 +714,155 @@ const onViewItemClicked = (id) => {
                       <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="onImportDialogCloseClicked">
                         Cancel
                       </button>
-                      <button type="button" class="btn btn-primary sm:grow sm:max-w-[10rem]">Import</button>
+                      <button
+                        type="submit"
+                        class="btn btn-primary sm:grow sm:max-w-[10rem]"
+                        :class="isLoading ? 'loading' : ''"
+                      >
+                        Import
+                      </button>
+                    </div>
+                  </form>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+    <TransitionRoot as="template" :show="isEditDialogOpen">
+      <Dialog as="div" class="relative z-40" @close="onEditDialogCloseClicked">
+        <div class="fixed inset-0" aria-hidden="true" />
+
+        <div class="fixed inset-0 overflow-hidden">
+          <div class="absolute inset-0 overflow-hidden">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+              <TransitionChild
+                as="template"
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enter-from="translate-x-full"
+                enter-to="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leave-from="translate-x-0"
+                leave-to="translate-x-full"
+              >
+                <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
+                  <form
+                    class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                    @submit.prevent="onBulkEditSaveClicked"
+                  >
+                    <div class="h-0 flex-1 overflow-y-auto">
+                      <div class="bg-primary px-4 py-6 sm:px-6">
+                        <div class="flex items-center justify-between">
+                          <DialogTitle class="text-base font-semibold leading-6 text-white"
+                            >Bulk Edit ({{ selectedTableRows.length }})</DialogTitle
+                          >
+                          <div class="ml-3 flex h-7 items-center">
+                            <button
+                              type="button"
+                              class="rounded-md bg-primary text-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                              @click="onEditDialogCloseClicked"
+                            >
+                              <span class="sr-only">Close panel</span>
+                              <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                            </button>
+                          </div>
+                        </div>
+                        <div class="mt-1">
+                          <p class="text-sm text-secondary">
+                            Note: Only some fields are made available for bulk editing.
+                          </p>
+                        </div>
+                      </div>
+                      <AdminAlert v-if="$page.props.flash.type === 'dialog'" :flash="$page.props.flash" />
+                      <div class="flex flex-1 flex-col justify-between py-6">
+                        <div class="grid grid-cols-1 px-4 gap-2 pb-6">
+                          <span class="font-semibold leading-6 text-gray-900">Bulk update</span>
+                          <div class="flex items-center gap-2">
+                            <label for="bulk_active" class="block text-sm font-medium leading-6 text-gray-900"
+                              >Active</label
+                            >
+                            <input
+                              type="checkbox"
+                              name="bulk_active"
+                              class="toggle toggle-primary"
+                              v-model="editBulkActive"
+                            />
+                          </div>
+                        </div>
+                        <Disclosure
+                          as="div"
+                          v-for="companyForm in editCompanyForms"
+                          :key="companyForm.id"
+                          v-slot="{ open }"
+                          :default-open="true"
+                        >
+                          <DisclosureButton
+                            class="sticky top-0 bg-gray-500 text-white p-4 font-semibold w-full flex justify-between border-t-2 border-t-gray-400"
+                          >
+                            <span>Editing ID {{ companyForm.id }}: {{ companyForm.company_name }}</span>
+                            <ChevronUpIcon v-if="open" class="h-4 w-4" />
+                            <ChevronDownIcon v-else class="h-4 w-4" />
+                          </DisclosureButton>
+                          <transition
+                            enter-active-class="transition duration-150"
+                            enter-from-class="opacity-0 -translate-y-2"
+                            enter-to-class="opacity-100 translate-y-0"
+                            leave-active-class="transition duration-150"
+                            leave-from-class="opacity-100 translate-y-0"
+                            leave-to-class="opacity-0 -translate-y-2"
+                          >
+                            <DisclosurePanel class="p-4 grid grid-cols-1 gap-y-4">
+                              <template v-for="input in inputFields" :key="input.key">
+                                <div v-if="input.key === 'active'">
+                                  <label for="active" class="block text-sm font-medium leading-6 text-gray-900"
+                                    >Active</label
+                                  >
+                                  <div class="mt-2">
+                                    <input
+                                      type="checkbox"
+                                      name="active"
+                                      class="toggle toggle-primary toggle-sm"
+                                      v-model="companyForm.active"
+                                    />
+                                  </div>
+                                </div>
+                                <div v-else>
+                                  <label :for="input.key" class="block text-sm font-medium leading-6 text-gray-900">{{
+                                    input.title
+                                  }}</label>
+                                  <div class="mt-2 flex flex-col gap-1">
+                                    <input
+                                      type="text"
+                                      :id="input.key"
+                                      :name="input.key"
+                                      class="input input-bordered input-sm w-full"
+                                      v-model="companyForm[input.key]"
+                                      :class="companyForm.errors[input.key] ? 'border-error' : ''"
+                                      @input="() => companyForm.clearErrors([input.key])"
+                                    />
+                                    <span v-if="companyForm.errors[input.key]" class="text-error">
+                                      {{ companyForm.errors[input.key] }}
+                                    </span>
+                                  </div>
+                                </div>
+                              </template>
+                            </DisclosurePanel>
+                          </transition>
+                        </Disclosure>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:flex sm:flex-shrink-0 gap-2 justify-end px-4 py-4">
+                      <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="onEditDialogCloseClicked">
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        class="btn btn-primary sm:grow sm:max-w-[10rem]"
+                        :class="isLoading ? 'loading' : ''"
+                      >
+                        Save
+                      </button>
                     </div>
                   </form>
                 </DialogPanel>

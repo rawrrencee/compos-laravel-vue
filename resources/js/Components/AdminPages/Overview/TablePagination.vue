@@ -60,7 +60,7 @@ const pagesArray = computed(() => {
               </div>
               <div class="flex flex-col gap-2">
                 <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900">Items per page</label>
-                <select class="select select-sm select-bordered w-full" v-model="perPage">
+                <select name="per_page" class="select select-sm select-bordered w-full" v-model="perPage">
                   <template
                     v-for="selectOption in ['10', '20', '50', '100', '200', '500', '1000', '2000']"
                     :key="selectOption"
@@ -94,7 +94,7 @@ const pagesArray = computed(() => {
         </PopoverPanel>
       </transition>
     </Popover>
-    <div class="flex items-center justify-center sm:justify-end gap-2">
+    <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2">
       <button
         :disabled="paginatedResults?.current_page === 1"
         @click="$emit('onGoToPageClicked', { page: 1, perPage })"
