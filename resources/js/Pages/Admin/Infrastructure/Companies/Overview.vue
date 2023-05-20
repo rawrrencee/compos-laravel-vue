@@ -513,7 +513,7 @@ watch(editBulkActive, (val) => {
 
         <div class="fixed inset-0 overflow-hidden">
           <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <TransitionChild
                 as="template"
                 enter="transform transition ease-in-out duration-300"
@@ -599,7 +599,7 @@ watch(editBulkActive, (val) => {
                                   <a
                                     :href="viewCompany[label.key]"
                                     v-if="viewCompany[label.key]"
-                                    class="link"
+                                    class="link break-all"
                                     @click.prevent="openInNewWindow(viewCompany[label.key])"
                                     >{{ viewCompany[label.key] }}</a
                                   >
@@ -628,7 +628,7 @@ watch(editBulkActive, (val) => {
 
         <div class="fixed inset-0 overflow-hidden">
           <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <TransitionChild
                 as="template"
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -736,7 +736,7 @@ watch(editBulkActive, (val) => {
 
         <div class="fixed inset-0 overflow-hidden">
           <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <TransitionChild
                 as="template"
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
