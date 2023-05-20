@@ -69,7 +69,7 @@ const viewCompanyLabels = [
   { key: 'address_2', title: 'Address Line 2' },
   { key: 'phone_number', title: 'Phone Number' },
   { key: 'mobile_number', title: 'Mobile Number' },
-  { key: 'website_url', title: 'Website URL' },
+  { key: 'website', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
 ];
 const inputFields = [
@@ -272,7 +272,8 @@ const onResetFiltersClicked = (controlName, value) => {
   } else {
     tableFilterOptions.defaults({
       company_name: '',
-      show_deleted: false,
+      show_deleted: 'only_non_deleted',
+      show_active: 'both',
     });
     tableFilterOptions.reset();
   }
@@ -595,7 +596,7 @@ watch(editBulkActive, (val) => {
                                 {{ label.title }}
                               </dt>
                               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:ml-6 sm:mt-0">
-                                <template v-if="['img_url', 'website_url'].includes(label.key)">
+                                <template v-if="['img_url', 'website'].includes(label.key)">
                                   <a
                                     :href="viewCompany[label.key]"
                                     v-if="viewCompany[label.key]"
@@ -798,9 +799,11 @@ watch(editBulkActive, (val) => {
                           :default-open="true"
                         >
                           <DisclosureButton
-                            class="sticky top-0 bg-gray-500 text-white p-4 font-semibold w-full flex justify-between border-t-2 border-t-gray-400"
+                            class="sticky top-0 bg-gray-500 text-white p-4 font-semibold w-full flex gap-2 items-center justify-between border-t-2 border-t-gray-400"
                           >
-                            <span>Editing ID {{ companyForm.id }}: {{ companyForm.company_name }}</span>
+                            <span class="text-left"
+                              >Editing ID {{ companyForm.id }}: {{ companyForm.company_name }}</span
+                            >
                             <ChevronUpIcon v-if="open" class="h-4 w-4" />
                             <ChevronDownIcon v-else class="h-4 w-4" />
                           </DisclosureButton>
