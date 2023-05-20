@@ -1,7 +1,5 @@
 <script setup>
 import CompaniesWrapper from '@/Pages/Admin/Infrastructure/Companies/CompaniesWrapper.vue';
-import { openInNewWindow } from '@/Util/Common';
-import { getImgSrcFromPath } from '@/Util/Photo';
 import {
   Dialog,
   DialogPanel,
@@ -12,14 +10,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue';
-import {
-  ArrowDownCircleIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  EyeIcon,
-  PhotoIcon,
-  XMarkIcon,
-} from '@heroicons/vue/24/outline';
+import { ArrowDownCircleIcon, ChevronDownIcon, ChevronUpIcon, EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
@@ -64,14 +55,6 @@ const tableHeaderTitles = [
   { key: 'active', title: 'Active' },
   { key: 'created_at', title: 'Created At' },
 ];
-const viewCompanyLabels = [
-  { key: 'address_1', title: 'Address Line 1' },
-  { key: 'address_2', title: 'Address Line 2' },
-  { key: 'phone_number', title: 'Phone Number' },
-  { key: 'mobile_number', title: 'Mobile Number' },
-  { key: 'website', title: 'Website URL' },
-  { key: 'img_url', title: 'Image URL' },
-];
 const inputFields = [
   { key: 'company_name', title: 'Company Name' },
   { key: 'active', title: 'Active' },
@@ -90,7 +73,6 @@ const editCompanyForms = ref([]);
 const editBulkActive = ref(false);
 const isImportDialogOpen = ref(false);
 const isLoading = ref(false);
-const isViewDialogOpen = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
 const tableSortOptions = ref({
@@ -279,21 +261,8 @@ const onResetFiltersClicked = (controlName, value) => {
   }
   onGoToPageClicked();
 };
-const onViewDialogCloseClicked = () => {
-  isViewDialogOpen.value = false;
-};
 const onViewItemClicked = (id) => {
-  router.post(
-    route('admin/infrastructure/companies/view'),
-    { id },
-    {
-      only: ['viewCompany'],
-      preserveScroll: true,
-      onSuccess: () => {
-        isViewDialogOpen.value = true;
-      },
-    }
-  );
+  router.visit(route('admin/infrastructure/companies/view', { id }));
 };
 // #endregion Functions
 
@@ -372,7 +341,7 @@ watch(editBulkActive, (val) => {
                 </select>
               </div>
               <div class="mt-4 grid grid-cols-2 gap-2">
-                <button type="button" class="btn btn-sm" @click="onResetFiltersClicked">Reset</button>
+                <button type="button" class="btn btn-sm" @click="onResetFiltersClicked()">Reset</button>
                 <button type="submit" class="btn btn-sm btn-primary">Apply</button>
               </div>
             </form>
@@ -508,9 +477,9 @@ watch(editBulkActive, (val) => {
       />
     </div>
     <Error404 :show="!paginatedResults" />
-    <TransitionRoot as="template" :show="isViewDialogOpen">
-      <Dialog as="div" class="relative z-40" @close="onViewDialogCloseClicked">
-        <div class="fixed inset-0" />
+    <TransitionRoot as="template" :show="isImportDialogOpen">
+      <Dialog as="div" class="relative z-40" @close="onImportDialogCloseClicked">
+        <div class="fixed inset-0" aria-hidden="true" />
 
         <div class="fixed inset-0 overflow-hidden">
           <div class="absolute inset-0 overflow-hidden">
@@ -521,121 +490,6 @@ watch(editBulkActive, (val) => {
                 enter-from="translate-x-full"
                 enter-to="translate-x-0"
                 leave="transform transition ease-in-out duration-300"
-                leave-from="translate-x-0"
-                leave-to="translate-x-full"
-              >
-                <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
-                  <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-                    <div class="sticky top-0 bg-white px-4 py-6 sm:px-6">
-                      <div class="flex items-start justify-between">
-                        <DialogTitle class="text-base font-semibold leading-6 text-gray-900">View</DialogTitle>
-                        <div class="ml-3 flex h-7 items-center">
-                          <button
-                            type="button"
-                            class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-primary"
-                            @click="onViewDialogCloseClicked"
-                          >
-                            <span class="sr-only">Close panel</span>
-                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Main -->
-                    <div class="divide-y divide-gray-200">
-                      <div class="pb-6">
-                        <div class="h-24 bg-primary sm:h-20 lg:h-28" />
-                        <div class="lg:-mt-15 -mt-12 flow-root px-4 sm:-mt-8 sm:flex sm:items-end sm:px-6">
-                          <div>
-                            <div class="-m-1 flex">
-                              <div class="inline-flex overflow-hidden rounded-lg border-4 border-white">
-                                <img
-                                  v-if="viewCompany?.img_url || viewCompany?.img_path"
-                                  :src="
-                                    viewCompany?.img_path
-                                      ? getImgSrcFromPath(viewCompany?.img_path)
-                                      : viewCompany?.img_url
-                                  "
-                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 object-cover"
-                                />
-                                <PhotoIcon
-                                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300 bg-white"
-                                  aria-hidden="true"
-                                  v-else
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="mt-6 sm:ml-6 sm:flex-1">
-                            <div>
-                              <div class="flex flex-col items-start gap-1">
-                                <h3 class="text-xl font-bold text-gray-900 sm:text-2xl">
-                                  {{ viewCompany.company_name }}
-                                </h3>
-                                <ColouredBadge :data="viewCompany.active" data-type="boolean" />
-                              </div>
-                            </div>
-                            <div class="mt-5 flex flex-wrap space-y-3 sm:space-x-3 sm:space-y-0">
-                              <Link
-                                :href="route(editUrl, { id: viewCompany.id })"
-                                :replace="true"
-                                as="button"
-                                class="btn btn-sm btn-block btn-primary sm:max-w-[7rem]"
-                              >
-                                Edit
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="px-4 py-5 sm:px-0 sm:py-0">
-                        <dl class="space-y-8 sm:space-y-0 sm:divide-y sm:divide-gray-200">
-                          <template v-for="label in viewCompanyLabels" :key="label.key">
-                            <div class="sm:flex sm:px-6 sm:py-5">
-                              <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0 lg:w-48">
-                                {{ label.title }}
-                              </dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:ml-6 sm:mt-0">
-                                <template v-if="['img_url', 'website'].includes(label.key)">
-                                  <a
-                                    :href="viewCompany[label.key]"
-                                    v-if="viewCompany[label.key]"
-                                    class="link break-all"
-                                    @click.prevent="openInNewWindow(viewCompany[label.key])"
-                                    >{{ viewCompany[label.key] }}</a
-                                  >
-                                  <span v-else>Unavailable</span>
-                                </template>
-                                <template v-else>
-                                  {{ viewCompany[label.key] ?? 'Unavailable' }}
-                                </template>
-                              </dd>
-                            </div>
-                          </template>
-                        </dl>
-                      </div>
-                    </div>
-                  </div>
-                </DialogPanel>
-              </TransitionChild>
-            </div>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-    <TransitionRoot as="template" :show="isImportDialogOpen">
-      <Dialog as="div" class="relative z-40" @close="onImportDialogCloseClicked">
-        <div class="fixed inset-0" aria-hidden="true" />
-
-        <div class="fixed inset-0 overflow-hidden">
-          <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
-              <TransitionChild
-                as="template"
-                enter="transform transition ease-in-out duration-500 sm:duration-700"
-                enter-from="translate-x-full"
-                enter-to="translate-x-0"
-                leave="transform transition ease-in-out duration-500 sm:duration-700"
                 leave-from="translate-x-0"
                 leave-to="translate-x-full"
               >
@@ -740,10 +594,10 @@ watch(editBulkActive, (val) => {
             <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <TransitionChild
                 as="template"
-                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enter="transform transition ease-in-out duration-300"
                 enter-from="translate-x-full"
                 enter-to="translate-x-0"
-                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leave="transform transition ease-in-out duration-300"
                 leave-from="translate-x-0"
                 leave-to="translate-x-full"
               >

@@ -93,7 +93,7 @@ const deletePhoto = () => {
 
 <template>
   <CompaniesWrapper>
-    <Head :title="`${!!company ? 'Edit' : 'Add New'} Employee`" />
+    <Head :title="`${!!company ? 'Edit' : 'Add New'} Company`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
     <div class="sm:px-6 lg:px-8">
       <form class="px-4 pt-4 sm:px-0 flex flex-col h-full" @submit.prevent="submit">

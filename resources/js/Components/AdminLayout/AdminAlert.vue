@@ -34,7 +34,11 @@ defineEmits(['buttonClicked']);
         <h3 class="text-sm font-bold" :class="flash.status === 'error' ? 'text-red-800' : 'text-green-800'">
           {{ flash.message }}
         </h3>
-        <p class="mt-1 text-sm text-gray-500" v-if="flash.description">
+        <p
+          v-if="flash.description"
+          class="mt-1 text-sm"
+          :class="flash.status === 'error' ? 'text-red-800' : 'text-green-800'"
+        >
           {{ flash.description }}
         </p>
         <div class="mt-4">

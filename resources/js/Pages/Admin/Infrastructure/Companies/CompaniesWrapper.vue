@@ -14,6 +14,10 @@ const secondaryNavigation = [
         name: 'Edit Company',
         href: 'admin/infrastructure/companies/edit',
       },
+      {
+        name: 'View Company',
+        href: 'admin/infrastructure/companies/view',
+      },
     ],
   },
 ];

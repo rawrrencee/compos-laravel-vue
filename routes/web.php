@@ -136,10 +136,10 @@ Route::middleware([
                 Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
                 Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('admin/infrastructure/companies/edit.bulk');
 
-                Route::get('/view', function () {
-                    return redirect()->route('admin/infrastructure/companies');
-                });
-                Route::post('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
+                // Route::get('/view', function () {
+                //     return redirect()->route('admin/infrastructure/companies');
+                // });
+                Route::get('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
                 Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
 
                 Route::post('/import', [CompanyController::class, 'importCsv'])->name('admin/infrastructure/companies/import');

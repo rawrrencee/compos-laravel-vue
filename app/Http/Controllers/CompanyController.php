@@ -107,7 +107,7 @@ class CompanyController extends Controller
                 ->with('message', 'An error occurred.');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['viewCompany' => $company]);
+        return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
     }
 
     public function store(Request $request)
@@ -179,6 +179,15 @@ class CompanyController extends Controller
         ]);
 
         $company = Company::find($request['id']);
+
+        if (!isset($company)) {
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'error')
+                ->with('message', 'Company to be updated was not found.');
+        }
+
         if (isset($company['img_path'])) {
             $isDeleted = $this->CommonController->deletePhoto($company['img_path']);
             if ($isDeleted) {
