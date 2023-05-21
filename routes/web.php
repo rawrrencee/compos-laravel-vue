@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CommonController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use \App\Http\Controllers\CompanyController;
+use \App\Http\Controllers\SupplierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -136,9 +138,6 @@ Route::middleware([
                 Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
                 Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('admin/infrastructure/companies/edit.bulk');
 
-                // Route::get('/view', function () {
-                //     return redirect()->route('admin/infrastructure/companies');
-                // });
                 Route::get('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
                 Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
 
@@ -152,9 +151,26 @@ Route::middleware([
                 return Inertia::render('Error/404');
             })->name('admin/infrastructure/stores');
 
-            Route::get('/suppliers', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/infrastructure/suppliers');
+            Route::prefix('suppliers')->group(function () {
+                Route::get('/', [SupplierController::class, 'index'])->name('admin/infrastructure/suppliers');
+
+                Route::get('/add', function () {
+                    return Inertia::render('Admin/Infrastructure/Suppliers/AddOrEditSupplier');
+                })->name('admin/infrastructure/suppliers/add');
+                Route::post('/add', [SupplierController::class, 'store'])->name('admin/infrastructure/suppliers/add.store');
+
+                Route::get('/edit', [SupplierController::class, 'edit'])->name('admin/infrastructure/suppliers/edit');
+                Route::post('/edit', [SupplierController::class, 'update'])->name('admin/infrastructure/suppliers/edit.update');
+                Route::post('/edit-bulk', [SupplierController::class, 'bulkUpdate'])->name('admin/infrastructure/suppliers/edit.bulk');
+
+                Route::get('/view', [SupplierController::class, 'view'])->name('admin/infrastructure/suppliers/view');
+                Route::post('/delete-photo', [SupplierController::class, 'deletePhoto'])->name('admin/infrastructure/suppliers/photo.delete');
+
+                Route::post('/import', [SupplierController::class, 'importCsv'])->name('admin/infrastructure/suppliers/import');
+                Route::post('/export', [SupplierController::class, 'exportCsv'])->name('admin/infrastructure/suppliers/export');
+
+                Route::post('/delete', [SupplierController::class, 'destroy'])->name('admin/infrastructure/suppliers/delete');
+            });
         });
 
         Route::prefix('commerce')->group(function () {
@@ -162,9 +178,26 @@ Route::middleware([
                 return Inertia::render('Error/404');
             })->name('admin/commerce');
 
-            Route::get('/brands', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/commerce/brands');
+            Route::prefix('brands')->group(function () {
+                Route::get('/', [BrandController::class, 'index'])->name('admin/commerce/brands');
+
+                Route::get('/add', function () {
+                    return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand');
+                })->name('admin/commerce/brands/add');
+                Route::post('/add', [BrandController::class, 'store'])->name('admin/commerce/brands/add.store');
+
+                Route::get('/edit', [BrandController::class, 'edit'])->name('admin/commerce/brands/edit');
+                Route::post('/edit', [BrandController::class, 'update'])->name('admin/commerce/brands/edit.update');
+                Route::post('/edit-bulk', [BrandController::class, 'bulkUpdate'])->name('admin/commerce/brands/edit.bulk');
+
+                Route::get('/view', [BrandController::class, 'view'])->name('admin/commerce/brands/view');
+                Route::post('/delete-photo', [BrandController::class, 'deletePhoto'])->name('admin/commerce/brands/photo.delete');
+
+                Route::post('/import', [BrandController::class, 'importCsv'])->name('admin/commerce/brands/import');
+                Route::post('/export', [BrandController::class, 'exportCsv'])->name('admin/commerce/brands/export');
+
+                Route::post('/delete', [BrandController::class, 'destroy'])->name('admin/commerce/brands/delete');
+            });
 
             Route::get('/categories', function () {
                 return Inertia::render('Error/404');

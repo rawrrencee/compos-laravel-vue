@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
-class CompanyController extends Controller
+class BrandController extends Controller
 {
     protected $CommonController;
 
@@ -29,7 +29,7 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'sortBy' => [
                 'required',
-                Rule::in(['company_name', 'active', 'created_at'])
+                Rule::in(['brand_name', 'brand_code', 'active', 'created_at'])
             ],
             'orderBy' => [
                 'required',
@@ -51,22 +51,28 @@ class CompanyController extends Controller
         }
 
         // Filters
-        $company_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['company_name']  ?? null : null;
+        $brand_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['brand_name']  ?? null : null;
+        $brand_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['brand_code']  ?? null : null;
 
-        $companies = Company::query();
-        if (!empty($company_name)) {
-            $companies->where(function ($q) use ($company_name) {
-                $q->where('company_name', 'like', '%' . $company_name . '%');
+        $brands = Brand::query();
+        if (!empty($brand_name)) {
+            $brands->where(function ($q) use ($brand_name) {
+                $q->where('brand_name', 'like', '%' . $brand_name . '%');
+            });
+        }
+        if (!empty($brand_code)) {
+            $brands->where(function ($q) use ($brand_code) {
+                $q->where('brand_code', 'like', '%' . $brand_code . '%');
             });
         }
 
         if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['showDeleted'])) {
             switch ($request['tableFilterOptions']['showDeleted']) {
                 case 'onlyDeleted':
-                    $companies->onlyTrashed();
+                    $brands->onlyTrashed();
                     break;
                 case 'both':
-                    $companies->withTrashed();
+                    $brands->withTrashed();
                     break;
                 case 'onlyNonDeleted':
                 default:
@@ -77,10 +83,10 @@ class CompanyController extends Controller
         if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['showActive'])) {
             switch ($request['tableFilterOptions']['showActive']) {
                 case 'onlyActive':
-                    $companies->where('active', '=', '1');
+                    $brands->where('active', '=', '1');
                     break;
                 case 'onlyNonActive':
-                    $companies->where('active', '=', '0');
+                    $brands->where('active', '=', '0');
                     break;
                 case 'both':
                 default:
@@ -88,7 +94,7 @@ class CompanyController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
+        return Inertia::render('Admin/Commerce/Brands/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $brands->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
     }
 
     public function view(Request $request)
@@ -97,23 +103,24 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::withTrashed()->where('id', '=', $id)->first();
+        $brand = Brand::withTrashed()->where('id', '=', $id)->first();
 
-        if (!isset($company)) {
-            return Inertia::render('Admin/Infrastructure/Companies/Overview')
+        if (!isset($brand)) {
+            return Inertia::render('Admin/Commerce/Brands/Overview')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'error')
                 ->with('message', 'An error occurred.');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
+        return Inertia::render('Admin/Commerce/Brands/ViewBrand', ['viewBrand' => $brand]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'company_name' => 'required|max:255',
+            'brand_name' => 'required|max:255',
+            'brand_code' => 'required|max:4|unique:brands',
             'address_1' => 'nullable|max:255',
             'address_2' => 'nullable|max:255',
             'phone_number' => 'nullable|max:255',
@@ -122,30 +129,30 @@ class CompanyController extends Controller
             'website' => 'nullable|url',
             'img_url' => 'nullable|url',
             'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
+            'brand_photo' => 'nullable|image',
         ]);
 
-        if (!empty($request['company_photo'])) {
-            $path = $request->file('company_photo')->store('company-photos', 'private');
+        if (!empty($request['brand_photo'])) {
+            $path = $request->file('brand_photo')->store('brand-photos', 'private');
             $request['img_path'] = $path;
         }
 
         try {
             DB::beginTransaction();
-            $company = Company::create($request->all());
+            $brand = Brand::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('admin/commerce/brands')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', 'Company created successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
-                ->with('id', $company->id);
+                ->with('message', 'Brand created successfully.')
+                ->with('route', 'admin/commerce/brands/edit')
+                ->with('id', $brand->id);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
+            return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand', [
                 'errorMessage' => 'Failed to create record: ' . $e->getMessage(),
             ]);
         }
@@ -157,20 +164,35 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::whereId($id)->first();
+        $brand = Brand::whereId($id)->first();
 
-        if (!isset($company)) {
+        if (!isset($brand)) {
             return redirect()->route('404');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', ['company' => $company]);
+        return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand', ['brand' => $brand]);
     }
 
     public function update(Request $request)
     {
+        $brand = Brand::find($request['id']);
+
+        if (!isset($brand)) {
+            return redirect()->back()
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'error')
+                ->with('message', 'Brand to be updated was not found.');
+        }
+
         $request->validate([
             'id' => 'required',
-            'company_name' => 'required|max:255',
+            'brand_name' => 'required|max:255',
+            'brand_code' => [
+                'required',
+                'max:4',
+                Rule::unique('brands')->ignore($brand->id),
+            ],
             'address_1' => 'nullable|max:255',
             'address_2' => 'nullable|max:255',
             'phone_number' => 'nullable|max:255',
@@ -179,46 +201,37 @@ class CompanyController extends Controller
             'website' => 'nullable|url',
             'img_url' => 'nullable|url',
             'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
+            'brand_photo' => 'nullable|image',
         ]);
 
-        $company = Company::find($request['id']);
-
-        if (!isset($company)) {
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'Company to be updated was not found.');
-        }
-
-        if (isset($company['img_path'])) {
-            $isDeleted = $this->CommonController->deletePhoto($company['img_path']);
+        if (isset($brand['img_path'])) {
+            $isDeleted = $this->CommonController->deletePhoto($brand['img_path']);
             if ($isDeleted) {
                 $request['img_path'] = null;
             }
         }
-        if (!empty($request['company_photo'])) {
-            $path = $request->file('company_photo')->store('company-photos', 'private');
+
+        if (!empty($request['brand_photo'])) {
+            $path = $request->file('brand_photo')->store('brand-photos', 'private');
             $request['img_path'] = $path;
         }
 
         try {
             DB::beginTransaction();
-            $company->update($request->all());
+            $brand->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('admin/commerce/brands')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', 'Company updated successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
-                ->with('id', $company->id);
+                ->with('message', 'Brand updated successfully.')
+                ->with('route', 'admin/commerce/brands/edit')
+                ->with('id', $brand->id);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+            return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
@@ -229,18 +242,26 @@ class CompanyController extends Controller
     public function bulkUpdate(Request $request)
     {
         try {
-            // Extract companies data from the request
-            $companies = $request->all();
+            // Extract brands data from the request
+            $brands = $request->all();
 
             // Start a DB transaction
             DB::beginTransaction();
 
-            // Loop through each company data
-            foreach ($companies as $companyData) {
+            // Loop through each brand data
+            foreach ($brands as $brandData) {
+                // If validation passes, locate the brand and update
+                $brand = Brand::find($brandData['id']);
+
                 // Validate the data
-                $validator = Validator::make($companyData, [
-                    'id' => 'required|exists:companies,id',
-                    'company_name' => 'required|max:255',
+                $validator = Validator::make($brandData, [
+                    'id' => 'required|exists:brands,id',
+                    'brand_name' => 'required|max:255',
+                    'brand_code' => [
+                        'required',
+                        'max:4',
+                        Rule::unique('brands')->ignore($brand->id),
+                    ],
                     'address_1' => 'nullable|max:255',
                     'address_2' => 'nullable|max:255',
                     'phone_number' => 'nullable|max:255',
@@ -256,9 +277,7 @@ class CompanyController extends Controller
                     throw new ValidationException($validator);
                 }
 
-                // If validation passes, locate the company and update
-                $company = Company::find($companyData['id']);
-                $company->update($companyData);
+                $brand->update($brandData);
             }
 
             // If all updates are successful, commit the transaction
@@ -268,7 +287,7 @@ class CompanyController extends Controller
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', count($companies) . ' companies bulk edited successfully.');
+                ->with('message', count($brands) . ' brands bulk edited successfully.');
         } catch (\Exception $e) {
             // If anything goes wrong, rollback the transaction
             DB::rollback();
@@ -284,14 +303,14 @@ class CompanyController extends Controller
 
     public function deletePhoto(Request $request)
     {
-        $company = Company::find($request['id']);
+        $brand = Brand::find($request['id']);
 
-        if (isset($company)) {
+        if (isset($brand)) {
             $isDeleted = $this->CommonController->deletePhoto($request['img_path']);
-            if ($isDeleted || !$isDeleted && !empty($company->img_path)) {
+            if ($isDeleted || !$isDeleted && !empty($brand->img_path)) {
                 try {
                     DB::beginTransaction();
-                    $company->update(['img_path' => null]);
+                    $brand->update(['img_path' => null]);
                     DB::commit();
 
                     return redirect()->back()
@@ -302,7 +321,7 @@ class CompanyController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+                    return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand')
                         ->with('show', true)
                         ->with('type', 'default')
                         ->with('status', 'success')
@@ -315,7 +334,7 @@ class CompanyController extends Controller
             ->with('show', true)
             ->with('type', 'default')
             ->with('status', 'error')
-            ->with('message', 'No image was deleted or company was not found.');
+            ->with('message', 'No image was deleted or brand was not found.');
     }
 
     public function importCsv(Request $request)
@@ -363,7 +382,8 @@ class CompanyController extends Controller
             foreach ($data as $row) {
                 // Validate the row
                 Validator::make($row, [
-                    'company_name' => 'required|max:255',
+                    'brand_name' => 'required|string|max:255',
+                    'brand_code' => 'required|max:4|unique:brands',
                     'address_1' => 'nullable|max:255',
                     'address_2' => 'nullable|max:255',
                     'email' => 'nullable|email|max:255',
@@ -374,9 +394,10 @@ class CompanyController extends Controller
                     'active' => 'required|in:0,1',
                 ])->validate();
 
-                // Create the company
-                Company::create([
-                    'company_name' => $row['company_name'],
+                // Create the brand
+                Brand::create([
+                    'brand_name' => $row['brand_name'],
+                    'brand_code' => $row['brand_code'],
                     'address_1' => empty($row['address_1']) ? null : $row['address_1'],
                     'address_2' => empty($row['address_2']) ? null : $row['address_2'],
                     'email' => empty($row['email']) ? null : $row['email'],
@@ -395,7 +416,7 @@ class CompanyController extends Controller
                 ->with('show', true)
                 ->with('type', 'dialog')
                 ->with('status', 'success')
-                ->with('message', count($data) . ' companies imported successfully.');
+                ->with('message', count($data) . ' brands imported successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of errors
             DB::rollBack();
@@ -404,7 +425,7 @@ class CompanyController extends Controller
                 ->with('show', true)
                 ->with('type', 'dialog')
                 ->with('status', 'error')
-                ->with('message', 'Failed to create record: ' . $e->getMessage());
+                ->with('message', 'Failed to update record: ' . $e->getMessage());
         }
     }
 
@@ -413,7 +434,8 @@ class CompanyController extends Controller
     {
         // Define the CSV header
         $header = [
-            'company_name',
+            'brand_name',
+            'brand_code',
             'address_1',
             'address_2',
             'email',
@@ -440,25 +462,26 @@ class CompanyController extends Controller
         fputcsv($file, $header);
 
         if ($request['with_data']) {
-            // Fetch companies
-            $companies = Company::withTrashed()->get();
+            // Fetch brands
+            $brands = Brand::withTrashed()->get();
 
-            // Insert the companies data
-            foreach ($companies as $company) {
+            // Insert the brands data
+            foreach ($brands as $brand) {
                 $row = [
-                    $company->id,
-                    $company->company_name,
-                    $company->address_1,
-                    $company->address_2,
-                    $company->email,
-                    $company->phone_number,
-                    $company->mobile_number,
-                    $company->website,
-                    $company->img_url,
-                    $company->active,
-                    $company->created_at,
-                    $company->updated_at,
-                    $company->deleted_at,
+                    $brand->id,
+                    $brand->brand_name,
+                    $brand->brand_code,
+                    $brand->address_1,
+                    $brand->address_2,
+                    $brand->email,
+                    $brand->phone_number,
+                    $brand->mobile_number,
+                    $brand->website,
+                    $brand->img_url,
+                    $brand->active,
+                    $brand->created_at,
+                    $brand->updated_at,
+                    $brand->deleted_at,
                 ];
 
                 // Convert each item in the row to UTF-8
@@ -479,14 +502,14 @@ class CompanyController extends Controller
         // Return a CSV file for download
         return response()->streamDownload(function () use ($file) {
             fpassthru($file);
-        }, 'companies.csv');
+        }, 'brands.csv');
     }
 
     public function destroy(Request $request)
     {
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:companies,id',
+            'ids.*' => 'exists:brands,id',
         ]);
 
         // Retrieve the ids
@@ -496,12 +519,12 @@ class CompanyController extends Controller
 
         try {
             // Delete the records
-            $deletedCount = Company::destroy($ids);
+            $deletedCount = Brand::destroy($ids);
 
             DB::commit();
 
-            $context = 'companies';
-            if ($deletedCount == 1) $context = 'company';
+            $context = 'brands';
+            if ($deletedCount == 1) $context = 'brand';
 
             return redirect()->back()
                 ->with('show', true)

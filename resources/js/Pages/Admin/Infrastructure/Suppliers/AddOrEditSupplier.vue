@@ -1,5 +1,5 @@
 <script setup>
-import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
+import SupplierLayout from '@/Pages/Admin/Infrastructure/Suppliers/SupplierLayout.vue';
 import { getImgSrcFromPath } from '@/Util/Photo';
 import { PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -8,11 +8,11 @@ import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
 
 const props = defineProps({
   errorMessage: String,
-  company: Object | undefined,
+  supplier: Object | undefined,
 });
 const inputFields = [
-  { key: 'company_name', title: 'Company Name' },
-  { key: 'company_photo', title: 'Company Photo' },
+  { key: 'supplier_name', title: 'Supplier Name' },
+  { key: 'supplier_photo', title: 'Supplier Photo' },
   { key: 'active', title: 'Active' },
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
@@ -21,17 +21,17 @@ const inputFields = [
   { key: 'website', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
 ];
-const companyForm = useForm({
-  company_name: props.company?.company_name ?? '',
-  active: !props.company?.active ? false : true,
-  address_1: props.company?.address_1 ?? '',
-  address_2: props.company?.address_2 ?? '',
-  email: props.company?.email ?? '',
-  phone_number: props.company?.phone_number ?? '',
-  mobile_number: props.company?.mobile_number ?? '',
-  website: props.company?.website ?? '',
-  img_url: props.company?.img_url ?? '',
-  company_photo: null,
+const supplierForm = useForm({
+  supplier_name: props.supplier?.supplier_name ?? '',
+  active: !props.supplier?.active ? false : true,
+  address_1: props.supplier?.address_1 ?? '',
+  address_2: props.supplier?.address_2 ?? '',
+  email: props.supplier?.email ?? '',
+  phone_number: props.supplier?.phone_number ?? '',
+  mobile_number: props.supplier?.mobile_number ?? '',
+  website: props.supplier?.website ?? '',
+  img_url: props.supplier?.img_url ?? '',
+  supplier_photo: null,
 });
 const photoPreview = ref(null);
 const photoFile = ref(null);
@@ -39,7 +39,7 @@ const showFlashError = ref(true);
 
 const flashError = computed(() => {
   return {
-    show: companyForm.hasErrors && showFlashError.value,
+    show: supplierForm.hasErrors && showFlashError.value,
     type: 'default',
     status: 'error',
     message: 'Please complete or correct the required fields.',
@@ -60,63 +60,65 @@ const updatePhotoPreview = (event) => {
 };
 const submit = () => {
   showFlashError.value = true;
-  if (!props.company) {
-    companyForm
+  if (!props.supplier) {
+    supplierForm
       .transform((data) => ({
         ...data,
         ...(photoFile.value && {
-          company_photo: photoFile.value,
+          supplier_photo: photoFile.value,
         }),
       }))
-      .post(route('admin/infrastructure/companies/add.store'));
+      .post(route('admin/infrastructure/suppliers/add.store'));
   } else {
-    companyForm
+    supplierForm
       .transform((data) => ({
         ...data,
         ...(photoFile.value && {
-          company_photo: photoFile.value,
+          supplier_photo: photoFile.value,
         }),
-        id: props.company.id,
+        id: props.supplier.id,
       }))
-      .post(route('admin/infrastructure/companies/edit.update'));
+      .post(route('admin/infrastructure/suppliers/edit.update'));
   }
 };
 const deletePhoto = () => {
-  if (props.company && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('admin/infrastructure/companies/photo.delete'), {
-      id: props.company.id,
-      img_path: props.company.img_path,
+  if (props.supplier && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
+    router.post(route('admin/infrastructure/suppliers/photo.delete'), {
+      id: props.supplier.id,
+      img_path: props.supplier.img_path,
     });
   }
 };
 </script>
 
 <template>
-  <CompanyLayout>
-    <Head :title="`${!!company ? 'Edit' : 'Add New'} Company`" />
+  <SupplierLayout>
+    <Head :title="`${!!supplier ? 'Edit' : 'Add New'} Supplier`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
     <div class="sm:px-6 lg:px-8">
       <form class="px-4 pt-4 sm:px-0 flex flex-col h-full" @submit.prevent="submit">
         <div class="flex-1 grow grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 pb-12">
           <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
-            <template v-if="input.key === 'company_photo'">
-              <label for="company_photo" class="block text-sm font-medium leading-6 text-gray-900">Company Photo</label>
+            <template v-if="input.key === 'supplier_photo'">
+              <label for="supplier_photo" class="block text-sm font-medium leading-6 text-gray-900"
+                >Supplier Photo</label
+              >
               <div
                 class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 max-w-lg"
               >
                 <div class="text-center flex flex-col gap-2 justify-center">
                   <div v-if="!photoPreview" class="mt-2 flex flex-col gap-4 items-center">
                     <img
-                      v-if="company?.img_url || company?.img_path"
-                      :src="company?.img_path ? getImgSrcFromPath(company?.img_path) : company?.img_url"
+                      v-if="supplier?.img_url || supplier?.img_path"
+                      :src="supplier?.img_path ? getImgSrcFromPath(supplier?.img_path) : supplier?.img_url"
                       class="rounded-lg h-20 w-20 object-cover"
                     />
                     <PhotoIcon class="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" v-else />
                     <button
                       type="button"
                       class="btn btn-ghost btn-sm"
-                      v-if="company?.img_path"
-                      :disabled="!!company?.img_url && !company?.img_path"
+                      v-if="supplier?.img_path"
+                      :disabled="!!supplier?.img_url && !supplier?.img_path"
                       @click="deletePhoto"
                     >
                       <div class="flex gap-2 items-center">
@@ -124,7 +126,7 @@ const deletePhoto = () => {
                         <span>Remove</span>
                       </div>
                     </button>
-                    <span class="text-gray-600 text-xs" v-if="company?.img_url && !company?.img_path"
+                    <span class="text-gray-600 text-xs" v-if="supplier?.img_url && !supplier?.img_path"
                       >Image populated from Image URL (filled in below)</span
                     >
                   </div>
@@ -137,17 +139,17 @@ const deletePhoto = () => {
                   <div class="flex flex-col">
                     <div class="flex text-sm leading-6 justify-center">
                       <label
-                        for="company_photo"
+                        for="supplier_photo"
                         class="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-secondary"
                       >
                         <span
                           >Click to upload
-                          {{ company?.img_path ? 'another' : 'a new' }}
+                          {{ supplier?.img_path ? 'another' : 'a new' }}
                           file</span
                         >
                         <input
-                          id="company_photo"
-                          name="company_photo"
+                          id="supplier_photo"
+                          name="supplier_photo"
                           type="file"
                           class="sr-only"
                           @change="updatePhotoPreview"
@@ -162,7 +164,7 @@ const deletePhoto = () => {
             <template v-else-if="input.key === 'active'">
               <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Active</label>
               <div class="mt-2">
-                <input type="checkbox" name="active" class="toggle toggle-primary" v-model="companyForm.active" />
+                <input type="checkbox" name="active" class="toggle toggle-primary" v-model="supplierForm.active" />
               </div>
             </template>
             <template v-else>
@@ -175,12 +177,12 @@ const deletePhoto = () => {
                   :id="input.key"
                   :name="input.key"
                   class="input input-bordered w-full max-w-lg"
-                  v-model="companyForm[input.key]"
-                  :class="companyForm.errors[input.key] ? 'border-error' : ''"
-                  @input="() => companyForm.clearErrors([input.key])"
+                  v-model="supplierForm[input.key]"
+                  :class="supplierForm.errors[input.key] ? 'border-error' : ''"
+                  @input="() => supplierForm.clearErrors([input.key])"
                 />
-                <span v-if="companyForm.errors[input.key]" class="text-error">
-                  {{ companyForm.errors[input.key] }}
+                <span v-if="supplierForm.errors[input.key]" class="text-error">
+                  {{ supplierForm.errors[input.key] }}
                 </span>
               </div>
             </template>
@@ -189,7 +191,7 @@ const deletePhoto = () => {
 
         <div class="bottom-0 sticky py-4 bg-white border-t-2 border-gray-100">
           <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:items-stretch">
-            <Link type="button" class="btn sm:grow sm:max-w-[10rem]" :href="route('admin/infrastructure/companies')">
+            <Link type="button" class="btn sm:grow sm:max-w-[10rem]" :href="route('admin/infrastructure/suppliers')">
               Cancel
             </Link>
             <button type="submit" class="btn btn-primary sm:grow sm:max-w-[10rem]">Save</button>
@@ -197,5 +199,5 @@ const deletePhoto = () => {
         </div>
       </form>
     </div>
-  </CompanyLayout>
+  </SupplierLayout>
 </template>

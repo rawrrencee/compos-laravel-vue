@@ -1,5 +1,5 @@
 <script setup>
-import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
+import BrandLayout from '@/Pages/Admin/Commerce/Brands/BrandLayout.vue';
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
@@ -28,27 +28,30 @@ const props = defineProps({
   sortBy: String,
   orderBy: String,
   tableFilterOptions: Object,
-  viewCompany: Object | undefined,
+  viewBrand: Object | undefined,
 });
 const tableFilterOptions = useForm({
-  company_name: props?.tableFilterOptions?.company_name ?? '',
+  brand_name: props?.tableFilterOptions?.brand_name ?? '',
+  brand_code: props?.tableFilterOptions?.brand_code ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
   showActive: props?.tableFilterOptions?.showActive ?? 'both',
 });
 const importForm = useForm({
   import_file: null,
 });
-const moduleUrl = 'admin/infrastructure/companies';
+const moduleUrl = 'admin/commerce/brands';
 const addNewUrl = `${moduleUrl}/add`;
 const editUrl = `${moduleUrl}/edit`;
-const exportUrl = `${route('admin/infrastructure/companies/export')}`;
+const exportUrl = `${route('admin/commerce/brands/export')}`;
 const tableHeaderTitles = [
-  { key: 'company_name', title: 'Company Name' },
+  { key: 'brand_name', title: 'Brand Name' },
+  { key: 'brand_code', title: 'Brand Code' },
   { key: 'active', title: 'Active' },
   { key: 'created_at', title: 'Created At' },
 ];
 const inputFields = [
-  { key: 'company_name', title: 'Company Name' },
+  { key: 'brand_name', title: 'Brand Name' },
+  { key: 'brand_code', title: 'Brand Code' },
   { key: 'active', title: 'Active' },
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
@@ -61,14 +64,14 @@ const inputFields = [
 
 // #region Ref variables
 const isEditDialogOpen = ref(false);
-const editCompanyForms = ref([]);
+const editBrandForms = ref([]);
 const editBulkActive = ref(false);
 const isImportDialogOpen = ref(false);
 const isLoading = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
 const tableSortOptions = ref({
-  sortBy: props?.sortBy ?? 'company_name',
+  sortBy: props?.sortBy ?? 'brand_name',
   orderBy: props?.orderBy ?? 'asc',
 });
 // #endregion Ref variables
@@ -80,7 +83,8 @@ const indeterminate = computed(
 const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
 const appliedFilterCount = computed(() => {
   let count = 0;
-  if (tableFilterOptions.company_name?.length > 0) count++;
+  if (tableFilterOptions.brand_name?.length > 0) count++;
+  if (tableFilterOptions.brand_code?.length > 0) count++;
   if (tableFilterOptions.showDeleted !== 'onlyNonDeleted') count++;
   if (tableFilterOptions.showActive !== 'both') count++;
   return count;
@@ -89,23 +93,24 @@ const appliedFilterCount = computed(() => {
 
 // #region Functions
 const onBulkEditSaveClicked = () => {
-  const bulkEditForm = useForm({ companies: [] });
+  const bulkEditForm = useForm({ brands: [] });
   bulkEditForm
     .transform(() =>
-      editCompanyForms.value.map((company) => ({
-        id: company.id,
-        company_name: company.company_name ?? '',
-        active: !company.active ? false : true,
-        address_1: company.address_1 ?? '',
-        address_2: company.address_2 ?? '',
-        email: company.email ?? '',
-        phone_number: company.phone_number ?? '',
-        mobile_number: company.mobile_number ?? '',
-        website: company.website ?? '',
-        img_url: company.img_url ?? '',
+      editBrandForms.value.map((brand) => ({
+        id: brand.id,
+        brand_name: brand.brand_name ?? '',
+        brand_code: brand.brand_code?.toLocaleUpperCase() ?? '',
+        active: !brand.active ? false : true,
+        address_1: brand.address_1 ?? '',
+        address_2: brand.address_2 ?? '',
+        email: brand.email ?? '',
+        phone_number: brand.phone_number ?? '',
+        mobile_number: brand.mobile_number ?? '',
+        website: brand.website ?? '',
+        img_url: brand.img_url ?? '',
       }))
     )
-    .post(route('admin/infrastructure/companies/edit.bulk'), {
+    .post(route('admin/commerce/brands/edit.bulk'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -115,7 +120,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/infrastructure/companies/delete'),
+    route('admin/commerce/brands/delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -136,7 +141,7 @@ const onDownloadFileClicked = (url, data) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'companies.csv');
+    link.setAttribute('download', 'brands.csv');
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -144,7 +149,7 @@ const onDownloadFileClicked = (url, data) => {
 };
 const onEditDialogCloseClicked = (shouldHideAlert = true) => {
   isEditDialogOpen.value = false;
-  editCompanyForms.value = [];
+  editBrandForms.value = [];
   if (shouldHideAlert) usePage().props.flash.show = null;
 };
 const onGoToPageClicked = (data) => {
@@ -156,7 +161,8 @@ const onGoToPageClicked = (data) => {
         ...tableSortOptions.value,
       }),
       tableFilterOptions: {
-        company_name: !!tableFilterOptions?.company_name ? tableFilterOptions.company_name : undefined,
+        brand_name: !!tableFilterOptions?.brand_name ? tableFilterOptions.brand_name : undefined,
+        brand_code: !!tableFilterOptions?.brand_code ? tableFilterOptions.brand_code : undefined,
         showDeleted: tableFilterOptions.showDeleted,
         showActive: tableFilterOptions.showActive,
       },
@@ -174,7 +180,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/infrastructure/companies/import'), {
+  importForm.post(route('admin/commerce/brands/import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -207,19 +213,20 @@ const onToolbarBtnClicked = (event) => {
       }
       break;
     case 'edit':
-      editCompanyForms.value = selectedTableRows.value.map((r) => {
-        const company = props.paginatedResults.data.find((d) => d.id === r);
+      editBrandForms.value = selectedTableRows.value.map((r) => {
+        const brand = props.paginatedResults.data.find((d) => d.id === r);
         return useForm({
-          id: company.id,
-          company_name: company.company_name ?? '',
-          active: !company.active ? false : true,
-          address_1: company.address_1 ?? '',
-          address_2: company.address_2 ?? '',
-          email: company.email ?? '',
-          phone_number: company.phone_number ?? '',
-          mobile_number: company.mobile_number ?? '',
-          website: company.website ?? '',
-          img_url: company.img_url ?? '',
+          id: brand.id,
+          brand_name: brand.brand_name ?? '',
+          brand_code: brand.brand_code?.toLocaleUpperCase() ?? '',
+          active: !brand.active ? false : true,
+          address_1: brand.address_1 ?? '',
+          address_2: brand.address_2 ?? '',
+          email: brand.email ?? '',
+          phone_number: brand.phone_number ?? '',
+          mobile_number: brand.mobile_number ?? '',
+          website: brand.website ?? '',
+          img_url: brand.img_url ?? '',
         });
       });
       isEditDialogOpen.value = true;
@@ -245,7 +252,8 @@ const onResetFiltersClicked = (controlName, value) => {
     tableFilterOptions.reset(controlName);
   } else {
     tableFilterOptions.defaults({
-      company_name: '',
+      brand_name: '',
+      brand_code: '',
       showDeleted: 'onlyNonDeleted',
       showActive: 'both',
     });
@@ -254,19 +262,19 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/infrastructure/companies/view', { id }));
+  router.visit(route('admin/commerce/brands/view', { id }));
 };
 // #endregion Functions
 
 // #region Watchers
 watch(editBulkActive, (val) => {
-  editCompanyForms.value.forEach((companyForm) => (companyForm.active = val));
+  editBrandForms.value.forEach((companyForm) => (companyForm.active = val));
 });
 // #endregion Watchers
 </script>
 
 <template>
-  <CompanyLayout>
+  <BrandLayout>
     <Head title="Overview" />
     <div class="h-full flex flex-col sm:px-6 lg:px-8" v-if="paginatedResults?.data.length >= 0">
       <TableToolbar
@@ -294,19 +302,37 @@ watch(editBulkActive, (val) => {
               class="mb-4 p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-3"
               @submit.prevent="onGoToPageClicked"
             >
-              <div class="grid gap-2 col-span-2">
-                <label for="company_name" class="block text-sm font-medium leading-6 text-gray-900">Company Name</label>
+              <div class="grid gap-2">
+                <label for="brand_name" class="block text-sm font-medium leading-6 text-gray-900">Brand Name</label>
                 <div class="input-group">
                   <input
                     type="text"
-                    name="company_name"
+                    name="brand_name"
                     class="input input-bordered input-sm w-full"
-                    v-model="tableFilterOptions.company_name"
+                    v-model="tableFilterOptions.brand_name"
                   />
                   <button
                     type="button"
                     class="btn btn-square btn-outline border-gray-300 btn-sm"
-                    @click="onResetFiltersClicked('company_name', '')"
+                    @click="onResetFiltersClicked('brand_name', '')"
+                  >
+                    <XMarkIcon class="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+              <div class="grid gap-2">
+                <label for="brand_code" class="block text-sm font-medium leading-6 text-gray-900">Brand Code</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    name="brand_code"
+                    class="input input-bordered input-sm w-full"
+                    v-model="tableFilterOptions.brand_code"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-square btn-outline border-gray-300 btn-sm"
+                    @click="onResetFiltersClicked('brand_code', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>
@@ -367,8 +393,8 @@ watch(editBulkActive, (val) => {
                 :toggle-sort="tableSortOptions.sortBy === header.key ? tableSortOptions.orderBy : null"
                 :class="[
                   i === 0
-                    ? 'pr-3 sm:w-96'
-                    : tableHeaderTitles.length > 2 && i < tableHeaderTitles.length - 1
+                    ? 'pr-3 sm:w-80'
+                    : tableHeaderTitles.length > 2 && i < tableHeaderTitles.length - 2
                     ? 'hidden lg:table-cell px-3'
                     : 'hidden sm:table-cell px-3',
                   'py-3.5 text-left text-sm font-semibold text-gray-900',
@@ -388,54 +414,55 @@ watch(editBulkActive, (val) => {
             </td>
           </tr>
           <tr
-            v-for="company in paginatedResults?.data"
-            :key="company.id"
+            v-for="brand in paginatedResults?.data"
+            :key="brand.id"
             :class="[
-              selectedTableRows.includes(company.id) && 'bg-gray-50',
-              !!company.deleted_at && 'bg-red-50 hover:bg-red-100',
+              selectedTableRows.includes(brand.id) && 'bg-gray-50',
+              !!brand.deleted_at && 'bg-red-50 hover:bg-red-100',
               'hover:bg-gray-50',
             ]"
           >
             <td class="relative px-7 w-4 sm:w-12 sm:px-6">
-              <div
-                v-if="selectedTableRows.includes(company.id)"
-                class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-              ></div>
+              <div v-if="selectedTableRows.includes(brand.id)" class="absolute inset-y-0 left-0 w-0.5 bg-primary"></div>
               <input
                 type="checkbox"
                 class="checkbox absolute left-4 top-1/2 -mt-2 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-                :value="company.id"
-                :disabled="!!company.deleted_at"
+                :value="brand.id"
+                :disabled="!!brand.deleted_at"
                 v-model="selectedTableRows"
               />
             </td>
             <td
               :class="[
                 'py-4 pr-3 text-sm font-medium',
-                selectedTableRows.includes(company.id) ? 'text-primary' : 'text-gray-900',
+                selectedTableRows.includes(brand.id) ? 'text-primary' : 'text-gray-900',
               ]"
             >
               <button
                 type="button"
                 class="link text-primary font-semibold text-left"
-                @click="onViewItemClicked(company.id)"
+                @click="onViewItemClicked(brand.id)"
               >
                 <div class="flex gap-2 items-center">
-                  <span :class="company.company_name?.length > 50 ? 'break-all' : 'break-words'">{{
-                    company.company_name
+                  <span :class="brand.brand_name?.length > 50 ? 'break-all' : 'break-words'">{{
+                    brand.brand_name
                   }}</span>
                   <EyeIcon class="h-5 w-5 flex-shrink-0" />
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
                 <dt class="sr-only">Active</dt>
-                <dd class="mt-2 truncate text-gray-700">
-                  <ColouredBadge :data="company.active" data-type="boolean" />
+                <dd class="mt-2 truncate text-gray-500 uppercase">
+                  {{ brand.brand_code }}
+                </dd>
+                <dt class="sr-only sm:hidden">Active</dt>
+                <dd class="mt-1 sm:hidden">
+                  <ColouredBadge :data="brand.active" data-type="boolean" />
                 </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
                 <dd class="mt-1 truncate text-gray-500 sm:hidden">
                   {{
-                    new Date(company.created_at).toLocaleString('en-SG', {
+                    new Date(brand.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })
@@ -443,15 +470,18 @@ watch(editBulkActive, (val) => {
                 </dd>
               </dl>
             </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              <ColouredBadge :data="company.active" data-type="boolean" />
+            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell uppercase">
+              {{ brand.brand_code }}
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-              {{ new Date(company.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}
+              <ColouredBadge :data="brand.active" data-type="boolean" />
+            </td>
+            <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+              {{ new Date(brand.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}
             </td>
             <td class="py-4 pl-3 pr-4 text-right text-sm font-medium">
-              <Link :href="route(editUrl, { id: company.id })" class="btn btn-link btn-sm"
-                >Edit<span class="sr-only">, {{ company.id }}</span></Link
+              <Link :href="route(editUrl, { id: brand.id })" class="btn btn-link btn-sm"
+                >Edit<span class="sr-only">, {{ brand.id }}</span></Link
               >
             </td>
           </tr>
@@ -472,7 +502,7 @@ watch(editBulkActive, (val) => {
     </div>
     <Error404 :show="!paginatedResults" />
     <DialogImportCsv
-      context="company"
+      context="brand"
       :show="isImportDialogOpen"
       :export-url="exportUrl"
       :import-form="importForm"
@@ -484,10 +514,10 @@ watch(editBulkActive, (val) => {
     <DialogBulkEdit
       :show="isEditDialogOpen"
       :selected-items="selectedTableRows"
-      :edit-forms="editCompanyForms"
+      :edit-forms="editBrandForms"
       :input-fields="inputFields"
       :is-loading="isLoading"
-      editable-header-key="company_name"
+      editable-header-key="brand_name"
       @on-dialog-close-clicked="onEditDialogCloseClicked"
       @on-dialog-save-clicked="onBulkEditSaveClicked"
     >
@@ -501,5 +531,5 @@ watch(editBulkActive, (val) => {
         </div>
       </template>
     </DialogBulkEdit>
-  </CompanyLayout>
+  </BrandLayout>
 </template>

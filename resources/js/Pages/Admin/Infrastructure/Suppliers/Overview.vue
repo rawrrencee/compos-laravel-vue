@@ -1,5 +1,5 @@
 <script setup>
-import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
+import SupplierLayout from '@/Pages/Admin/Infrastructure/Suppliers/SupplierLayout.vue';
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
@@ -28,27 +28,27 @@ const props = defineProps({
   sortBy: String,
   orderBy: String,
   tableFilterOptions: Object,
-  viewCompany: Object | undefined,
+  viewSupplier: Object | undefined,
 });
 const tableFilterOptions = useForm({
-  company_name: props?.tableFilterOptions?.company_name ?? '',
+  supplier_name: props?.tableFilterOptions?.supplier_name ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
   showActive: props?.tableFilterOptions?.showActive ?? 'both',
 });
 const importForm = useForm({
   import_file: null,
 });
-const moduleUrl = 'admin/infrastructure/companies';
+const moduleUrl = 'admin/infrastructure/suppliers';
 const addNewUrl = `${moduleUrl}/add`;
 const editUrl = `${moduleUrl}/edit`;
-const exportUrl = `${route('admin/infrastructure/companies/export')}`;
+const exportUrl = `${route('admin/infrastructure/suppliers/export')}`;
 const tableHeaderTitles = [
-  { key: 'company_name', title: 'Company Name' },
+  { key: 'supplier_name', title: 'Supplier Name' },
   { key: 'active', title: 'Active' },
   { key: 'created_at', title: 'Created At' },
 ];
 const inputFields = [
-  { key: 'company_name', title: 'Company Name' },
+  { key: 'supplier_name', title: 'Supplier Name' },
   { key: 'active', title: 'Active' },
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
@@ -61,14 +61,14 @@ const inputFields = [
 
 // #region Ref variables
 const isEditDialogOpen = ref(false);
-const editCompanyForms = ref([]);
+const editSupplierForms = ref([]);
 const editBulkActive = ref(false);
 const isImportDialogOpen = ref(false);
 const isLoading = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
 const tableSortOptions = ref({
-  sortBy: props?.sortBy ?? 'company_name',
+  sortBy: props?.sortBy ?? 'supplier_name',
   orderBy: props?.orderBy ?? 'asc',
 });
 // #endregion Ref variables
@@ -80,7 +80,7 @@ const indeterminate = computed(
 const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
 const appliedFilterCount = computed(() => {
   let count = 0;
-  if (tableFilterOptions.company_name?.length > 0) count++;
+  if (tableFilterOptions.supplier_name?.length > 0) count++;
   if (tableFilterOptions.showDeleted !== 'onlyNonDeleted') count++;
   if (tableFilterOptions.showActive !== 'both') count++;
   return count;
@@ -89,23 +89,23 @@ const appliedFilterCount = computed(() => {
 
 // #region Functions
 const onBulkEditSaveClicked = () => {
-  const bulkEditForm = useForm({ companies: [] });
+  const bulkEditForm = useForm({ suppliers: [] });
   bulkEditForm
     .transform(() =>
-      editCompanyForms.value.map((company) => ({
-        id: company.id,
-        company_name: company.company_name ?? '',
-        active: !company.active ? false : true,
-        address_1: company.address_1 ?? '',
-        address_2: company.address_2 ?? '',
-        email: company.email ?? '',
-        phone_number: company.phone_number ?? '',
-        mobile_number: company.mobile_number ?? '',
-        website: company.website ?? '',
-        img_url: company.img_url ?? '',
+      editSupplierForms.value.map((supplier) => ({
+        id: supplier.id,
+        supplier_name: supplier.supplier_name ?? '',
+        active: !supplier.active ? false : true,
+        address_1: supplier.address_1 ?? '',
+        address_2: supplier.address_2 ?? '',
+        email: supplier.email ?? '',
+        phone_number: supplier.phone_number ?? '',
+        mobile_number: supplier.mobile_number ?? '',
+        website: supplier.website ?? '',
+        img_url: supplier.img_url ?? '',
       }))
     )
-    .post(route('admin/infrastructure/companies/edit.bulk'), {
+    .post(route('admin/infrastructure/suppliers/edit.bulk'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -115,7 +115,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/infrastructure/companies/delete'),
+    route('admin/infrastructure/suppliers/delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -136,7 +136,7 @@ const onDownloadFileClicked = (url, data) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'companies.csv');
+    link.setAttribute('download', 'suppliers.csv');
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -144,7 +144,7 @@ const onDownloadFileClicked = (url, data) => {
 };
 const onEditDialogCloseClicked = (shouldHideAlert = true) => {
   isEditDialogOpen.value = false;
-  editCompanyForms.value = [];
+  editSupplierForms.value = [];
   if (shouldHideAlert) usePage().props.flash.show = null;
 };
 const onGoToPageClicked = (data) => {
@@ -156,7 +156,7 @@ const onGoToPageClicked = (data) => {
         ...tableSortOptions.value,
       }),
       tableFilterOptions: {
-        company_name: !!tableFilterOptions?.company_name ? tableFilterOptions.company_name : undefined,
+        supplier_name: !!tableFilterOptions?.supplier_name ? tableFilterOptions.supplier_name : undefined,
         showDeleted: tableFilterOptions.showDeleted,
         showActive: tableFilterOptions.showActive,
       },
@@ -174,7 +174,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/infrastructure/companies/import'), {
+  importForm.post(route('admin/infrastructure/suppliers/import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -207,19 +207,19 @@ const onToolbarBtnClicked = (event) => {
       }
       break;
     case 'edit':
-      editCompanyForms.value = selectedTableRows.value.map((r) => {
-        const company = props.paginatedResults.data.find((d) => d.id === r);
+      editSupplierForms.value = selectedTableRows.value.map((r) => {
+        const supplier = props.paginatedResults.data.find((d) => d.id === r);
         return useForm({
-          id: company.id,
-          company_name: company.company_name ?? '',
-          active: !company.active ? false : true,
-          address_1: company.address_1 ?? '',
-          address_2: company.address_2 ?? '',
-          email: company.email ?? '',
-          phone_number: company.phone_number ?? '',
-          mobile_number: company.mobile_number ?? '',
-          website: company.website ?? '',
-          img_url: company.img_url ?? '',
+          id: supplier.id,
+          supplier_name: supplier.supplier_name ?? '',
+          active: !supplier.active ? false : true,
+          address_1: supplier.address_1 ?? '',
+          address_2: supplier.address_2 ?? '',
+          email: supplier.email ?? '',
+          phone_number: supplier.phone_number ?? '',
+          mobile_number: supplier.mobile_number ?? '',
+          website: supplier.website ?? '',
+          img_url: supplier.img_url ?? '',
         });
       });
       isEditDialogOpen.value = true;
@@ -245,7 +245,7 @@ const onResetFiltersClicked = (controlName, value) => {
     tableFilterOptions.reset(controlName);
   } else {
     tableFilterOptions.defaults({
-      company_name: '',
+      supplier_name: '',
       showDeleted: 'onlyNonDeleted',
       showActive: 'both',
     });
@@ -254,19 +254,19 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/infrastructure/companies/view', { id }));
+  router.visit(route('admin/infrastructure/suppliers/view', { id }));
 };
 // #endregion Functions
 
 // #region Watchers
 watch(editBulkActive, (val) => {
-  editCompanyForms.value.forEach((companyForm) => (companyForm.active = val));
+  editSupplierForms.value.forEach((companyForm) => (companyForm.active = val));
 });
 // #endregion Watchers
 </script>
 
 <template>
-  <CompanyLayout>
+  <SupplierLayout>
     <Head title="Overview" />
     <div class="h-full flex flex-col sm:px-6 lg:px-8" v-if="paginatedResults?.data.length >= 0">
       <TableToolbar
@@ -295,18 +295,20 @@ watch(editBulkActive, (val) => {
               @submit.prevent="onGoToPageClicked"
             >
               <div class="grid gap-2 col-span-2">
-                <label for="company_name" class="block text-sm font-medium leading-6 text-gray-900">Company Name</label>
+                <label for="supplier_name" class="block text-sm font-medium leading-6 text-gray-900"
+                  >Supplier Name</label
+                >
                 <div class="input-group">
                   <input
                     type="text"
-                    name="company_name"
+                    name="supplier_name"
                     class="input input-bordered input-sm w-full"
-                    v-model="tableFilterOptions.company_name"
+                    v-model="tableFilterOptions.supplier_name"
                   />
                   <button
                     type="button"
                     class="btn btn-square btn-outline border-gray-300 btn-sm"
-                    @click="onResetFiltersClicked('company_name', '')"
+                    @click="onResetFiltersClicked('supplier_name', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>
@@ -388,41 +390,41 @@ watch(editBulkActive, (val) => {
             </td>
           </tr>
           <tr
-            v-for="company in paginatedResults?.data"
-            :key="company.id"
+            v-for="supplier in paginatedResults?.data"
+            :key="supplier.id"
             :class="[
-              selectedTableRows.includes(company.id) && 'bg-gray-50',
-              !!company.deleted_at && 'bg-red-50 hover:bg-red-100',
+              selectedTableRows.includes(supplier.id) && 'bg-gray-50',
+              !!supplier.deleted_at && 'bg-red-50 hover:bg-red-100',
               'hover:bg-gray-50',
             ]"
           >
             <td class="relative px-7 w-4 sm:w-12 sm:px-6">
               <div
-                v-if="selectedTableRows.includes(company.id)"
+                v-if="selectedTableRows.includes(supplier.id)"
                 class="absolute inset-y-0 left-0 w-0.5 bg-primary"
               ></div>
               <input
                 type="checkbox"
                 class="checkbox absolute left-4 top-1/2 -mt-2 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-                :value="company.id"
-                :disabled="!!company.deleted_at"
+                :value="supplier.id"
+                :disabled="!!supplier.deleted_at"
                 v-model="selectedTableRows"
               />
             </td>
             <td
               :class="[
                 'py-4 pr-3 text-sm font-medium',
-                selectedTableRows.includes(company.id) ? 'text-primary' : 'text-gray-900',
+                selectedTableRows.includes(supplier.id) ? 'text-primary' : 'text-gray-900',
               ]"
             >
               <button
                 type="button"
                 class="link text-primary font-semibold text-left"
-                @click="onViewItemClicked(company.id)"
+                @click="onViewItemClicked(supplier.id)"
               >
                 <div class="flex gap-2 items-center">
-                  <span :class="company.company_name?.length > 50 ? 'break-all' : 'break-words'">{{
-                    company.company_name
+                  <span :class="supplier.supplier_name?.length > 50 ? 'break-all' : 'break-words'">{{
+                    supplier.supplier_name
                   }}</span>
                   <EyeIcon class="h-5 w-5 flex-shrink-0" />
                 </div>
@@ -430,12 +432,12 @@ watch(editBulkActive, (val) => {
               <dl class="font-normal lg:hidden">
                 <dt class="sr-only">Active</dt>
                 <dd class="mt-2 truncate text-gray-700">
-                  <ColouredBadge :data="company.active" data-type="boolean" />
+                  <ColouredBadge :data="supplier.active" data-type="boolean" />
                 </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
                 <dd class="mt-1 truncate text-gray-500 sm:hidden">
                   {{
-                    new Date(company.created_at).toLocaleString('en-SG', {
+                    new Date(supplier.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })
@@ -444,14 +446,14 @@ watch(editBulkActive, (val) => {
               </dl>
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              <ColouredBadge :data="company.active" data-type="boolean" />
+              <ColouredBadge :data="supplier.active" data-type="boolean" />
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-              {{ new Date(company.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}
+              {{ new Date(supplier.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}
             </td>
             <td class="py-4 pl-3 pr-4 text-right text-sm font-medium">
-              <Link :href="route(editUrl, { id: company.id })" class="btn btn-link btn-sm"
-                >Edit<span class="sr-only">, {{ company.id }}</span></Link
+              <Link :href="route(editUrl, { id: supplier.id })" class="btn btn-link btn-sm"
+                >Edit<span class="sr-only">, {{ supplier.id }}</span></Link
               >
             </td>
           </tr>
@@ -472,7 +474,7 @@ watch(editBulkActive, (val) => {
     </div>
     <Error404 :show="!paginatedResults" />
     <DialogImportCsv
-      context="company"
+      context="supplier"
       :show="isImportDialogOpen"
       :export-url="exportUrl"
       :import-form="importForm"
@@ -484,10 +486,10 @@ watch(editBulkActive, (val) => {
     <DialogBulkEdit
       :show="isEditDialogOpen"
       :selected-items="selectedTableRows"
-      :edit-forms="editCompanyForms"
+      :edit-forms="editSupplierForms"
       :input-fields="inputFields"
       :is-loading="isLoading"
-      editable-header-key="company_name"
+      editable-header-key="supplier_name"
       @on-dialog-close-clicked="onEditDialogCloseClicked"
       @on-dialog-save-clicked="onBulkEditSaveClicked"
     >
@@ -501,5 +503,5 @@ watch(editBulkActive, (val) => {
         </div>
       </template>
     </DialogBulkEdit>
-  </CompanyLayout>
+  </SupplierLayout>
 </template>

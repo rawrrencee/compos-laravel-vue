@@ -1,5 +1,5 @@
 <script setup>
-import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
+import BrandLayout from '@/Pages/Admin/Commerce/Brands/BrandLayout.vue';
 import { getImgSrcFromPath } from '@/Util/Photo';
 import { PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -8,11 +8,12 @@ import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
 
 const props = defineProps({
   errorMessage: String,
-  company: Object | undefined,
+  brand: Object | undefined,
 });
 const inputFields = [
-  { key: 'company_name', title: 'Company Name' },
-  { key: 'company_photo', title: 'Company Photo' },
+  { key: 'brand_name', title: 'Brand Name' },
+  { key: 'brand_code', title: 'Brand Code' },
+  { key: 'brand_photo', title: 'Brand Photo' },
   { key: 'active', title: 'Active' },
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
@@ -21,17 +22,18 @@ const inputFields = [
   { key: 'website', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
 ];
-const companyForm = useForm({
-  company_name: props.company?.company_name ?? '',
-  active: !props.company?.active ? false : true,
-  address_1: props.company?.address_1 ?? '',
-  address_2: props.company?.address_2 ?? '',
-  email: props.company?.email ?? '',
-  phone_number: props.company?.phone_number ?? '',
-  mobile_number: props.company?.mobile_number ?? '',
-  website: props.company?.website ?? '',
-  img_url: props.company?.img_url ?? '',
-  company_photo: null,
+const brandForm = useForm({
+  brand_name: props.brand?.brand_name ?? '',
+  brand_code: props.brand?.brand_code ?? '',
+  active: !props.brand?.active ? false : true,
+  address_1: props.brand?.address_1 ?? '',
+  address_2: props.brand?.address_2 ?? '',
+  email: props.brand?.email ?? '',
+  phone_number: props.brand?.phone_number ?? '',
+  mobile_number: props.brand?.mobile_number ?? '',
+  website: props.brand?.website ?? '',
+  img_url: props.brand?.img_url ?? '',
+  brand_photo: null,
 });
 const photoPreview = ref(null);
 const photoFile = ref(null);
@@ -39,7 +41,7 @@ const showFlashError = ref(true);
 
 const flashError = computed(() => {
   return {
-    show: companyForm.hasErrors && showFlashError.value,
+    show: brandForm.hasErrors && showFlashError.value,
     type: 'default',
     status: 'error',
     message: 'Please complete or correct the required fields.',
@@ -60,63 +62,65 @@ const updatePhotoPreview = (event) => {
 };
 const submit = () => {
   showFlashError.value = true;
-  if (!props.company) {
-    companyForm
+  if (!props.brand) {
+    brandForm
       .transform((data) => ({
         ...data,
+        brand_code: data.brand_code?.toLocaleUpperCase(),
         ...(photoFile.value && {
-          company_photo: photoFile.value,
+          brand_photo: photoFile.value,
         }),
       }))
-      .post(route('admin/infrastructure/companies/add.store'));
+      .post(route('admin/commerce/brands/add.store'));
   } else {
-    companyForm
+    brandForm
       .transform((data) => ({
         ...data,
+        brand_code: data.brand_code?.toLocaleUpperCase(),
         ...(photoFile.value && {
-          company_photo: photoFile.value,
+          brand_photo: photoFile.value,
         }),
-        id: props.company.id,
+        id: props.brand.id,
       }))
-      .post(route('admin/infrastructure/companies/edit.update'));
+      .post(route('admin/commerce/brands/edit.update'));
   }
 };
 const deletePhoto = () => {
-  if (props.company && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('admin/infrastructure/companies/photo.delete'), {
-      id: props.company.id,
-      img_path: props.company.img_path,
+  if (props.brand && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
+    router.post(route('admin/commerce/brands/photo.delete'), {
+      id: props.brand.id,
+      img_path: props.brand.img_path,
     });
   }
 };
 </script>
 
 <template>
-  <CompanyLayout>
-    <Head :title="`${!!company ? 'Edit' : 'Add New'} Company`" />
+  <BrandLayout>
+    <Head :title="`${!!brand ? 'Edit' : 'Add New'} Brand`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
     <div class="sm:px-6 lg:px-8">
       <form class="px-4 pt-4 sm:px-0 flex flex-col h-full" @submit.prevent="submit">
         <div class="flex-1 grow grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 pb-12">
           <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
-            <template v-if="input.key === 'company_photo'">
-              <label for="company_photo" class="block text-sm font-medium leading-6 text-gray-900">Company Photo</label>
+            <template v-if="input.key === 'brand_photo'">
+              <label for="brand_photo" class="block text-sm font-medium leading-6 text-gray-900">Brand Photo</label>
               <div
                 class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 max-w-lg"
               >
                 <div class="text-center flex flex-col gap-2 justify-center">
                   <div v-if="!photoPreview" class="mt-2 flex flex-col gap-4 items-center">
                     <img
-                      v-if="company?.img_url || company?.img_path"
-                      :src="company?.img_path ? getImgSrcFromPath(company?.img_path) : company?.img_url"
+                      v-if="brand?.img_url || brand?.img_path"
+                      :src="brand?.img_path ? getImgSrcFromPath(brand?.img_path) : brand?.img_url"
                       class="rounded-lg h-20 w-20 object-cover"
                     />
                     <PhotoIcon class="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" v-else />
                     <button
                       type="button"
                       class="btn btn-ghost btn-sm"
-                      v-if="company?.img_path"
-                      :disabled="!!company?.img_url && !company?.img_path"
+                      v-if="brand?.img_path"
+                      :disabled="!!brand?.img_url && !brand?.img_path"
                       @click="deletePhoto"
                     >
                       <div class="flex gap-2 items-center">
@@ -124,7 +128,7 @@ const deletePhoto = () => {
                         <span>Remove</span>
                       </div>
                     </button>
-                    <span class="text-gray-600 text-xs" v-if="company?.img_url && !company?.img_path"
+                    <span class="text-gray-600 text-xs" v-if="brand?.img_url && !brand?.img_path"
                       >Image populated from Image URL (filled in below)</span
                     >
                   </div>
@@ -137,17 +141,17 @@ const deletePhoto = () => {
                   <div class="flex flex-col">
                     <div class="flex text-sm leading-6 justify-center">
                       <label
-                        for="company_photo"
+                        for="brand_photo"
                         class="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-secondary"
                       >
                         <span
                           >Click to upload
-                          {{ company?.img_path ? 'another' : 'a new' }}
+                          {{ brand?.img_path ? 'another' : 'a new' }}
                           file</span
                         >
                         <input
-                          id="company_photo"
-                          name="company_photo"
+                          id="brand_photo"
+                          name="brand_photo"
                           type="file"
                           class="sr-only"
                           @change="updatePhotoPreview"
@@ -162,7 +166,7 @@ const deletePhoto = () => {
             <template v-else-if="input.key === 'active'">
               <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Active</label>
               <div class="mt-2">
-                <input type="checkbox" name="active" class="toggle toggle-primary" v-model="companyForm.active" />
+                <input type="checkbox" name="active" class="toggle toggle-primary" v-model="brandForm.active" />
               </div>
             </template>
             <template v-else>
@@ -175,12 +179,15 @@ const deletePhoto = () => {
                   :id="input.key"
                   :name="input.key"
                   class="input input-bordered w-full max-w-lg"
-                  v-model="companyForm[input.key]"
-                  :class="companyForm.errors[input.key] ? 'border-error' : ''"
-                  @input="() => companyForm.clearErrors([input.key])"
+                  v-model="brandForm[input.key]"
+                  :class="[
+                    brandForm.errors[input.key] ? 'border-error' : '',
+                    input.key === 'brand_code' && 'uppercase',
+                  ]"
+                  @input="() => brandForm.clearErrors([input.key])"
                 />
-                <span v-if="companyForm.errors[input.key]" class="text-error">
-                  {{ companyForm.errors[input.key] }}
+                <span v-if="brandForm.errors[input.key]" class="text-error">
+                  {{ brandForm.errors[input.key] }}
                 </span>
               </div>
             </template>
@@ -189,7 +196,7 @@ const deletePhoto = () => {
 
         <div class="bottom-0 sticky py-4 bg-white border-t-2 border-gray-100">
           <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:items-stretch">
-            <Link type="button" class="btn sm:grow sm:max-w-[10rem]" :href="route('admin/infrastructure/companies')">
+            <Link type="button" class="btn sm:grow sm:max-w-[10rem]" :href="route('admin/commerce/brands')">
               Cancel
             </Link>
             <button type="submit" class="btn btn-primary sm:grow sm:max-w-[10rem]">Save</button>
@@ -197,5 +204,5 @@ const deletePhoto = () => {
         </div>
       </form>
     </div>
-  </CompanyLayout>
+  </BrandLayout>
 </template>
