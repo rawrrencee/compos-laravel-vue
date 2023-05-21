@@ -82,8 +82,8 @@ const onDownloadFileClicked = (url, data) => {
                           <div class="flex flex-col text-sm">
                             <span class="font-medium leading-6 text-gray-900">Note</span>
                             <span class="mt-2">Please leave blanks for data that is empty.</span>
-                            <span>Use 1 or 0 for true or false.</span>
-                            <span>Do not use NULL or NA to represent empty values.</span>
+                            <span>Use 1 or 0 for true or false. (e.g. for 'active' value)</span>
+                            <span>If you modified the CSV after attaching it, please reload the page.</span>
                           </div>
                           <div>
                             <label for="project-name" class="block text-sm font-medium leading-6 text-gray-900"

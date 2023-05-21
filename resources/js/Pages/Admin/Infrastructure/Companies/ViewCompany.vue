@@ -50,14 +50,16 @@ const onAdminAlertButtonClicked = () => {
         <div class="lg:-mt-15 -mt-12 flow-root px-4 sm:-mt-8 sm:flex sm:items-end sm:px-6">
           <div>
             <div class="-m-1 flex">
-              <div class="inline-flex overflow-hidden rounded-lg border-4 border-white">
+              <div
+                class="h-24 w-24 sm:h-40 sm:w-40 lg:h-48 lg:w-48 flex items-center justify-center bg-white rounded-lg shadow-md border-4 border-white"
+              >
                 <img
                   v-if="viewCompany?.img_url || viewCompany?.img_path"
                   :src="viewCompany?.img_path ? getImgSrcFromPath(viewCompany?.img_path) : viewCompany?.img_url"
-                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 object-cover"
+                  class="w-full h-auto"
                 />
                 <PhotoIcon
-                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300 bg-white"
+                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300"
                   aria-hidden="true"
                   v-else
                 />
