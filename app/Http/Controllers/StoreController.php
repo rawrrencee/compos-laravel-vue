@@ -117,7 +117,12 @@ class StoreController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $store = Store::withTrashed()->where('id', '=', $id)->first();
+        $store = Store::withTrashed()
+            ->where('id', '=', $id)
+            ->with(['company' => function ($query) {
+                $query->select('id', 'company_name');
+            }])
+            ->first();
 
         if (!isset($store)) {
             return Inertia::render('Admin/Infrastructure/Stores/Overview')
@@ -127,7 +132,7 @@ class StoreController extends Controller
                 ->with('message', 'An error occurred.');
         }
 
-        return Inertia::render('Admin/Infrastructure/Stores/ViewStore', ['viewStore' => $store, 'companies' => $this->CompanyController->getValidCompanies()]);
+        return Inertia::render('Admin/Infrastructure/Stores/ViewStore', ['viewStore' => $store]);
     }
 
     public function store(Request $request)

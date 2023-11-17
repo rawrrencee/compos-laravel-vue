@@ -12,6 +12,7 @@ const spanColourClass = computed(() => {
   const successColour = 'bg-green-100 text-green-700';
   if (props.dataType) {
     switch (props.dataType) {
+      case 'yesNo':
       case 'boolean':
         return !!props.data ? successColour : errorColour;
       default:
@@ -27,6 +28,7 @@ const svgColourClass = computed(() => {
   const successColour = 'fill-green-500';
   if (props.dataType) {
     switch (props.dataType) {
+      case 'yesNo':
       case 'boolean':
         return !!props.data ? successColour : errorColour;
       default:
@@ -39,6 +41,8 @@ const svgColourClass = computed(() => {
 const badgeTitle = computed(() => {
   if (props.dataType) {
     switch (props.dataType) {
+      case 'yesNo':
+        return !!props.data ? 'Yes' : 'No';
       case 'boolean':
         return !!props.data ? 'Active' : 'Inactive';
       default:

@@ -24,7 +24,7 @@ const inputFields = [
   { key: 'website', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
   { key: 'tax_percentage', title: 'Tax Percentage', type: 'number' },
-  { key: 'include_tax', title: 'Includes Tax' },
+  { key: 'include_tax', title: 'Include Tax' },
 ];
 const storeForm = useForm({
   store_name: props.store?.store_name ?? '',
@@ -196,9 +196,7 @@ const deletePhoto = () => {
               </div>
             </template>
             <template v-else-if="input.key === 'include_tax'">
-              <label for="include_tax" class="block text-sm font-medium leading-6 text-gray-900"
-                >Item Price Includes Tax</label
-              >
+              <label for="include_tax" class="block text-sm font-medium leading-6 text-gray-900">Include Tax</label>
               <div class="mt-2">
                 <input
                   type="checkbox"
