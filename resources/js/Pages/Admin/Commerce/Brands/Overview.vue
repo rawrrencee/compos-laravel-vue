@@ -399,7 +399,7 @@ watch(editBulkActive, (val) => {
                     : 'hidden sm:table-cell px-3',
                   'py-3.5 text-left text-sm font-semibold text-gray-900',
                 ]"
-                @on-table-header-clicked="onTableHeaderClicked"
+                @table-header-clicked="onTableHeaderClicked"
               />
             </template>
             <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3">
@@ -489,7 +489,7 @@ watch(editBulkActive, (val) => {
       </TableMain>
       <TablePagination
         :paginated-results="paginatedResults"
-        @on-go-to-page-clicked="(data) => onGoToPageClicked(data)"
+        @go-to-page-clicked="(data) => onGoToPageClicked(data)"
         v-if="paginatedResults?.data.length > 0"
       />
       <TableStickyFooter
@@ -507,9 +507,9 @@ watch(editBulkActive, (val) => {
       :export-url="exportUrl"
       :import-form="importForm"
       :is-loading="isLoading"
-      @on-dialog-close-clicked="onImportDialogCloseClicked"
-      @on-dialog-save-clicked="onImportFileSaveClicked"
-      @on-import-file-added="onImportFileAdded"
+      @dialog-close-clicked="onImportDialogCloseClicked"
+      @dialog-save-clicked="onImportFileSaveClicked"
+      @import-file-added="onImportFileAdded"
     />
     <DialogBulkEdit
       :show="isEditDialogOpen"
@@ -518,8 +518,8 @@ watch(editBulkActive, (val) => {
       :input-fields="inputFields"
       :is-loading="isLoading"
       editable-header-key="brand_name"
-      @on-dialog-close-clicked="onEditDialogCloseClicked"
-      @on-dialog-save-clicked="onBulkEditSaveClicked"
+      @dialog-close-clicked="onEditDialogCloseClicked"
+      @dialog-save-clicked="onBulkEditSaveClicked"
     >
       <template #bulk-fields>
         <div class="grid grid-cols-1 px-4 gap-2 pb-6">

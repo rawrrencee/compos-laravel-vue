@@ -22,12 +22,12 @@ defineProps({
   additionalData: Object,
 });
 
-defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
+defineEmits(['dialogCloseClicked', 'dialogSaveClicked']);
 </script>
 
 <template>
   <TransitionRoot as="template" :show="show">
-    <Dialog as="div" class="relative z-40" @close="$emit('onDialogCloseClicked')">
+    <Dialog as="div" class="relative z-40" @close="$emit('dialogCloseClicked')">
       <div class="fixed inset-0" aria-hidden="true" />
 
       <div class="fixed inset-0 overflow-hidden">
@@ -45,7 +45,7 @@ defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
               <DialogPanel class="pointer-events-auto w-screen max-w-2xl">
                 <form
                   class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
-                  @submit.prevent="$emit('onDialogSaveClicked')"
+                  @submit.prevent="$emit('dialogSaveClicked')"
                 >
                   <div class="h-0 flex-1 overflow-y-auto">
                     <div class="bg-primary px-4 py-6 sm:px-6">
@@ -57,7 +57,7 @@ defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
                           <button
                             type="button"
                             class="rounded-md bg-primary text-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                            @click="$emit('onDialogCloseClicked')"
+                            @click="$emit('dialogCloseClicked')"
                           >
                             <span class="sr-only">Close panel</span>
                             <XMarkIcon class="h-6 w-6" aria-hidden="true" />
@@ -174,7 +174,7 @@ defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
                     </div>
                   </div>
                   <div class="grid grid-cols-2 sm:flex sm:flex-shrink-0 gap-2 justify-end px-4 py-4">
-                    <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="$emit('onDialogCloseClicked')">
+                    <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="$emit('dialogCloseClicked')">
                       Cancel
                     </button>
                     <button

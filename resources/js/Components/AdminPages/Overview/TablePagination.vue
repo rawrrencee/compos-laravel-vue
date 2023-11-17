@@ -12,7 +12,7 @@ const props = defineProps({
   paginatedResults: Object,
 });
 
-defineEmits(['onGoToPageClicked']);
+defineEmits(['goToPageClicked']);
 
 const goToPage = ref(props.paginatedResults?.current_page ?? 1);
 const perPage = ref(props.paginatedResults?.per_page ?? 10);
@@ -80,7 +80,7 @@ const pagesArray = computed(() => {
                   type="button"
                   class="btn btn-sm btn-primary"
                   @click="
-                    $emit('onGoToPageClicked', {
+                    $emit('goToPageClicked', {
                       page: 1,
                       perPage,
                     })
@@ -97,7 +97,7 @@ const pagesArray = computed(() => {
     <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2">
       <button
         :disabled="paginatedResults?.current_page === 1"
-        @click="$emit('onGoToPageClicked', { page: 1, perPage })"
+        @click="$emit('goToPageClicked', { page: 1, perPage })"
         class="btn btn-sm btn-ghost disabled:bg-gray-50"
       >
         <ChevronDoubleLeftIcon class="h-3 w-3" />
@@ -105,7 +105,7 @@ const pagesArray = computed(() => {
       <button
         :disabled="paginatedResults?.current_page === 1"
         @click="
-          $emit('onGoToPageClicked', {
+          $emit('goToPageClicked', {
             page: paginatedResults?.current_page - 1,
             perPage,
           })
@@ -118,7 +118,7 @@ const pagesArray = computed(() => {
         <template v-for="page in pagesArray" :key="page">
           <button
             :class="[page === paginatedResults?.current_page ? '' : 'btn-ghost', 'btn btn-sm']"
-            @click="$emit('onGoToPageClicked', { page, perPage })"
+            @click="$emit('goToPageClicked', { page, perPage })"
           >
             {{ page }}
           </button>
@@ -128,7 +128,7 @@ const pagesArray = computed(() => {
         :disabled="paginatedResults?.current_page === paginatedResults?.last_page"
         @click="
           () =>
-            $emit('onGoToPageClicked', {
+            $emit('goToPageClicked', {
               page: paginatedResults?.current_page + 1,
               perPage,
             })
@@ -140,7 +140,7 @@ const pagesArray = computed(() => {
       <button
         :disabled="paginatedResults?.current_page === paginatedResults?.last_page"
         @click="
-          $emit('onGoToPageClicked', {
+          $emit('goToPageClicked', {
             page: paginatedResults?.last_page,
             perPage,
           })
