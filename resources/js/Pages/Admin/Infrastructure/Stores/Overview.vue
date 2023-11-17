@@ -45,6 +45,8 @@ const editUrl = `${moduleUrl}/edit`;
 const exportUrl = `${route('admin/infrastructure/stores/export')}`;
 const tableHeaderTitles = [
   { key: 'store_name', title: 'Store Name' },
+  { key: 'store_code', title: 'Store Code' },
+  { key: 'company_name', title: 'Company Name' },
   { key: 'active', title: 'Active' },
   { key: 'created_at', title: 'Created At' },
 ];
@@ -101,7 +103,7 @@ const onBulkEditSaveClicked = () => {
       editStoreForms.value.map((store) => ({
         id: store.id,
         store_name: store.store_name ?? '',
-        store_code: store.store_code ?? '',
+        store_code: store.store_code?.toLocaleUpperCase() ?? '',
         company_id: store.company_id ?? '',
         address_1: store.address_1 ?? '',
         address_2: store.address_2 ?? '',
@@ -224,7 +226,7 @@ const onToolbarBtnClicked = (event) => {
         return useForm({
           id: store.id,
           store_name: store.store_name ?? '',
-          store_code: store.store_code ?? '',
+          store_code: store.store_code?.toLocaleUpperCase() ?? '',
           company_id: store.company_id ?? '',
           address_1: store.address_1 ?? '',
           address_2: store.address_2 ?? '',
@@ -441,6 +443,14 @@ watch(editBulkActive, (val) => {
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
+                <dt class="sr-only">Store Code</dt>
+                <dd class="mt-2 truncate text-gray-700">
+                  {{ store.store_code }}
+                </dd>
+                <dt class="sr-only">Company Name</dt>
+                <dd class="mt-2 truncate text-gray-700">
+                  {{ store.company?.company_name }}
+                </dd>
                 <dt class="sr-only">Active</dt>
                 <dd class="mt-2 truncate text-gray-700">
                   <ColouredBadge :data="store.active" data-type="boolean" />
@@ -456,6 +466,10 @@ watch(editBulkActive, (val) => {
                 </dd>
               </dl>
             </td>
+            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
+              {{ store.store_code }}
+            </td>
+            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{{ store.company?.company_name }}</td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
               <ColouredBadge :data="store.active" data-type="boolean" />
             </td>

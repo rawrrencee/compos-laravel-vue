@@ -25,4 +25,14 @@ class Brand extends Model
         'img_path',
         'img_url',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            $model->store_code = $model->store_code . '__deleted@' . date('d-m-Y h:i:s A');
+            $model->save();
+        });
+    }
 }

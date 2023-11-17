@@ -90,7 +90,19 @@ class StoreController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Infrastructure/Stores/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $stores->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions'], 'companies' => $this->CompanyController->getValidCompanies()]);
+        return Inertia::render('Admin/Infrastructure/Stores/Overview', [
+            'sortBy' => $request['sortBy'],
+            'orderBy' => $request['orderBy'],
+            'paginatedResults' =>
+            $stores
+                ->with(['company' => function ($query) {
+                    $query->select('id', 'company_name');
+                }])
+                ->orderBy($request['sortBy'], $request['orderBy'])
+                ->paginate($request['perPage']),
+            'tableFilterOptions' => $request['tableFilterOptions'],
+            'companies' => $this->CompanyController->getValidCompanies()
+        ]);
     }
 
     public function add()

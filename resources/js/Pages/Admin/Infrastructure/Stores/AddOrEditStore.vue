@@ -73,6 +73,7 @@ const submit = () => {
     storeForm
       .transform((data) => ({
         ...data,
+        store_code: data.store_code?.toLocaleUpperCase() ?? '',
         ...(photoFile.value && {
           store_photo: photoFile.value,
         }),
@@ -82,6 +83,7 @@ const submit = () => {
     storeForm
       .transform((data) => ({
         ...data,
+        store_code: data.store_code?.toLocaleUpperCase() ?? '',
         ...(photoFile.value && {
           store_photo: photoFile.value,
         }),
