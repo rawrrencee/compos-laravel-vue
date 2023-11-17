@@ -102,7 +102,8 @@ class CompanyController extends Controller
             ->with(['stores' => function ($query) {
                 $query
                     ->withoutTrashed()
-                    ->select('id', 'company_id', 'store_name', 'store_code');
+                    ->select('id', 'company_id', 'store_name', 'store_code')
+                    ->orderBy('store_name');
             }])
             ->firstOrFail();
 

@@ -109,7 +109,7 @@ const onAdminAlertButtonClicked = () => {
                 </template>
                 <template v-else-if="label.key === 'stores'">
                   <ul v-if="viewCompany.stores?.length > 0">
-                    <li v-for="store in viewCompany.stores" class="m-1">
+                    <li v-for="(store, index) in viewCompany.stores" :class="index !== 0 && 'mt-3'">
                       <Link
                         class="link flex items-center gap-1"
                         :href="route('admin/infrastructure/stores/view', { id: store.id })"
