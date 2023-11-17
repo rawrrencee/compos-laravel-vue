@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommonController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -215,9 +216,26 @@ Route::middleware([
                 Route::post('/delete', [BrandController::class, 'destroy'])->name('admin/commerce/brands/delete');
             });
 
-            Route::get('/categories', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/commerce/categories');
+            Route::prefix('categories')->group(function () {
+                Route::get('/', [CategoryController::class, 'index'])->name('admin/commerce/categories');
+
+                Route::get('/add', function () {
+                    return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory');
+                })->name('admin/commerce/categories/add');
+                Route::post('/add', [CategoryController::class, 'store'])->name('admin/commerce/categories/add.store');
+
+                Route::get('/edit', [CategoryController::class, 'edit'])->name('admin/commerce/categories/edit');
+                Route::post('/edit', [CategoryController::class, 'update'])->name('admin/commerce/categories/edit.update');
+                Route::post('/edit-bulk', [CategoryController::class, 'bulkUpdate'])->name('admin/commerce/categories/edit.bulk');
+
+                Route::get('/view', [CategoryController::class, 'view'])->name('admin/commerce/categories/view');
+                Route::post('/delete-photo', [CategoryController::class, 'deletePhoto'])->name('admin/commerce/categories/photo.delete');
+
+                Route::post('/import', [CategoryController::class, 'importCsv'])->name('admin/commerce/categories/import');
+                Route::post('/export', [CategoryController::class, 'exportCsv'])->name('admin/commerce/categories/export');
+
+                Route::post('/delete', [CategoryController::class, 'destroy'])->name('admin/commerce/categories/delete');
+            });
 
             Route::get('/items', function () {
                 return Inertia::render('Error/404');

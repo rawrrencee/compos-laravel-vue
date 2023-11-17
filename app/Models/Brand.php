@@ -31,7 +31,7 @@ class Brand extends Model
         parent::boot();
 
         static::deleting(function ($model) {
-            $model->store_code = $model->store_code . '__deleted@' . date('d-m-Y h:i:s A');
+            $model->brand_code = $model->brand_code . '__deleted@' . date('d-m-Y h:i:s A');
             $model->save();
         });
     }

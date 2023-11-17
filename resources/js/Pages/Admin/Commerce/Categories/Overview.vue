@@ -1,5 +1,4 @@
 <script setup>
-import CategoryLayout from '@/Pages/Admin/Infrastructure/Categorys/CategoryLayout.vue';
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
@@ -15,6 +14,7 @@ import TablePagination from '../../../../Components/AdminPages/Overview/TablePag
 import TableSortableHeader from '../../../../Components/AdminPages/Overview/TableSortableHeader.vue';
 import TableStickyFooter from '../../../../Components/AdminPages/Overview/TableStickyFooter.vue';
 import TableToolbar from '../../../../Components/AdminPages/Overview/TableToolbar.vue';
+import CategoryLayout from './CategoryLayout.vue';
 
 // #region Page Variables
 const props = defineProps({
