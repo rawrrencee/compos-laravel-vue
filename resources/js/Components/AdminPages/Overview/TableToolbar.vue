@@ -63,14 +63,14 @@ defineEmits(['buttonClicked']);
       </button>
     </div>
     <div class="hidden sm:join">
-      <Link as="button" :href="route(addNewUrl)" class="btn join-item" :class="isLoading ? 'loading' : ''">
+      <Link as="button" :href="route(addNewUrl)" class="btn btn-primary join-item" :class="isLoading ? 'loading' : ''">
         <div class="flex gap-2 items-center">
           <PlusCircleIcon class="w-5 h-5" />
           <span>Add New</span>
         </div>
       </Link>
       <Menu>
-        <MenuButton class="btn join-item !rounded-r-lg">
+        <MenuButton class="btn btn-primary join-item !rounded-r-lg">
           <EllipsisVerticalIcon class="h-4 w-4" />
         </MenuButton>
 
