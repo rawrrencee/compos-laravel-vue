@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use \App\Http\Controllers\CompanyController;
+use \App\Http\Controllers\StoreController;
 use \App\Http\Controllers\SupplierController;
 
 /*
@@ -147,9 +148,24 @@ Route::middleware([
                 Route::post('/delete', [CompanyController::class, 'destroy'])->name('admin/infrastructure/companies/delete');
             });
 
-            Route::get('/stores', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/infrastructure/stores');
+            Route::prefix('stores')->group(function () {
+                Route::get('/', [StoreController::class, 'index'])->name('admin/infrastructure/stores');
+
+                Route::get('/add', [StoreController::class, 'add'])->name('admin/infrastructure/stores/add');
+                Route::post('/add', [StoreController::class, 'store'])->name('admin/infrastructure/stores/add.store');
+
+                Route::get('/edit', [StoreController::class, 'edit'])->name('admin/infrastructure/stores/edit');
+                Route::post('/edit', [StoreController::class, 'update'])->name('admin/infrastructure/stores/edit.update');
+                Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('admin/infrastructure/stores/edit.bulk');
+
+                Route::get('/view', [StoreController::class, 'view'])->name('admin/infrastructure/stores/view');
+                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('admin/infrastructure/stores/photo.delete');
+
+                Route::post('/import', [StoreController::class, 'importCsv'])->name('admin/infrastructure/stores/import');
+                Route::post('/export', [StoreController::class, 'exportCsv'])->name('admin/infrastructure/stores/export');
+
+                Route::post('/delete', [StoreController::class, 'destroy'])->name('admin/infrastructure/stores/delete');
+            });
 
             Route::prefix('suppliers')->group(function () {
                 Route::get('/', [SupplierController::class, 'index'])->name('admin/infrastructure/suppliers');

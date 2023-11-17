@@ -21,4 +21,9 @@ class CommonController extends Controller
         }
         return false;
     }
+
+    public function formatException(\Exception $e)
+    {
+        return 'Message: ' . $e->getMessage() . ' Line: ' . $e->getLine();
+    }
 }

@@ -146,7 +146,7 @@ class SupplierController extends Controller
             DB::rollBack();
 
             return Inertia::render('Admin/Infrastructure/Suppliers/AddOrEditSupplier', [
-                'errorMessage' => 'Failed to create record: ' . $e->getMessage(),
+                'errorMessage' => 'Failed to create record: ' . $this->CommonController->formatException($e),
             ]);
         }
     }
@@ -222,7 +222,7 @@ class SupplierController extends Controller
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', 'Failed to update record: ' . $e->getMessage());
+                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
         }
     }
 
@@ -278,7 +278,7 @@ class SupplierController extends Controller
                 ->with('show', true)
                 ->with('type', 'dialog')
                 ->with('status', 'error')
-                ->with('message', 'Failed to bulk edit records: ' . $e->getMessage());
+                ->with('message', 'Failed to bulk edit records: ' . $this->CommonController->formatException($e));
         }
     }
 
@@ -306,7 +306,7 @@ class SupplierController extends Controller
                         ->with('show', true)
                         ->with('type', 'default')
                         ->with('status', 'success')
-                        ->with('message', 'Failed to update record: ' . $e->getMessage());
+                        ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
                 }
             }
         }
@@ -402,7 +402,7 @@ class SupplierController extends Controller
                 ->with('show', true)
                 ->with('type', 'dialog')
                 ->with('status', 'error')
-                ->with('message', 'Failed to update record: ' . $e->getMessage());
+                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
         }
     }
 
@@ -513,7 +513,7 @@ class SupplierController extends Controller
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'error')
-                ->with('message', 'Failed to delete record: ' . $e->getMessage());
+                ->with('message', 'Failed to delete record: ' . $this->CommonController->formatException($e));
         }
     }
 }

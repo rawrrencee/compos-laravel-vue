@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -11,13 +11,15 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
-class CompanyController extends Controller
+class StoreController extends Controller
 {
     protected $CommonController;
+    protected $CompanyController;
 
-    public function __construct(CommonController $CommonController)
+    public function __construct(CommonController $CommonController, CompanyController $CompanyController)
     {
         $this->CommonController = $CommonController;
+        $this->CompanyController = $CompanyController;
     }
 
     public function index(Request $request)
@@ -29,7 +31,7 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'sortBy' => [
                 'required',
-                Rule::in(['company_name', 'active', 'created_at'])
+                Rule::in(['store_name', 'active', 'created_at'])
             ],
             'orderBy' => [
                 'required',
@@ -51,22 +53,22 @@ class CompanyController extends Controller
         }
 
         // Filters
-        $company_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['company_name']  ?? null : null;
+        $store_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['store_name']  ?? null : null;
 
-        $companies = Company::query();
-        if (!empty($company_name)) {
-            $companies->where(function ($q) use ($company_name) {
-                $q->where('company_name', 'like', '%' . $company_name . '%');
+        $stores = Store::query();
+        if (!empty($store_name)) {
+            $stores->where(function ($q) use ($store_name) {
+                $q->where('store_name', 'like', '%' . $store_name . '%');
             });
         }
 
         if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['showDeleted'])) {
             switch ($request['tableFilterOptions']['showDeleted']) {
                 case 'onlyDeleted':
-                    $companies->onlyTrashed();
+                    $stores->onlyTrashed();
                     break;
                 case 'both':
-                    $companies->withTrashed();
+                    $stores->withTrashed();
                     break;
                 case 'onlyNonDeleted':
                 default:
@@ -77,10 +79,10 @@ class CompanyController extends Controller
         if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['showActive'])) {
             switch ($request['tableFilterOptions']['showActive']) {
                 case 'onlyActive':
-                    $companies->where('active', '=', '1');
+                    $stores->where('active', '=', '1');
                     break;
                 case 'onlyNonActive':
-                    $companies->where('active', '=', '0');
+                    $stores->where('active', '=', '0');
                     break;
                 case 'both':
                 default:
@@ -88,7 +90,13 @@ class CompanyController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
+        return Inertia::render('Admin/Infrastructure/Stores/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $stores->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions'], 'companies' => $this->CompanyController->getValidCompanies()]);
+    }
+
+    public function add()
+    {
+        return
+            Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore', ['companies' => $this->CompanyController->getValidCompanies()]);
     }
 
     public function view(Request $request)
@@ -97,55 +105,44 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::withTrashed()->where('id', '=', $id)->first();
+        $store = Store::withTrashed()->where('id', '=', $id)->first();
 
-        if (!isset($company)) {
-            return Inertia::render('Admin/Infrastructure/Companies/Overview')
+        if (!isset($store)) {
+            return Inertia::render('Admin/Infrastructure/Stores/Overview')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'error')
                 ->with('message', 'An error occurred.');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
+        return Inertia::render('Admin/Infrastructure/Stores/ViewStore', ['viewStore' => $store, 'companies' => $this->CompanyController->getValidCompanies()]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'company_name' => 'required|max:255',
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
-        ]);
+        $this->getValidatorForCreate($request)->validate();
 
-        if (!empty($request['company_photo'])) {
-            $path = $request->file('company_photo')->store('company-photos', 'private');
+        if (!empty($request['store_photo'])) {
+            $path = $request->file('store_photo')->store('store-photos', 'private');
             $request['img_path'] = $path;
         }
 
         try {
             DB::beginTransaction();
-            $company = Company::create($request->all());
+            $store = Store::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('admin/infrastructure/stores')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', 'Company created successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
-                ->with('id', $company->id);
+                ->with('message', 'Store created successfully.')
+                ->with('route', 'admin/infrastructure/stores/edit')
+                ->with('id', $store->id);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
+            return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore', [
                 'errorMessage' => 'Failed to create record: ' . $this->CommonController->formatException($e),
             ]);
         }
@@ -157,68 +154,57 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::whereId($id)->first();
+        $store = Store::whereId($id)->first();
 
-        if (!isset($company)) {
+        if (!isset($store)) {
             return redirect()->route('404');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', ['company' => $company]);
+        return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore', ['store' => $store, 'companies' => $this->CompanyController->getValidCompanies()]);
     }
 
     public function update(Request $request)
     {
-        $request->validate([
-            'id' => 'required',
-            'company_name' => 'required|max:255',
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
-        ]);
+        $store = Store::find($request['id']);
 
-        $company = Company::find($request['id']);
-
-        if (!isset($company)) {
+        if (!isset($store)) {
             return redirect()->back()
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'error')
-                ->with('message', 'Company to be updated was not found.');
+                ->with('message', 'Store to be updated was not found.');
         }
 
-        if (isset($company['img_path'])) {
-            $isDeleted = $this->CommonController->deletePhoto($company['img_path']);
+        $validator = $this->getValidatorForEdit($request, $store);
+        $validator->validate();
+
+        if (isset($store['img_path'])) {
+            $isDeleted = $this->CommonController->deletePhoto($store['img_path']);
             if ($isDeleted) {
                 $request['img_path'] = null;
             }
         }
-        if (!empty($request['company_photo'])) {
-            $path = $request->file('company_photo')->store('company-photos', 'private');
+        if (!empty($request['store_photo'])) {
+            $path = $request->file('store_photo')->store('store-photos', 'private');
             $request['img_path'] = $path;
         }
 
         try {
             DB::beginTransaction();
-            $company->update($request->all());
+            $store->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('admin/infrastructure/stores')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', 'Company updated successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
-                ->with('id', $company->id);
+                ->with('message', 'Store updated successfully.')
+                ->with('route', 'admin/infrastructure/stores/edit')
+                ->with('id', $store->id);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+            return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
@@ -229,36 +215,37 @@ class CompanyController extends Controller
     public function bulkUpdate(Request $request)
     {
         try {
-            // Extract companies data from the request
-            $companies = $request->all();
-
             // Start a DB transaction
             DB::beginTransaction();
 
-            // Loop through each company data
-            foreach ($companies as $companyData) {
+            // Extract stores data from the request
+            $storesInput = $request->all();
+            $ids = array_map(function ($store) {
+                return $store['id'];
+            }, $storesInput);
+            $storesFromDatabase = $this->getStoresByIds($ids);
+
+            // Loop through each store data
+            foreach ($storesInput as $storeData) {
+
+                $storeToUpdate = null;
+                foreach ($storesFromDatabase as $store) {
+                    if ($store->id == $storeData['id']) {
+                        $storeToUpdate = $store;
+                    }
+                }
+
                 // Validate the data
-                $validator = Validator::make($companyData, [
-                    'id' => 'required|exists:companies,id',
-                    'company_name' => 'required|max:255',
-                    'address_1' => 'nullable|max:255',
-                    'address_2' => 'nullable|max:255',
-                    'phone_number' => 'nullable|max:255',
-                    'mobile_number' => 'nullable|max:255',
-                    'email' => 'nullable|email',
-                    'website' => 'nullable|url',
-                    'img_url' => 'nullable|url',
-                    'active' => 'required|boolean',
-                ]);
+                $validator = $this->getValidatorForEdit($storeData, $storeToUpdate);
 
                 // If validation fails, stop and return error
                 if ($validator->fails()) {
                     throw new ValidationException($validator);
                 }
 
-                // If validation passes, locate the company and update
-                $company = Company::find($companyData['id']);
-                $company->update($companyData);
+                // If validation passes, locate the store and update
+                $store = Store::find($storeData['id']);
+                $store->update($storeData);
             }
 
             // If all updates are successful, commit the transaction
@@ -268,7 +255,7 @@ class CompanyController extends Controller
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
-                ->with('message', count($companies) . ' companies bulk edited successfully.');
+                ->with('message', count($storesInput) . ' stores bulk edited successfully.');
         } catch (\Exception $e) {
             // If anything goes wrong, rollback the transaction
             DB::rollback();
@@ -284,14 +271,14 @@ class CompanyController extends Controller
 
     public function deletePhoto(Request $request)
     {
-        $company = Company::find($request['id']);
+        $store = Store::find($request['id']);
 
-        if (isset($company)) {
+        if (isset($store)) {
             $isDeleted = $this->CommonController->deletePhoto($request['img_path']);
-            if ($isDeleted || !$isDeleted && !empty($company->img_path)) {
+            if ($isDeleted || !$isDeleted && !empty($store->img_path)) {
                 try {
                     DB::beginTransaction();
-                    $company->update(['img_path' => null]);
+                    $store->update(['img_path' => null]);
                     DB::commit();
 
                     return redirect()->back()
@@ -302,7 +289,7 @@ class CompanyController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
+                    return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore')
                         ->with('show', true)
                         ->with('type', 'default')
                         ->with('status', 'success')
@@ -315,7 +302,7 @@ class CompanyController extends Controller
             ->with('show', true)
             ->with('type', 'default')
             ->with('status', 'error')
-            ->with('message', 'No image was deleted or company was not found.');
+            ->with('message', 'No image was deleted or store was not found.');
     }
 
     public function importCsv(Request $request)
@@ -362,29 +349,23 @@ class CompanyController extends Controller
 
             foreach ($data as $row) {
                 // Validate the row
-                Validator::make($row, [
-                    'company_name' => 'required|max:255',
-                    'address_1' => 'nullable|max:255',
-                    'address_2' => 'nullable|max:255',
-                    'email' => 'nullable|email|max:255',
-                    'phone_number' => 'nullable|max:255',
-                    'mobile_number' => 'nullable|max:255',
-                    'website' => 'nullable|url|max:255',
-                    'img_url' => 'nullable|url|max:255',
-                    'active' => 'required|in:0,1',
-                ])->validate();
+                $this->getValidatorForCreate($row)->validate();
 
-                // Create the company
-                Company::create([
-                    'company_name' => $row['company_name'],
+                // Create the store
+                Store::create([
+                    'store_name' => $row['store_name'],
+                    'store_code' => $row['store_code'],
+                    'company_id' => $row['company_id'],
                     'address_1' => empty($row['address_1']) ? null : $row['address_1'],
                     'address_2' => empty($row['address_2']) ? null : $row['address_2'],
                     'email' => empty($row['email']) ? null : $row['email'],
                     'phone_number' => empty($row['phone_number']) ? null : $row['phone_number'],
                     'mobile_number' => empty($row['mobile_number']) ? null : $row['mobile_number'],
                     'website' => empty($row['website']) ? null : $row['website'],
-                    'img_url' => empty($row['img_url']) ? null : $row['img_url'],
                     'active' => $row['active'],
+                    'include_tax' => $row['include_tax'],
+                    'tax_percentage' => empty($row['tax_percentage']) ? null : $row['tax_percentage'],
+                    'img_url' => empty($row['img_url']) ? null : $row['img_url'],
                 ]);
             }
 
@@ -395,7 +376,7 @@ class CompanyController extends Controller
                 ->with('show', true)
                 ->with('type', 'dialog')
                 ->with('status', 'success')
-                ->with('message', count($data) . ' companies imported successfully.');
+                ->with('message', count($data) . ' stores imported successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of errors
             DB::rollBack();
@@ -413,7 +394,9 @@ class CompanyController extends Controller
     {
         // Define the CSV header
         $header = [
-            'company_name',
+            'store_name',
+            'store_code',
+            'company_id',
             'address_1',
             'address_2',
             'email',
@@ -421,10 +404,13 @@ class CompanyController extends Controller
             'mobile_number',
             'website',
             'img_url',
+            'include_tax',
+            'tax_percentage',
             'active'
         ];
 
         if ($request['with_data']) {
+            array_splice($header, 3, 0, 'company_name');
             array_unshift($header, 'id');
             array_push($header, 'created_at', 'updated_at', 'deleted_at');
         }
@@ -440,25 +426,32 @@ class CompanyController extends Controller
         fputcsv($file, $header);
 
         if ($request['with_data']) {
-            // Fetch companies
-            $companies = Company::withTrashed()->get();
+            // Fetch stores with related company
+            $stores = Store::withTrashed()->with(['company' => function ($query) {
+                $query->select('id', 'company_name');
+            }])->get();
 
-            // Insert the companies data
-            foreach ($companies as $company) {
+            // Insert the stores data
+            foreach ($stores as $store) {
                 $row = [
-                    $company->id,
-                    $company->company_name,
-                    $company->address_1,
-                    $company->address_2,
-                    $company->email,
-                    $company->phone_number,
-                    $company->mobile_number,
-                    $company->website,
-                    $company->img_url,
-                    $company->active,
-                    $company->created_at,
-                    $company->updated_at,
-                    $company->deleted_at,
+                    $store->id,
+                    $store->store_name,
+                    $store->store_code,
+                    $store->company->id,
+                    $store->company->company_name,
+                    $store->address_1,
+                    $store->address_2,
+                    $store->email,
+                    $store->phone_number,
+                    $store->mobile_number,
+                    $store->website,
+                    $store->img_url,
+                    $store->include_tax,
+                    $store->tax_percentage,
+                    $store->active,
+                    $store->created_at,
+                    $store->updated_at,
+                    $store->deleted_at,
                 ];
 
                 // Convert each item in the row to UTF-8
@@ -479,14 +472,14 @@ class CompanyController extends Controller
         // Return a CSV file for download
         return response()->streamDownload(function () use ($file) {
             fpassthru($file);
-        }, 'companies.csv');
+        }, 'stores.csv');
     }
 
     public function destroy(Request $request)
     {
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:companies,id',
+            'ids.*' => 'exists:stores,id',
         ]);
 
         // Retrieve the ids
@@ -496,12 +489,12 @@ class CompanyController extends Controller
 
         try {
             // Delete the records
-            $deletedCount = Company::destroy($ids);
+            $deletedCount = Store::destroy($ids);
 
             DB::commit();
 
-            $context = 'companies';
-            if ($deletedCount == 1) $context = 'company';
+            $context = 'stores';
+            if ($deletedCount == 1) $context = 'store';
 
             return redirect()->back()
                 ->with('show', true)
@@ -519,8 +512,69 @@ class CompanyController extends Controller
         }
     }
 
-    public function getValidCompanies()
+    public function getStoresByIds(array $ids)
     {
-        return Company::all();
+        return Store::whereIn('id', $ids)->get();
+    }
+
+    private function getValidatorForCreate($request)
+    {
+        if ($request instanceof Request) {
+            $requestData = $request->all();
+        } elseif (is_array($request)) {
+            $requestData = $request;
+        } else {
+            return null;
+        }
+
+        return Validator::make($requestData, [
+            'store_name' => 'required|max:255',
+            'store_code' => 'required|max:4|unique:stores',
+            'company_id' => 'required|exists:companies,id',
+            'address_1' => 'nullable|max:255',
+            'address_2' => 'nullable|max:255',
+            'phone_number' => 'nullable|max:255',
+            'mobile_number' => 'nullable|max:255',
+            'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'img_url' => 'nullable|url',
+            'active' => 'required|boolean',
+            'include_tax' => 'required|boolean',
+            'tax_percentage' => 'required|numeric|between:0,100',
+            'store_photo' => 'nullable|image',
+        ]);
+    }
+
+    private function getValidatorForEdit($request, Store $store)
+    {
+        if ($request instanceof Request) {
+            $requestData = $request->all();
+        } elseif (is_array($request)) {
+            $requestData = $request;
+        } else {
+            return null;
+        }
+
+        return Validator::make($requestData, [
+            'id' => 'required',
+            'store_name' => 'required|max:255',
+            'store_code' => [
+                'required',
+                'max:4',
+                Rule::unique('stores')->ignore($store->id),
+            ],
+            'company_id' => 'required|exists:companies,id',
+            'address_1' => 'nullable|max:255',
+            'address_2' => 'nullable|max:255',
+            'phone_number' => 'nullable|max:255',
+            'mobile_number' => 'nullable|max:255',
+            'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'img_url' => 'nullable|url',
+            'active' => 'required|boolean',
+            'include_tax' => 'required|boolean',
+            'tax_percentage' => 'required|numeric|between:0,100',
+            'store_photo' => 'nullable|image',
+        ]);
     }
 }

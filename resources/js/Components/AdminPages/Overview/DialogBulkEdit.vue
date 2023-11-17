@@ -19,6 +19,7 @@ defineProps({
   editableHeaderKey: String,
   inputFields: Array,
   isLoading: Boolean,
+  additionalData: Object,
 });
 
 defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
@@ -109,6 +110,44 @@ defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
                                   />
                                 </div>
                               </div>
+                              <div v-else-if="input.key === 'company_id'">
+                                <label for="company_id" class="block text-sm font-medium leading-6 text-gray-900"
+                                  >Company</label
+                                >
+                                <div class="mt-2 flex flex-col gap-1">
+                                  <select
+                                    class="select select-bordered select-sm w-full"
+                                    :class="form.errors[input.key] ? 'border-error' : ''"
+                                    name="company_id"
+                                    v-model="form.company_id"
+                                  >
+                                    <option disabled selected>Select a company</option>
+                                    <option
+                                      v-for="company in additionalData?.['companies'] ?? []"
+                                      :key="company.id"
+                                      :value="company.id"
+                                    >
+                                      {{ company.company_name }}
+                                    </option>
+                                  </select>
+                                  <span v-if="form.errors[input.key]" class="text-error">
+                                    {{ form.errors[input.key] }}
+                                  </span>
+                                </div>
+                              </div>
+                              <div v-else-if="input.key === 'include_tax'">
+                                <label for="include_tax" class="block text-sm font-medium leading-6 text-gray-900"
+                                  >Item Price Includes Tax</label
+                                >
+                                <div class="mt-2">
+                                  <input
+                                    type="checkbox"
+                                    name="include_tax"
+                                    class="toggle toggle-primary toggle-sm"
+                                    v-model="form.include_tax"
+                                  />
+                                </div>
+                              </div>
                               <div v-else>
                                 <label :for="input.key" class="block text-sm font-medium leading-6 text-gray-900">{{
                                   input.title
@@ -118,9 +157,12 @@ defineEmits(['onDialogCloseClicked', 'onDialogSaveClicked']);
                                     type="text"
                                     :id="input.key"
                                     :name="input.key"
-                                    class="input input-bordered input-sm w-full"
+                                    :class="[
+                                      'input input-bordered input-sm w-full',
+                                      form.errors[input.key] ? 'border-error' : '',
+                                      input.key.includes('_code') && 'uppercase',
+                                    ]"
                                     v-model="form[input.key]"
-                                    :class="form.errors[input.key] ? 'border-error' : ''"
                                     @input="() => form.clearErrors([input.key])"
                                   />
                                 </div>

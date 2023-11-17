@@ -25,7 +25,7 @@ const inputFields = [
 const brandForm = useForm({
   brand_name: props.brand?.brand_name ?? '',
   brand_code: props.brand?.brand_code ?? '',
-  active: !props.brand?.active ? false : true,
+  active: props.brand?.active === 0 ? false : true,
   address_1: props.brand?.address_1 ?? '',
   address_2: props.brand?.address_2 ?? '',
   email: props.brand?.email ?? '',
