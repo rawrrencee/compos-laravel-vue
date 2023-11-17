@@ -2,7 +2,7 @@
 import StoreLayout from '@/Pages/Admin/Infrastructure/Stores/StoreLayout.vue';
 import { openInNewWindow } from '@/Util/Common';
 import { getImgSrcFromPath } from '@/Util/Photo';
-import { PhotoIcon } from '@heroicons/vue/24/outline';
+import { ArrowRightOnRectangleIcon, PhotoIcon } from '@heroicons/vue/24/outline';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
@@ -107,19 +107,25 @@ const onAdminAlertButtonClicked = () => {
                     @click.prevent="openInNewWindow(viewStore[label.key])"
                     >{{ viewStore[label.key] }}</a
                   >
-                  <span v-else>Unavailable</span>
+                  <span v-else>-</span>
                 </template>
                 <template v-else-if="['include_tax'].includes(label.key)">
                   <ColouredBadge :data="viewStore[label.key]" data-type="yesNo" />
                 </template>
                 <template v-else-if="['company_name'].includes(label.key)">
-                  {{ viewStore.company?.company_name }}
+                  <Link
+                    class="link flex items-center gap-1"
+                    :href="route('admin/infrastructure/companies/view', { id: viewStore.company.id })"
+                  >
+                    <span>{{ viewStore.company?.company_name }}</span>
+                    <ArrowRightOnRectangleIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                  </Link>
                 </template>
                 <template v-else-if="['tax_percentage'].includes(label.key)">
-                  {{ viewStore[label.key] ?? 'Unavailable' }}%
+                  {{ viewStore[label.key] ?? '-' }}%
                 </template>
                 <template v-else>
-                  {{ viewStore[label.key] ?? 'Unavailable' }}
+                  {{ viewStore[label.key] ?? '-' }}
                 </template>
               </dd>
             </div>

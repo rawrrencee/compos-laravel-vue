@@ -24,4 +24,9 @@ class Company extends Model
         'img_path',
         'img_url',
     ];
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class);
+    }
 }

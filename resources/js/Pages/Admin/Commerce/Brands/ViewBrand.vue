@@ -104,10 +104,10 @@ const onAdminAlertButtonClicked = () => {
                     @click.prevent="openInNewWindow(viewBrand[label.key])"
                     >{{ viewBrand[label.key] }}</a
                   >
-                  <span v-else>Unavailable</span>
+                  <span v-else>-</span>
                 </template>
                 <template v-else>
-                  {{ viewBrand[label.key] ?? 'Unavailable' }}
+                  {{ viewBrand[label.key] ?? '-' }}
                 </template>
               </dd>
             </div>

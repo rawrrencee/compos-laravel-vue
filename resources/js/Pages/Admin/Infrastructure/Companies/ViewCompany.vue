@@ -2,7 +2,7 @@
 import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
 import { openInNewWindow } from '@/Util/Common';
 import { getImgSrcFromPath } from '@/Util/Photo';
-import { PhotoIcon } from '@heroicons/vue/24/outline';
+import { ArrowRightOnRectangleIcon, PhotoIcon } from '@heroicons/vue/24/outline';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
@@ -22,6 +22,7 @@ const viewCompanyLabels = [
   { key: 'mobile_number', title: 'Mobile Number' },
   { key: 'website', title: 'Website URL' },
   { key: 'img_url', title: 'Image URL' },
+  { key: 'stores', title: 'Stores' },
 ];
 
 const showFlashError = ref(true);
@@ -104,10 +105,24 @@ const onAdminAlertButtonClicked = () => {
                     @click.prevent="openInNewWindow(viewCompany[label.key])"
                     >{{ viewCompany[label.key] }}</a
                   >
-                  <span v-else>Unavailable</span>
+                  <span v-else>-</span>
+                </template>
+                <template v-else-if="label.key === 'stores'">
+                  <ul v-if="viewCompany.stores?.length > 0">
+                    <li v-for="store in viewCompany.stores" class="m-1">
+                      <Link
+                        class="link flex items-center gap-1"
+                        :href="route('admin/infrastructure/stores/view', { id: store.id })"
+                      >
+                        <span>{{ store.store_name }}&nbsp;({{ store.store_code }})</span>
+                        <ArrowRightOnRectangleIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  </ul>
+                  <template v-else> - </template>
                 </template>
                 <template v-else>
-                  {{ viewCompany[label.key] ?? 'Unavailable' }}
+                  {{ viewCompany[label.key] ?? '-' }}
                 </template>
               </dd>
             </div>

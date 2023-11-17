@@ -97,7 +97,14 @@ class CompanyController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $company = Company::withTrashed()->where('id', '=', $id)->first();
+        $company = Company::withTrashed()
+            ->where('id', $id)
+            ->with(['stores' => function ($query) {
+                $query
+                    ->withoutTrashed()
+                    ->select('id', 'company_id', 'store_name', 'store_code');
+            }])
+            ->firstOrFail();
 
         if (!isset($company)) {
             return Inertia::render('Admin/Infrastructure/Companies/Overview')
