@@ -62,15 +62,15 @@ defineEmits(['buttonClicked']);
         >
       </button>
     </div>
-    <div class="hidden sm:btn-group">
-      <Link as="button" :href="route(addNewUrl)" class="btn" :class="isLoading ? 'loading' : ''">
+    <div class="hidden sm:join">
+      <Link as="button" :href="route(addNewUrl)" class="btn join-item" :class="isLoading ? 'loading' : ''">
         <div class="flex gap-2 items-center">
           <PlusCircleIcon class="w-5 h-5" />
           <span>Add New</span>
         </div>
       </Link>
       <Menu>
-        <MenuButton class="btn !rounded-r-lg">
+        <MenuButton class="btn join-item !rounded-r-lg">
           <EllipsisVerticalIcon class="h-4 w-4" />
         </MenuButton>
 
@@ -91,7 +91,7 @@ defineEmits(['buttonClicked']);
                   type="button"
                   :class="[
                     active ? 'bg-primary text-white' : 'text-gray-900',
-                    'group flex w-full gap-2 items-center rounded-t-md px-3 py-3 text-xs font-semibold uppercase',
+                    'flex w-full gap-2 items-center rounded-t-md px-3 py-3 text-xs font-semibold uppercase',
                   ]"
                   @click="$emit('buttonClicked', { action: 'import' })"
                 >
@@ -104,7 +104,7 @@ defineEmits(['buttonClicked']);
                   type="button"
                   :class="[
                     active ? 'bg-primary text-white' : 'text-gray-900',
-                    'group flex w-full gap-2 items-center rounded-b-md px-3 py-3 text-xs font-semibold uppercase',
+                    'flex w-full gap-2 items-center rounded-b-md px-3 py-3 text-xs font-semibold uppercase',
                   ]"
                   @click="$emit('buttonClicked', { action: 'export' })"
                 >

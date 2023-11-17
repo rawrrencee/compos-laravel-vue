@@ -298,16 +298,16 @@ watch(editBulkActive, (val) => {
                 <label for="supplier_name" class="block text-sm font-medium leading-6 text-gray-900"
                   >Supplier Name</label
                 >
-                <div class="input-group">
+                <div class="join">
                   <input
                     type="text"
                     name="supplier_name"
-                    class="input input-bordered input-sm w-full"
+                    class="input join-item input-bordered input-sm w-full"
                     v-model="tableFilterOptions.supplier_name"
                   />
                   <button
                     type="button"
-                    class="btn btn-square btn-outline border-gray-300 btn-sm"
+                    class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
                     @click="onResetFiltersClicked('supplier_name', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />

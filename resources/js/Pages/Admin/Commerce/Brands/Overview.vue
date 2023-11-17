@@ -304,16 +304,16 @@ watch(editBulkActive, (val) => {
             >
               <div class="grid gap-2">
                 <label for="brand_name" class="block text-sm font-medium leading-6 text-gray-900">Brand Name</label>
-                <div class="input-group">
+                <div class="join">
                   <input
                     type="text"
                     name="brand_name"
-                    class="input input-bordered input-sm w-full"
+                    class="input join-item input-bordered input-sm w-full"
                     v-model="tableFilterOptions.brand_name"
                   />
                   <button
                     type="button"
-                    class="btn btn-square btn-outline border-gray-300 btn-sm"
+                    class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
                     @click="onResetFiltersClicked('brand_name', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
@@ -322,16 +322,16 @@ watch(editBulkActive, (val) => {
               </div>
               <div class="grid gap-2">
                 <label for="brand_code" class="block text-sm font-medium leading-6 text-gray-900">Brand Code</label>
-                <div class="input-group">
+                <div class="join">
                   <input
                     type="text"
                     name="brand_code"
-                    class="input input-bordered input-sm w-full"
+                    class="input join-item input-bordered input-sm w-full"
                     v-model="tableFilterOptions.brand_code"
                   />
                   <button
                     type="button"
-                    class="btn btn-square btn-outline border-gray-300 btn-sm"
+                    class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
                     @click="onResetFiltersClicked('brand_code', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
