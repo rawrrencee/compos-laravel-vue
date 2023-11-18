@@ -65,6 +65,8 @@ const onAdminAlertButtonClicked = () => {
                   <ul v-if="viewCategory.subcategories?.length > 0">
                     <li v-for="(subcategory, index) in viewCategory.subcategories" :class="index !== 0 && 'mt-3'">
                       {{ subcategory.subcategory_name }}&nbsp;({{ subcategory.subcategory_code }})
+                      <br />
+                      <small class="text-secondary">{{ subcategory.description }}</small>
                     </li>
                   </ul>
                   <template v-else> - </template>

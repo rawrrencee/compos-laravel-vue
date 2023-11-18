@@ -369,6 +369,10 @@ class CategoryController extends Controller
             ],
             'subcategories.*.description' => 'nullable|string|max:1000',
             'subcategories.*.category_id' => 'required|exists:categories,id',
+        ], [
+            'subcategories.*.subcategory_name.required' => 'The subcategory name is required.',
+            'subcategories.*.subcategory_code.required' => 'The subcategory code is required.',
+            'subcategories.*.description.required' => 'The subcategory description is required.'
         ]);
     }
 }

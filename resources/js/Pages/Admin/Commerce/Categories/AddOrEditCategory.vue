@@ -3,7 +3,7 @@ import StickyFooter from '@/Components/AdminPages/AddOrEdit/StickyFooter.vue';
 import NoResults from '@/Components/AdminPages/NoResults.vue';
 import TableMain from '@/Components/AdminPages/Overview/TableMain.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
 import CategoryLayout from './CategoryLayout.vue';
 
@@ -11,6 +11,7 @@ import CategoryLayout from './CategoryLayout.vue';
 const props = defineProps({
   errorMessage: String,
   category: Object | undefined,
+  errors: Object,
 });
 const inputFields = [
   { key: 'category_name', title: 'Category Name' },
@@ -70,6 +71,10 @@ const onSubcategoryAddClicked = () => {
 const onSubcategoryRemoveClicked = (subcategory) => {
   if (confirm('Are you sure you want to remove this subcategory?')) {
     if (subcategory.id) {
+      const s = toRaw(props.category?.subcategories.find((s) => s.id === subcategory.id));
+      subcategory.subcategory_name = s.subcategory_name;
+      subcategory.subcategory_code = s.subcategory_code;
+      subcategory.description = s.description;
       subcategory.is_deleted = true;
     } else {
       subcategoryForms.value = subcategoryForms.value.filter((s) => s !== subcategory);
@@ -151,75 +156,104 @@ const submit = () => {
             </template>
             <template #tbody>
               <tr v-if="nonDeletedSubcategories.length === 0">
-                <td colspan="5">
+                <td colspan="4">
                   <NoResults message="No Records" />
                 </td>
               </tr>
-              <tr v-for="(subcategory, index) in nonDeletedSubcategories" :key="index">
-                <td class="pr-3 pl-3 py-4">
-                  <label for="subcategory_name" class="md:hidden text-sm font-medium leading-6 text-gray-900"
-                    >Subcategory Name</label
-                  >
-                  <input
-                    id="subcategory_name"
-                    name="subcategory_name"
-                    type="text"
-                    class="input input-sm input-bordered md:input-lg w-full"
-                    v-model="subcategory.subcategory_name"
-                  />
-                  <dl class="md:hidden">
-                    <dt class="sr-only">Subcategory Code</dt>
-                    <dd class="mt-2">
-                      <label for="subcategory_name" class="text-sm font-medium leading-6 text-gray-900"
-                        >Subcategory Code</label
-                      >
-                      <input
-                        id="subcategory_code"
-                        name="subcategory_code"
-                        type="text"
-                        class="input input-sm input-bordered w-full"
-                        v-model="subcategory.subcategory_code"
-                      />
-                    </dd>
-                    <dt class="sr-only">Description</dt>
-                    <dd class="mt-2">
-                      <label for="description" class="text-sm font-medium leading-6 text-gray-900">Description</label>
-                      <textarea
-                        id="description"
-                        name="description"
-                        class="textarea textarea-bordered w-full"
-                        v-model="subcategory.description"
-                      />
-                    </dd>
-                    <dt class="sr-only">Remove button</dt>
-                    <dd class="mt-4">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-error"
-                        @click="onSubcategoryRemoveClicked(subcategory)"
-                      >
-                        Remove
-                      </button>
-                    </dd>
-                  </dl>
-                </td>
-                <td class="px-3 hidden md:table-cell">
-                  <input
-                    type="text"
-                    class="input input-lg input-bordered w-full uppercase"
-                    maxlength="4"
-                    v-model="subcategory.subcategory_code"
-                  />
-                </td>
-                <td class="px-3 hidden md:table-cell">
-                  <input type="text" class="input input-lg input-bordered w-full" v-model="subcategory.description" />
-                </td>
-                <td class="px-3 text-center md:text-left hidden md:table-cell">
-                  <button type="button" class="btn btn-sm btn-error" @click="onSubcategoryRemoveClicked(subcategory)">
-                    Remove
-                  </button>
-                </td>
-              </tr>
+              <template v-for="(subcategory, index) in nonDeletedSubcategories" :key="index">
+                <tr>
+                  <td class="px-3 py-4 align-top">
+                    <label for="subcategory_name" class="md:hidden text-sm font-medium leading-6 text-gray-900"
+                      >Subcategory Name</label
+                    >
+                    <input
+                      id="subcategory_name"
+                      name="subcategory_name"
+                      type="text"
+                      class="input input-sm input-bordered md:input-lg w-full"
+                      :class="errors?.[`subcategories.${index}.subcategory_name`] ? 'border-error' : ''"
+                      v-model="subcategory.subcategory_name"
+                    />
+                    <span v-if="errors?.[`subcategories.${index}.subcategory_name`]" class="text-error">
+                      {{ errors?.[`subcategories.${index}.subcategory_name`] }}
+                    </span>
+                    <dl class="md:hidden">
+                      <dt class="sr-only">Subcategory Code</dt>
+                      <dd class="mt-2">
+                        <label for="subcategory_name" class="text-sm font-medium leading-6 text-gray-900"
+                          >Subcategory Code</label
+                        >
+                        <input
+                          id="subcategory_code"
+                          name="subcategory_code"
+                          type="text"
+                          class="input input-sm input-bordered w-full"
+                          :class="errors?.[`subcategories.${index}.subcategory_code`] ? 'border-error' : ''"
+                          v-model="subcategory.subcategory_code"
+                        />
+                        <span v-if="errors?.[`subcategories.${index}.subcategory_code`]" class="text-error">
+                          {{ errors?.[`subcategories.${index}.subcategory_code`] }}
+                        </span>
+                      </dd>
+                      <dt class="sr-only">Description</dt>
+                      <dd class="mt-2">
+                        <label for="description" class="text-sm font-medium leading-6 text-gray-900">Description</label>
+                        <textarea
+                          id="description"
+                          name="description"
+                          class="textarea textarea-bordered w-full"
+                          :class="errors?.[`subcategories.${index}.description`] ? 'border-error' : ''"
+                          v-model="subcategory.description"
+                        />
+                        <span v-if="errors?.[`subcategories.${index}.description`]" class="text-error">
+                          {{ errors?.[`subcategories.${index}.description`] }}
+                        </span>
+                      </dd>
+                      <dt class="sr-only">Remove button</dt>
+                      <dd class="mt-4">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-error"
+                          @click="onSubcategoryRemoveClicked(subcategory)"
+                        >
+                          Remove
+                        </button>
+                      </dd>
+                    </dl>
+                  </td>
+                  <td class="px-3 py-4 align-top hidden md:table-cell">
+                    <input
+                      type="text"
+                      class="input input-lg input-bordered w-full uppercase"
+                      maxlength="4"
+                      :class="errors?.[`subcategories.${index}.subcategory_code`] ? 'border-error' : ''"
+                      v-model="subcategory.subcategory_code"
+                    />
+                    <span v-if="errors?.[`subcategories.${index}.subcategory_code`]" class="text-error">
+                      {{ errors?.[`subcategories.${index}.subcategory_code`] }}
+                    </span>
+                  </td>
+                  <td class="px-3 py-4 align-top hidden md:table-cell">
+                    <input
+                      type="text"
+                      class="input input-lg input-bordered w-full"
+                      :class="errors?.[`subcategories.${index}.description`] ? 'border-error' : ''"
+                      v-model="subcategory.description"
+                    />
+                    <span v-if="errors?.[`subcategories.${index}.description`]" class="text-error">
+                      {{ errors?.[`subcategories.${index}.description`] }}
+                    </span>
+                  </td>
+                  <td class="px-3 py-4 text-center md:text-left hidden md:table-cell">
+                    <button type="button" class="btn btn-sm btn-error" @click="onSubcategoryRemoveClicked(subcategory)">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="errors?.[`subcategories.${index}`]">
+                  <td colspan="4" class="px-3 py-2 text-error">^ {{ errors?.[`subcategories.${index}`] }}</td>
+                </tr>
+              </template>
             </template>
             <template #footer>
               <div class="mt-2 grid grid-cols-1 sm:grid-cols-6">
