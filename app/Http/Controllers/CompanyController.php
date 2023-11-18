@@ -88,12 +88,15 @@ class CompanyController extends Controller
             }
         }
 
+        if ($request['sortBy'] !== 'active') {
+            $companies->orderBy('active', 'desc');
+        }
+
         return Inertia::render('Admin/Infrastructure/Companies/Overview', [
             'sortBy' => $request['sortBy'],
             'orderBy' => $request['orderBy'],
             'paginatedResults' =>
             $companies
-                ->orderBy('active', 'desc')
                 ->orderBy($request['sortBy'], $request['orderBy'])
                 ->paginate($request['perPage']),
             'tableFilterOptions' => $request['tableFilterOptions']

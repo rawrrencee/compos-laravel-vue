@@ -94,12 +94,15 @@ class BrandController extends Controller
             }
         }
 
+        if ($request['sortBy'] !== 'active') {
+            $brands->orderBy('active', 'desc');
+        }
+
         return Inertia::render('Admin/Commerce/Brands/Overview', [
             'sortBy' => $request['sortBy'],
             'orderBy' => $request['orderBy'],
             'paginatedResults' =>
             $brands
-                ->orderBy('active', 'desc')
                 ->orderBy($request['sortBy'], $request['orderBy'])
                 ->paginate($request['perPage']),
             'tableFilterOptions' => $request['tableFilterOptions']

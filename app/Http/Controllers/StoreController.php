@@ -91,6 +91,10 @@ class StoreController extends Controller
             }
         }
 
+        if ($request['sortBy'] !== 'active') {
+            $stores->orderBy('active', 'desc');
+        }
+
         return Inertia::render('Admin/Infrastructure/Stores/Overview', [
             'sortBy' => $request['sortBy'],
             'orderBy' => $request['orderBy'],
@@ -99,7 +103,6 @@ class StoreController extends Controller
                 ->with(['company' => function ($query) {
                     $query->select('id', 'company_name');
                 }])
-                ->orderBy('active', 'desc')
                 ->orderBy($request['sortBy'], $request['orderBy'])
                 ->paginate($request['perPage']),
             'tableFilterOptions' => $request['tableFilterOptions'],

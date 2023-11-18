@@ -79,20 +79,15 @@ const onSubcategoryRemoveClicked = (subcategory) => {
 const submit = () => {
   showFlashError.value = true;
   categoryForm
-    .transform((data) => {
-      const formData = {
-        ...data,
-        ...(props.category?.id && { id: props.category.id }),
-        category_code: data.category_code?.toLocaleUpperCase(),
-        subcategories: subcategoryForms.value?.map((s) => ({
-          ...s,
-          subcategory_code: s.subcategory_code?.toLocaleUpperCase(),
-        })),
-      };
-      console.log('formData', formData);
-
-      return formData;
-    })
+    .transform((data) => ({
+      ...data,
+      ...(props.category?.id && { id: props.category.id }),
+      category_code: data.category_code?.toLocaleUpperCase(),
+      subcategories: subcategoryForms.value?.map((s) => ({
+        ...s,
+        subcategory_code: s.subcategory_code?.toLocaleUpperCase(),
+      })),
+    }))
     .post(route(`admin/commerce/categories/${props.category ? 'edit.update' : 'add.store'}`));
 };
 // #endregion Functions

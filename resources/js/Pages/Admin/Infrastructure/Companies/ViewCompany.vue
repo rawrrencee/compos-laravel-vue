@@ -11,7 +11,6 @@ import ColouredBadge from '../../../../Components/AdminPages/ColouredBadge.vue';
 const props = defineProps({
   viewCompany: Object,
 });
-console.log(props.viewCompany);
 
 const moduleUrl = 'admin/infrastructure/companies';
 const editUrl = `${moduleUrl}/edit`;

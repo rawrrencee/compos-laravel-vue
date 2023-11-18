@@ -88,12 +88,15 @@ class SupplierController extends Controller
             }
         }
 
+        if ($request['sortBy'] !== 'active') {
+            $suppliers->orderBy('active', 'desc');
+        }
+
         return Inertia::render('Admin/Infrastructure/Suppliers/Overview', [
             'sortBy' => $request['sortBy'],
             'orderBy' => $request['orderBy'],
             'paginatedResults' =>
             $suppliers
-                ->orderBy('active', 'desc')
                 ->orderBy($request['sortBy'], $request['orderBy'])
                 ->paginate($request['perPage']),
             'tableFilterOptions' => $request['tableFilterOptions']
