@@ -109,7 +109,9 @@ const onBulkEditSaveClicked = () => {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
-        onEditDialogCloseClicked(false);
+        if (usePage().props.flash?.status !== 'error') {
+          onEditDialogCloseClicked(false);
+        }
       },
     });
 };

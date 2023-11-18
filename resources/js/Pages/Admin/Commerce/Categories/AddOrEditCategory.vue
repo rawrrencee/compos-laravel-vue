@@ -102,9 +102,9 @@ const submit = () => {
   <CategoryLayout>
     <Head :title="`${!!category ? 'Edit' : 'Add New'} Category`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
-    <div class="sm:px-6 lg:px-8">
-      <form class="px-4 pt-4 sm:px-0 flex flex-col gap-x-6 gap-y-8 h-full" @submit.prevent="submit">
-        <div class="flex-1 grow grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+    <form class="sm:px-6 lg:px-8 px-4 pt-4 flex flex-col gap-x-6 gap-y-8 h-full" @submit.prevent="submit">
+      <div class="flex-grow flex flex-col gap-x-6 gap-y-8">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
             <template v-if="input.key === 'description'">
               <label :for="input.key" class="block text-sm font-medium leading-6 text-gray-900">{{
@@ -235,9 +235,9 @@ const submit = () => {
             </template>
           </TableMain>
         </div>
+      </div>
 
-        <StickyFooter back-url="admin/commerce/categories" />
-      </form>
-    </div>
+      <StickyFooter back-url="admin/commerce/categories" />
+    </form>
   </CategoryLayout>
 </template>

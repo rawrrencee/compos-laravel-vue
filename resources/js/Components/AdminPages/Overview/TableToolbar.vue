@@ -18,6 +18,10 @@ const props = defineProps({
   showFilters: Boolean,
   appliedFilterCount: Number,
   isLoading: Boolean,
+  showAdditionalMenu: {
+    default: true,
+    type: Boolean,
+  },
 });
 
 defineEmits(['buttonClicked']);
@@ -69,7 +73,7 @@ defineEmits(['buttonClicked']);
           <span>Add New</span>
         </div>
       </Link>
-      <Menu>
+      <Menu v-if="showAdditionalMenu">
         <MenuButton class="btn btn-primary join-item !rounded-r-lg">
           <EllipsisVerticalIcon class="h-4 w-4" />
         </MenuButton>

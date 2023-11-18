@@ -22,8 +22,8 @@ class SupplierController extends Controller
 
     public function index(Request $request)
     {
-        $request['sortBy'] = $request['sortBy'] ?? 'created_at';
-        $request['orderBy'] = $request['orderBy'] ?? 'desc';
+        $request['sortBy'] = $request['sortBy'] ?? 'supplier_name';
+        $request['orderBy'] = $request['orderBy'] ?? 'asc';
         $request['perPage'] = $request['perPage'] ?? '10';
 
         $validator = Validator::make($request->all(), [
@@ -88,7 +88,16 @@ class SupplierController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Infrastructure/Suppliers/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $suppliers->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
+        return Inertia::render('Admin/Infrastructure/Suppliers/Overview', [
+            'sortBy' => $request['sortBy'],
+            'orderBy' => $request['orderBy'],
+            'paginatedResults' =>
+            $suppliers
+                ->orderBy('active', 'desc')
+                ->orderBy($request['sortBy'], $request['orderBy'])
+                ->paginate($request['perPage']),
+            'tableFilterOptions' => $request['tableFilterOptions']
+        ]);
     }
 
     public function view(Request $request)

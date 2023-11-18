@@ -107,9 +107,9 @@ const deletePhoto = () => {
   <StoreLayout>
     <Head :title="`${!!store ? 'Edit' : 'Add New'} Store`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
-    <div class="sm:px-6 lg:px-8">
-      <form class="px-4 pt-4 sm:px-0 flex flex-col h-full" @submit.prevent="submit">
-        <div class="flex-1 grow grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 pb-12">
+    <form class="sm:px-6 lg:px-8 px-4 pt-4 flex flex-col gap-x-6 gap-y-8 h-full" @submit.prevent="submit">
+      <div class="flex-grow flex flex-col gap-x-6 gap-y-8">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 pb-12">
           <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
             <template v-if="input.key === 'store_photo'">
               <label for="store_photo" class="block text-sm font-medium leading-6 text-gray-900">Store Photo</label>
@@ -232,9 +232,9 @@ const deletePhoto = () => {
             </template>
           </div>
         </div>
+      </div>
 
-        <StickyFooter back-url="admin/infrastructure/stores" />
-      </form>
-    </div>
+      <StickyFooter back-url="admin/infrastructure/stores" />
+    </form>
   </StoreLayout>
 </template>

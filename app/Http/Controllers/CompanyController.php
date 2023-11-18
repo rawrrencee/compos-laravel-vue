@@ -22,8 +22,8 @@ class CompanyController extends Controller
 
     public function index(Request $request)
     {
-        $request['sortBy'] = $request['sortBy'] ?? 'created_at';
-        $request['orderBy'] = $request['orderBy'] ?? 'desc';
+        $request['sortBy'] = $request['sortBy'] ?? 'company_name';
+        $request['orderBy'] = $request['orderBy'] ?? 'asc';
         $request['perPage'] = $request['perPage'] ?? '10';
 
         $validator = Validator::make($request->all(), [
@@ -88,7 +88,16 @@ class CompanyController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $companies->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
+        return Inertia::render('Admin/Infrastructure/Companies/Overview', [
+            'sortBy' => $request['sortBy'],
+            'orderBy' => $request['orderBy'],
+            'paginatedResults' =>
+            $companies
+                ->orderBy('active', 'desc')
+                ->orderBy($request['sortBy'], $request['orderBy'])
+                ->paginate($request['perPage']),
+            'tableFilterOptions' => $request['tableFilterOptions']
+        ]);
     }
 
     public function view(Request $request)

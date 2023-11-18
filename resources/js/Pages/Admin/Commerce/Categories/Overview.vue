@@ -1,4 +1,5 @@
 <script setup>
+import DialogBulkEdit from '@/Components/AdminPages/Overview/DialogBulkEdit.vue';
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
@@ -6,8 +7,6 @@ import axios from 'axios';
 import { computed, ref, watch } from 'vue';
 import Error404 from '../../../../Components/AdminPages/Error404.vue';
 import NoResults from '../../../../Components/AdminPages/NoResults.vue';
-import DialogBulkEdit from '../../../../Components/AdminPages/Overview/DialogBulkEdit.vue';
-import DialogImportCsv from '../../../../Components/AdminPages/Overview/DialogImportCsv.vue';
 import TableMain from '../../../../Components/AdminPages/Overview/TableMain.vue';
 import TablePagination from '../../../../Components/AdminPages/Overview/TablePagination.vue';
 import TableSortableHeader from '../../../../Components/AdminPages/Overview/TableSortableHeader.vue';
@@ -30,11 +29,9 @@ const props = defineProps({
   viewCategory: Object | undefined,
 });
 const tableFilterOptions = useForm({
-  category_name: props?.tableFilterOptions?.category_name ?? '',
+  category_name_or_code: props?.tableFilterOptions?.category_name_or_code ?? '',
+  subcategory_name_or_code: props?.tableFilterOptions?.subcategory_name_or_code ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
-});
-const importForm = useForm({
-  import_file: null,
 });
 const moduleUrl = 'admin/commerce/categories';
 const addNewUrl = `${moduleUrl}/add`;
@@ -73,7 +70,8 @@ const indeterminate = computed(
 const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
 const appliedFilterCount = computed(() => {
   let count = 0;
-  if (tableFilterOptions.category_name?.length > 0) count++;
+  if (tableFilterOptions.category_name_or_code?.length > 0) count++;
+  if (tableFilterOptions.subcategory_name_or_code?.length > 0) count++;
   if (tableFilterOptions.showDeleted !== 'onlyNonDeleted') count++;
   return count;
 });
@@ -87,15 +85,16 @@ const onBulkEditSaveClicked = () => {
       editCategoryForms.value.map((category) => ({
         id: category.id,
         category_name: category.category_name ?? '',
-        active: !category.active ? false : true,
-        subcategories: [],
+        category_code: category.category_code ?? '',
       }))
     )
     .post(route('admin/commerce/categories/edit.bulk'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
-        onEditDialogCloseClicked(false);
+        if (usePage().props.flash?.status !== 'error') {
+          onEditDialogCloseClicked(false);
+        }
       },
     });
 };
@@ -142,26 +141,18 @@ const onGoToPageClicked = (data) => {
         ...tableSortOptions.value,
       }),
       tableFilterOptions: {
-        category_name: !!tableFilterOptions?.category_name ? tableFilterOptions.category_name : undefined,
+        category_name_or_code: !!tableFilterOptions?.category_name_or_code
+          ? tableFilterOptions.category_name_or_code
+          : undefined,
+        subcategory_name_or_code: !!tableFilterOptions?.subcategory_name_or_code
+          ? tableFilterOptions.subcategory_name_or_code
+          : undefined,
         showDeleted: tableFilterOptions.showDeleted,
       },
     },
     only: ['paginatedResults', 'sortBy', 'orderBy', 'tableFilterOptions'],
     replace: true,
     preserveScroll: true,
-  });
-};
-const onImportDialogCloseClicked = () => {
-  isImportDialogOpen.value = false;
-  usePage().props.flash.show = null;
-};
-const onImportFileAdded = (event) => {
-  importForm.import_file = event.target.files[0];
-};
-const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/commerce/categories/import'), {
-    onStart: () => (isLoading.value = true),
-    onFinish: () => (isLoading.value = false),
   });
 };
 const onTableHeaderClicked = (title) => {
@@ -197,7 +188,7 @@ const onToolbarBtnClicked = (event) => {
         return useForm({
           id: category.id,
           category_name: category.category_name ?? '',
-          active: !category.active ? false : true,
+          category_code: category.category_code ?? '',
         });
       });
       isEditDialogOpen.value = true;
@@ -223,9 +214,9 @@ const onResetFiltersClicked = (controlName, value) => {
     tableFilterOptions.reset(controlName);
   } else {
     tableFilterOptions.defaults({
-      category_name: '',
+      category_name_or_code: '',
+      subcategory_name_or_code: '',
       showDeleted: 'onlyNonDeleted',
-      showActive: 'both',
     });
     tableFilterOptions.reset();
   }
@@ -254,6 +245,7 @@ watch(editBulkActive, (val) => {
         :show-filters="showFilters"
         :applied-filter-count="appliedFilterCount"
         :is-loading="isLoading"
+        :show-additional-menu="false"
         @button-clicked="onToolbarBtnClicked"
       >
         <template #filter>
@@ -279,34 +271,34 @@ watch(editBulkActive, (val) => {
                 <div class="join">
                   <input
                     type="text"
-                    name="category_name"
+                    name="category_name_or_code"
                     class="input join-item input-bordered input-sm w-full"
-                    v-model="tableFilterOptions.category_name"
+                    v-model="tableFilterOptions.category_name_or_code"
                   />
                   <button
                     type="button"
                     class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
-                    @click="onResetFiltersClicked('category_name', '')"
+                    @click="onResetFiltersClicked('category_name_or_code', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>
                 </div>
               </div>
               <div class="grid gap-2 col-span-2">
-                <label for="category_name" class="block text-sm font-medium leading-6 text-gray-900"
+                <label for="subcategory_name_or_code" class="block text-sm font-medium leading-6 text-gray-900"
                   >Subcategory Name/ Code</label
                 >
                 <div class="join">
                   <input
                     type="text"
-                    name="category_name"
+                    name="subcategory_name_or_code"
                     class="input join-item input-bordered input-sm w-full"
-                    v-model="tableFilterOptions.category_name"
+                    v-model="tableFilterOptions.subcategory_name_or_code"
                   />
                   <button
                     type="button"
                     class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
-                    @click="onResetFiltersClicked('category_name', '')"
+                    @click="onResetFiltersClicked('subcategory_name_or_code', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>
@@ -418,6 +410,12 @@ watch(editBulkActive, (val) => {
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
+                <dt class="sr-only sm:hidden">Category Code</dt>
+                <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                  {{ category.category_code }}
+                </dd>
+              </dl>
+              <dl class="font-normal lg:hidden">
                 <dt class="sr-only sm:hidden">Created At</dt>
                 <dd class="mt-1 truncate text-gray-500 sm:hidden">
                   {{
@@ -428,6 +426,15 @@ watch(editBulkActive, (val) => {
                   }}
                 </dd>
               </dl>
+            </td>
+            <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+              {{ category.category_code }}
+            </td>
+            <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+              <ul>
+                <li v-for="s in category.subcategories.slice(0, 3)">{{ s.subcategory_code }}</li>
+                <li v-if="category.subcategories.length > 3">and {{ category.subcategories.length - 3 }} more</li>
+              </ul>
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
               {{ new Date(category.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}
@@ -450,20 +457,11 @@ watch(editBulkActive, (val) => {
         :show-edit-delete-btn="showEditDeleteBtn"
         :add-new-url="addNewUrl"
         :is-loading="isLoading"
+        :show-additional-menu="false"
         @button-clicked="onToolbarBtnClicked"
       />
     </div>
     <Error404 :show="!paginatedResults" />
-    <DialogImportCsv
-      context="category"
-      :show="isImportDialogOpen"
-      :export-url="exportUrl"
-      :import-form="importForm"
-      :is-loading="isLoading"
-      @dialog-close-clicked="onImportDialogCloseClicked"
-      @dialog-save-clicked="onImportFileSaveClicked"
-      @import-file-added="onImportFileAdded"
-    />
     <DialogBulkEdit
       :show="isEditDialogOpen"
       :selected-items="selectedTableRows"

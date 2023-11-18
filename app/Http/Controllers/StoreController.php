@@ -24,8 +24,8 @@ class StoreController extends Controller
 
     public function index(Request $request)
     {
-        $request['sortBy'] = $request['sortBy'] ?? 'created_at';
-        $request['orderBy'] = $request['orderBy'] ?? 'desc';
+        $request['sortBy'] = $request['sortBy'] ?? 'store_name';
+        $request['orderBy'] = $request['orderBy'] ?? 'asc';
         $request['perPage'] = $request['perPage'] ?? '10';
 
         $validator = Validator::make($request->all(), [
@@ -99,6 +99,7 @@ class StoreController extends Controller
                 ->with(['company' => function ($query) {
                     $query->select('id', 'company_name');
                 }])
+                ->orderBy('active', 'desc')
                 ->orderBy($request['sortBy'], $request['orderBy'])
                 ->paginate($request['perPage']),
             'tableFilterOptions' => $request['tableFilterOptions'],

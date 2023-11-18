@@ -6,14 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Rules\UniqueSubcategoryCode;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
-use Illuminate\Database\Query\Builder;
 
 class CategoryController extends Controller
 {
@@ -26,8 +24,8 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
-        $request['sortBy'] = $request['sortBy'] ?? 'created_at';
-        $request['orderBy'] = $request['orderBy'] ?? 'desc';
+        $request['sortBy'] = $request['sortBy'] ?? 'category_name';
+        $request['orderBy'] = $request['orderBy'] ?? 'asc';
         $request['perPage'] = $request['perPage'] ?? '10';
 
         $validator = Validator::make($request->all(), [
@@ -56,12 +54,20 @@ class CategoryController extends Controller
 
         // Filters
         $category_name_or_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['category_name_or_code']  ?? null : null;
+        $subcategory_name_or_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['subcategory_name_or_code']  ?? null : null;
 
         $categories = Category::query();
         if (!empty($category_name_or_code)) {
             $categories->where(function ($q) use ($category_name_or_code) {
                 $q->where('category_name', 'like', '%' . $category_name_or_code . '%')
                     ->orWhere('category_code', 'like', '%' . $category_name_or_code . '%');
+            });
+        }
+
+        if (!empty($subcategory_name_or_code)) {
+            $categories->whereHas('subcategories', function ($query) use ($subcategory_name_or_code) {
+                $query->where('subcategory_name', 'like', '%' . $subcategory_name_or_code . '%')
+                    ->orWhere('subcategory_code', 'like', '%' . $subcategory_name_or_code . '%');
             });
         }
 
@@ -79,7 +85,21 @@ class CategoryController extends Controller
             }
         }
 
-        return Inertia::render('Admin/Commerce/Categories/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $categories->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
+        // Join with subcategories
+        $categories->with(['subcategories' => function ($query) {
+            $query->select('id', 'category_id', 'subcategory_name', 'subcategory_code');
+            $query->orderBy('subcategory_code', 'asc');
+        }]);
+
+        return Inertia::render('Admin/Commerce/Categories/Overview', [
+            'sortBy' => $request['sortBy'],
+            'orderBy' => $request['orderBy'],
+            'paginatedResults' =>
+            $categories
+                ->orderBy($request['sortBy'], $request['orderBy'])
+                ->paginate($request['perPage']),
+            'tableFilterOptions' => $request['tableFilterOptions']
+        ]);
     }
 
     public function view(Request $request)
@@ -176,24 +196,7 @@ class CategoryController extends Controller
                 ->with('message', 'Category to be updated was not found.');
         }
 
-        $request->validate([
-            'id' => 'required',
-            'category_name' => 'required|max:255',
-            'category_code' => [
-                'required',
-                'max:4',
-                Rule::unique('categories')->ignore($category->id),
-            ],
-            'subcategories' => 'array',
-            'subcategories.*' => [new UniqueSubcategoryCode($category->id)],
-            'subcategories.*.subcategory_name' => 'required|string|max:255',
-            'subcategories.*.subcategory_code' => [
-                'required',
-                'max:4',
-            ],
-            'subcategories.*.description' => 'nullable|string|max:1000',
-            'subcategories.*.category_id' => 'required|exists:categories,id',
-        ]);
+        $this->getEditCategoryValidator($request, $category)->validate();
 
         try {
             DB::beginTransaction();
@@ -250,23 +253,7 @@ class CategoryController extends Controller
                 $category = Category::find($categoryData['id']);
 
                 // Validate the data
-                $validator = Validator::make($categoryData, [
-                    'id' => 'required|exists:categories,id',
-                    'category_name' => 'required|max:255',
-                    'category_code' => [
-                        'required',
-                        'max:4',
-                        Rule::unique('categories')->ignore($category->id),
-                    ],
-                    'address_1' => 'nullable|max:255',
-                    'address_2' => 'nullable|max:255',
-                    'phone_number' => 'nullable|max:255',
-                    'mobile_number' => 'nullable|max:255',
-                    'email' => 'nullable|email',
-                    'website' => 'nullable|url',
-                    'img_url' => 'nullable|url',
-                    'active' => 'required|boolean',
-                ]);
+                $validator = $this->getEditCategoryValidator($categoryData, $category);
 
                 // If validation fails, stop and return error
                 if ($validator->fails()) {
@@ -295,202 +282,6 @@ class CategoryController extends Controller
                 ->with('status', 'error')
                 ->with('message', 'Failed to bulk edit records: ' . $this->CommonController->formatException($e));
         }
-    }
-
-    public function deletePhoto(Request $request)
-    {
-        $category = Category::find($request['id']);
-
-        if (isset($category)) {
-            $isDeleted = $this->CommonController->deletePhoto($request['img_path']);
-            if ($isDeleted || !$isDeleted && !empty($category->img_path)) {
-                try {
-                    DB::beginTransaction();
-                    $category->update(['img_path' => null]);
-                    DB::commit();
-
-                    return redirect()->back()
-                        ->with('show', true)
-                        ->with('type', 'default')
-                        ->with('status', 'success')
-                        ->with('message', 'Photo removed successfully.');
-                } catch (\Exception $e) {
-                    DB::rollBack();
-
-                    return $this->CommonController->handleException($e);
-                }
-            }
-        }
-
-        return redirect()->back()
-            ->with('show', true)
-            ->with('type', 'default')
-            ->with('status', 'error')
-            ->with('message', 'No image was deleted or category was not found.');
-    }
-
-    public function importCsv(Request $request)
-    {
-        // Validate the uploaded file
-        $request->validate([
-            'import_file' => 'required|mimes:csv,txt'
-        ]);
-
-        // Read the CSV file
-        $path = $request->file('import_file')->getRealPath();
-        $file = fopen($path, 'r');
-        $bom = pack('H*', 'EFBBBF'); // UTF-8 BOM
-
-        if (strpos(fread($file, 3), $bom) !== 0) {
-            // BOM not detected, rewind the pointer to the start of the file and read all contents
-            rewind($file);
-        }
-
-        // BOM detected, continue reading the file starting from the 4th byte
-        // Get the header row
-        $header = fgetcsv($file);
-
-        // Read the rest of the data
-        $data = [];
-        while (($row = fgetcsv($file)) !== false) {
-            $data[] = array_combine($header, $row);
-        }
-
-        fclose($file);
-
-        if (count($data) == 0) {
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'dialog')
-                ->with('status', 'error')
-                ->with('message', 'Unable to import data as none was provided.');
-        }
-
-        // Begin a database transaction
-
-        try {
-            DB::beginTransaction();
-
-            foreach ($data as $row) {
-                // Validate the row
-                Validator::make($row, [
-                    'category_name' => 'required|string|max:255',
-                    'category_code' => 'required|max:4|unique:categories',
-                    'address_1' => 'nullable|max:255',
-                    'address_2' => 'nullable|max:255',
-                    'email' => 'nullable|email|max:255',
-                    'phone_number' => 'nullable|max:255',
-                    'mobile_number' => 'nullable|max:255',
-                    'website' => 'nullable|url|max:255',
-                    'img_url' => 'nullable|url|max:255',
-                    'active' => 'required|in:0,1',
-                ])->validate();
-
-                // Create the category
-                Category::create([
-                    'category_name' => $row['category_name'],
-                    'category_code' => $row['category_code'],
-                    'address_1' => empty($row['address_1']) ? null : $row['address_1'],
-                    'address_2' => empty($row['address_2']) ? null : $row['address_2'],
-                    'email' => empty($row['email']) ? null : $row['email'],
-                    'phone_number' => empty($row['phone_number']) ? null : $row['phone_number'],
-                    'mobile_number' => empty($row['mobile_number']) ? null : $row['mobile_number'],
-                    'website' => empty($row['website']) ? null : $row['website'],
-                    'img_url' => empty($row['img_url']) ? null : $row['img_url'],
-                    'active' => $row['active'],
-                ]);
-            }
-
-            // Commit the transaction
-            DB::commit();
-
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'dialog')
-                ->with('status', 'success')
-                ->with('message', count($data) . ' categories imported successfully.');
-        } catch (\Exception $e) {
-            // Rollback the transaction in case of errors
-            DB::rollBack();
-
-            $this->CommonController->handleException($e, 'dialog');
-        }
-    }
-
-
-    public function exportCsv(Request $request)
-    {
-        // Define the CSV header
-        $header = [
-            'category_name',
-            'category_code',
-            'address_1',
-            'address_2',
-            'email',
-            'phone_number',
-            'mobile_number',
-            'website',
-            'img_url',
-            'active'
-        ];
-
-        if ($request['with_data']) {
-            array_unshift($header, 'id');
-            array_push($header, 'created_at', 'updated_at', 'deleted_at');
-        }
-
-        foreach ($header as &$item) {
-            $item = mb_convert_encoding($item, 'UTF-8');
-        }
-
-        // Open a memory "file" for write
-        $file = fopen('php://memory', 'w');
-
-        // Insert the CSV header
-        fputcsv($file, $header);
-
-        if ($request['with_data']) {
-            // Fetch categories
-            $categories = Category::withTrashed()->get();
-
-            // Insert the categories data
-            foreach ($categories as $category) {
-                $row = [
-                    $category->id,
-                    $category->category_name,
-                    $category->category_code,
-                    $category->address_1,
-                    $category->address_2,
-                    $category->email,
-                    $category->phone_number,
-                    $category->mobile_number,
-                    $category->website,
-                    $category->img_url,
-                    $category->active,
-                    $category->created_at,
-                    $category->updated_at,
-                    $category->deleted_at,
-                ];
-
-                // Convert each item in the row to UTF-8
-                foreach ($row as &$item) {
-                    $item = mb_convert_encoding($item, 'UTF-8');
-                }
-
-                fputcsv($file, $row);
-            }
-        }
-
-        // Reset the file pointer to the start of the file
-        fseek($file, 0);
-
-        // Send BOM header for UTF-8 CSV
-        echo "\xEF\xBB\xBF";
-
-        // Return a CSV file for download
-        return response()->streamDownload(function () use ($file) {
-            fpassthru($file);
-        }, 'categories.csv');
     }
 
     public function destroy(Request $request)
@@ -549,5 +340,35 @@ class CategoryController extends Controller
         }
 
         return $subcategoriesData;
+    }
+
+    private function getEditCategoryValidator(mixed $request, Category $category)
+    {
+        if ($request instanceof Request) {
+            $requestData = $request->all();
+        } elseif (is_array($request)) {
+            $requestData = $request;
+        } else {
+            return null;
+        }
+
+        return Validator::make($requestData, [
+            'id' => 'required',
+            'category_name' => 'required|max:255',
+            'category_code' => [
+                'required',
+                'max:4',
+                Rule::unique('categories')->ignore($category->id),
+            ],
+            'subcategories' => 'array',
+            'subcategories.*' => [new UniqueSubcategoryCode($category->id)],
+            'subcategories.*.subcategory_name' => 'required|string|max:255',
+            'subcategories.*.subcategory_code' => [
+                'required',
+                'max:4',
+            ],
+            'subcategories.*.description' => 'nullable|string|max:1000',
+            'subcategories.*.category_id' => 'required|exists:categories,id',
+        ]);
     }
 }
