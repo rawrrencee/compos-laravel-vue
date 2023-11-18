@@ -209,7 +209,7 @@ class CategoryController extends Controller
                 }
 
                 if (isset($s) && $subcategoryData['is_deleted']) {
-                    $s->delete();
+                    Subcategory::destroy($subcategoryData['id']);
                 } else {
                     unset($subcategoryData['is_deleted']);
 

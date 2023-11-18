@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DateTime;
+use DateTimeZone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,7 +31,12 @@ class Subcategory extends Model
         parent::boot();
 
         static::deleting(function ($model) {
-            $model->subcategory_code = $model->subcategory_code . '__deleted@' . date('d-m-Y h:i:s A');
+            $timezone = new DateTimeZone('Asia/Singapore');
+            $date = new DateTime('now', $timezone);
+            $formattedDate = $date->format('d-m-Y h:i:s A');
+
+            $split = explode('__deleted', $model->subcategory_code);
+            $model->subcategory_code = $split[0] . '__deleted@' . $formattedDate;
             $model->save();
         });
     }
