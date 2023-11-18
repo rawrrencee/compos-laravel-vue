@@ -1,5 +1,5 @@
 <script setup>
-import EmployeesWrapper from '@/Pages/Admin/Users/Employees/EmployeesWrapper.vue';
+import EmployeesLayout from '@/Pages/Admin/Users/Employees/EmployeesLayout.vue';
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon } from '@heroicons/vue/24/outline';
 import {
@@ -156,7 +156,7 @@ const goToPage = (nextPageNumber) => {
 </script>
 
 <template>
-  <EmployeesWrapper>
+  <EmployeesLayout>
     <Head title="Overview" />
     <TransitionRoot
       appear
@@ -302,5 +302,5 @@ const goToPage = (nextPageNumber) => {
         @button-clicked="onToolbarBtnClicked"
       />
     </TransitionRoot>
-  </EmployeesWrapper>
+  </EmployeesLayout>
 </template>

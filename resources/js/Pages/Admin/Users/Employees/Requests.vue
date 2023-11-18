@@ -1,5 +1,5 @@
 <script setup>
-import EmployeesWrapper from './EmployeesWrapper.vue';
+import EmployeesLayout from '@/Pages/Admin/Users/Employees/EmployeesLayout.vue';
 </script>
 
-<template><EmployeesWrapper>Requests</EmployeesWrapper></template>
+<template><EmployeesLayout>Requests</EmployeesLayout></template>
