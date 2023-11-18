@@ -410,14 +410,12 @@ watch(editBulkActive, (val) => {
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
-                <dt class="sr-only sm:hidden">Category Code</dt>
-                <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                <dt class="sr-only">Category Code</dt>
+                <dd class="mt-1 truncate text-gray-500">
                   {{ category.category_code }}
                 </dd>
-              </dl>
-              <dl class="font-normal lg:hidden">
-                <dt class="sr-only sm:hidden">Created At</dt>
-                <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                <dt class="sr-only">Created At</dt>
+                <dd class="mt-1 truncate text-gray-500">
                   {{
                     new Date(category.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',
@@ -427,10 +425,10 @@ watch(editBulkActive, (val) => {
                 </dd>
               </dl>
             </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
               {{ category.category_code }}
             </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
               <ul>
                 <li v-for="s in category.subcategories.slice(0, 3)">{{ s.subcategory_code }}</li>
                 <li v-if="category.subcategories.length > 3">and {{ category.subcategories.length - 3 }} more</li>
