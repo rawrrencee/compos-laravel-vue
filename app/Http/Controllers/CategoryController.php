@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Subcategory;
+use App\Rules\UniqueSubcategoryCode;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Illuminate\Database\Query\Builder;
 
 class CategoryController extends Controller
 {
@@ -51,18 +55,13 @@ class CategoryController extends Controller
         }
 
         // Filters
-        $category_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['category_name']  ?? null : null;
-        $category_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['category_code']  ?? null : null;
+        $category_name_or_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['category_name_or_code']  ?? null : null;
 
         $categories = Category::query();
-        if (!empty($category_name)) {
-            $categories->where(function ($q) use ($category_name) {
-                $q->where('category_name', 'like', '%' . $category_name . '%');
-            });
-        }
-        if (!empty($category_code)) {
-            $categories->where(function ($q) use ($category_code) {
-                $q->where('category_code', 'like', '%' . $category_code . '%');
+        if (!empty($category_name_or_code)) {
+            $categories->where(function ($q) use ($category_name_or_code) {
+                $q->where('category_name', 'like', '%' . $category_name_or_code . '%')
+                    ->orWhere('category_code', 'like', '%' . $category_name_or_code . '%');
             });
         }
 
@@ -80,20 +79,6 @@ class CategoryController extends Controller
             }
         }
 
-        if (isset($request['tableFilterOptions']) && isset($request['tableFilterOptions']['showActive'])) {
-            switch ($request['tableFilterOptions']['showActive']) {
-                case 'onlyActive':
-                    $categories->where('active', '=', '1');
-                    break;
-                case 'onlyNonActive':
-                    $categories->where('active', '=', '0');
-                    break;
-                case 'both':
-                default:
-                    break;
-            }
-        }
-
         return Inertia::render('Admin/Commerce/Categories/Overview', ['sortBy' => $request['sortBy'], 'orderBy' => $request['orderBy'], 'paginatedResults' => $categories->orderBy($request['sortBy'], $request['orderBy'])->paginate($request['perPage']), 'tableFilterOptions' => $request['tableFilterOptions']]);
     }
 
@@ -103,7 +88,7 @@ class CategoryController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $category = Category::withTrashed()->where('id', '=', $id)->first();
+        $category = Category::withTrashed()->where('id', '=', $id)->with('subcategories')->firstOrFail();
 
         if (!isset($category)) {
             return Inertia::render('Admin/Commerce/Categories/Overview')
@@ -121,25 +106,25 @@ class CategoryController extends Controller
         $request->validate([
             'category_name' => 'required|max:255',
             'category_code' => 'required|max:4|unique:categories',
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'category_photo' => 'nullable|image',
+            'description' => 'nullable|string|max:1000',
+            'subcategories' => 'array',
+            'subcategories.*.subcategory_name' => 'required|string|max:255',
+            'subcategories.*.subcategory_code' => 'required|string|max:4',
+            'subcategories.*.description' => 'nullable|string|max:1000',
+            'subcategories.*.category_id' => 'required|exists:categories,id',
         ]);
-
-        if (!empty($request['category_photo'])) {
-            $path = $request->file('category_photo')->store('category-photos', 'private');
-            $request['img_path'] = $path;
-        }
 
         try {
             DB::beginTransaction();
-            $category = Category::create($request->all());
+            $category = Category::create($request->only(['category_name', 'category_code', 'description']));
+
+            $subcategoriesData = $this->getSubcategoriesFromRequest($request);
+
+            foreach ($subcategoriesData as $subcategoryData) {
+                $subcategory = new Subcategory($subcategoryData);
+                $category->subcategories()->save($subcategory);
+            }
+
             DB::commit();
 
             return redirect()->route('admin/commerce/categories')
@@ -164,7 +149,13 @@ class CategoryController extends Controller
         if ($id === 0) {
             return redirect()->route('404');
         }
-        $category = Category::whereId($id)->first();
+        $category = Category::whereId($id)
+            ->with(['subcategories' => function ($query) {
+                $query
+                    ->withoutTrashed()
+                    ->orderBy('subcategory_name');
+            }])
+            ->firstOrFail();
 
         if (!isset($category)) {
             return redirect()->route('404');
@@ -193,32 +184,41 @@ class CategoryController extends Controller
                 'max:4',
                 Rule::unique('categories')->ignore($category->id),
             ],
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'category_photo' => 'nullable|image',
+            'subcategories' => 'array',
+            'subcategories.*' => [new UniqueSubcategoryCode($category->id)],
+            'subcategories.*.subcategory_name' => 'required|string|max:255',
+            'subcategories.*.subcategory_code' => [
+                'required',
+                'max:4',
+            ],
+            'subcategories.*.description' => 'nullable|string|max:1000',
+            'subcategories.*.category_id' => 'required|exists:categories,id',
         ]);
-
-        if (isset($category['img_path'])) {
-            $isDeleted = $this->CommonController->deletePhoto($category['img_path']);
-            if ($isDeleted) {
-                $request['img_path'] = null;
-            }
-        }
-
-        if (!empty($request['category_photo'])) {
-            $path = $request->file('category_photo')->store('category-photos', 'private');
-            $request['img_path'] = $path;
-        }
 
         try {
             DB::beginTransaction();
-            $category->update($request->all());
+            $category->update($request->only(['category_name', 'category_code', 'description']));
+            $subcategoriesData = $this->getSubcategoriesFromRequest($request);
+            foreach ($subcategoriesData as $subcategoryData) {
+                unset($s);
+                if (isset($subcategoryData['id'])) {
+                    $s = Subcategory::whereId($subcategoryData['id']);
+                }
+
+                if (isset($s) && $subcategoryData['is_deleted']) {
+                    $s->delete();
+                } else {
+                    unset($subcategoryData['is_deleted']);
+
+                    if (!isset($s)) {
+                        $subcategory = new Subcategory($subcategoryData);
+                        $category->subcategories()->save($subcategory);
+                    } else {
+                        $s->update($subcategoryData);
+                    }
+                }
+            }
+
             DB::commit();
 
             return redirect()->route('admin/commerce/categories')
@@ -231,11 +231,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'success')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e);
         }
     }
 
@@ -321,11 +317,7 @@ class CategoryController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory')
-                        ->with('show', true)
-                        ->with('type', 'default')
-                        ->with('status', 'success')
-                        ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+                    return $this->CommonController->handleException($e);
                 }
             }
         }
@@ -421,11 +413,7 @@ class CategoryController extends Controller
             // Rollback the transaction in case of errors
             DB::rollBack();
 
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'dialog')
-                ->with('status', 'error')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            $this->CommonController->handleException($e, 'dialog');
         }
     }
 
@@ -540,5 +528,26 @@ class CategoryController extends Controller
                 ->with('status', 'error')
                 ->with('message', 'Failed to delete record: ' . $this->CommonController->formatException($e));
         }
+    }
+
+    private function getSubcategoriesFromRequest(Request $request)
+    {
+        $subcategoriesData = $request->input('subcategories', []);
+        $allDeleted = collect($subcategoriesData)->every(function ($subcategory) {
+            return $subcategory['is_deleted'] ?? false; // Return true if is_deleted is not set or is true
+        });
+
+        if (count($subcategoriesData) == 0 || $allDeleted) {
+            $defaultSubcategory = [
+                'subcategory_name' => 'DEFAULT',
+                'subcategory_code' => 'DFLT',
+                'description' => 'Default subcategory'
+            ];
+
+            // Merge the default subcategory into $subcategoriesData
+            $subcategoriesData[] = $defaultSubcategory;
+        }
+
+        return $subcategoriesData;
     }
 }

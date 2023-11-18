@@ -12,5 +12,6 @@
         </tbody>
       </table>
     </div>
+    <slot name="footer"></slot>
   </div>
 </template>

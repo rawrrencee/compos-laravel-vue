@@ -4,7 +4,6 @@ import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
-import ColouredBadge from '../../../../Components/AdminPages/ColouredBadge.vue';
 import Error404 from '../../../../Components/AdminPages/Error404.vue';
 import NoResults from '../../../../Components/AdminPages/NoResults.vue';
 import DialogBulkEdit from '../../../../Components/AdminPages/Overview/DialogBulkEdit.vue';
@@ -33,7 +32,6 @@ const props = defineProps({
 const tableFilterOptions = useForm({
   category_name: props?.tableFilterOptions?.category_name ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
-  showActive: props?.tableFilterOptions?.showActive ?? 'both',
 });
 const importForm = useForm({
   import_file: null,
@@ -44,18 +42,13 @@ const editUrl = `${moduleUrl}/edit`;
 const exportUrl = `${route('admin/commerce/categories/export')}`;
 const tableHeaderTitles = [
   { key: 'category_name', title: 'Category Name' },
-  { key: 'active', title: 'Active' },
+  { key: 'category_code', title: 'Category Code' },
+  { key: 'subcategories', title: 'Subcategories' },
   { key: 'created_at', title: 'Created At' },
 ];
 const inputFields = [
   { key: 'category_name', title: 'Category Name' },
-  { key: 'active', title: 'Active' },
-  { key: 'address_1', title: 'Address Line 1' },
-  { key: 'address_2', title: 'Address Line 2' },
-  { key: 'phone_number', title: 'Phone Number' },
-  { key: 'mobile_number', title: 'Mobile Number' },
-  { key: 'website', title: 'Website URL' },
-  { key: 'img_url', title: 'Image URL' },
+  { key: 'category_code', title: 'Category Code' },
 ];
 // #endregion Page Variables
 
@@ -82,7 +75,6 @@ const appliedFilterCount = computed(() => {
   let count = 0;
   if (tableFilterOptions.category_name?.length > 0) count++;
   if (tableFilterOptions.showDeleted !== 'onlyNonDeleted') count++;
-  if (tableFilterOptions.showActive !== 'both') count++;
   return count;
 });
 // #endregion Computed variables
@@ -152,7 +144,6 @@ const onGoToPageClicked = (data) => {
       tableFilterOptions: {
         category_name: !!tableFilterOptions?.category_name ? tableFilterOptions.category_name : undefined,
         showDeleted: tableFilterOptions.showDeleted,
-        showActive: tableFilterOptions.showActive,
       },
     },
     only: ['paginatedResults', 'sortBy', 'orderBy', 'tableFilterOptions'],
@@ -283,7 +274,27 @@ watch(editBulkActive, (val) => {
             >
               <div class="grid gap-2 col-span-2">
                 <label for="category_name" class="block text-sm font-medium leading-6 text-gray-900"
-                  >Category Name</label
+                  >Category Name/ Code</label
+                >
+                <div class="join">
+                  <input
+                    type="text"
+                    name="category_name"
+                    class="input join-item input-bordered input-sm w-full"
+                    v-model="tableFilterOptions.category_name"
+                  />
+                  <button
+                    type="button"
+                    class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
+                    @click="onResetFiltersClicked('category_name', '')"
+                  >
+                    <XMarkIcon class="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+              <div class="grid gap-2 col-span-2">
+                <label for="category_name" class="block text-sm font-medium leading-6 text-gray-900"
+                  >Subcategory Name/ Code</label
                 >
                 <div class="join">
                   <input
@@ -310,16 +321,6 @@ watch(editBulkActive, (val) => {
                     <option value="onlyNonDeleted">Only non-deleted</option>
                     <option value="onlyDeleted">Only deleted</option>
                     <option value="both">Both deleted and non-deleted</option>
-                  </select>
-                </div>
-                <div class="grid gap-2">
-                  <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900"
-                    >Show Active Items</label
-                  >
-                  <select class="select select-bordered select-sm w-full" v-model="tableFilterOptions.showActive">
-                    <option value="onlyActive">Only active</option>
-                    <option value="onlyNonActive">Only non-active</option>
-                    <option value="both">Both active and non-active</option>
                   </select>
                 </div>
               </div>
@@ -417,10 +418,6 @@ watch(editBulkActive, (val) => {
                 </div>
               </button>
               <dl class="font-normal lg:hidden">
-                <dt class="sr-only">Active</dt>
-                <dd class="mt-2 truncate text-gray-700">
-                  <ColouredBadge :data="category.active" data-type="boolean" />
-                </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
                 <dd class="mt-1 truncate text-gray-500 sm:hidden">
                   {{
@@ -431,9 +428,6 @@ watch(editBulkActive, (val) => {
                   }}
                 </dd>
               </dl>
-            </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              <ColouredBadge :data="category.active" data-type="boolean" />
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
               {{ new Date(category.created_at).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }) }}

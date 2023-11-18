@@ -226,11 +226,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'success')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e);
         }
     }
 
@@ -310,11 +306,7 @@ class CompanyController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany')
-                        ->with('show', true)
-                        ->with('type', 'default')
-                        ->with('status', 'success')
-                        ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+                    return $this->CommonController->handleException($e);
                 }
             }
         }

@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+defineProps({
+  message: String,
+});
+</script>
 
 <template>
   <div class="grid min-h-full place-items-center py-12">
@@ -47,7 +51,7 @@
           <circle cx="433.63626" cy="105.17383" r="12.18187" fill="#fff" />
         </svg>
       </div>
-      <p class="text-base font-semibold opacity-30">No Results</p>
+      <p class="text-base font-semibold opacity-30">{{ message ?? 'No Results' }}</p>
     </div>
   </div>
 </template>

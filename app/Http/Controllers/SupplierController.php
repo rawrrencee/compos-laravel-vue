@@ -218,11 +218,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Suppliers/AddOrEditSupplier')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'success')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e);
         }
     }
 
@@ -302,11 +298,7 @@ class SupplierController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Suppliers/AddOrEditSupplier')
-                        ->with('show', true)
-                        ->with('type', 'default')
-                        ->with('status', 'success')
-                        ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+                    return $this->CommonController->handleException($e);
                 }
             }
         }
@@ -398,11 +390,7 @@ class SupplierController extends Controller
             // Rollback the transaction in case of errors
             DB::rollBack();
 
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'dialog')
-                ->with('status', 'error')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            $this->CommonController->handleException($e, 'dialog');
         }
     }
 

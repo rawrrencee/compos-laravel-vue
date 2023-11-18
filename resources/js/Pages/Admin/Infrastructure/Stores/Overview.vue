@@ -32,7 +32,7 @@ const props = defineProps({
   companies: Array,
 });
 const tableFilterOptions = useForm({
-  store_name: props?.tableFilterOptions?.store_name ?? '',
+  store_name_or_code: props?.tableFilterOptions?.store_name_or_code ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
   showActive: props?.tableFilterOptions?.showActive ?? 'both',
 });
@@ -88,7 +88,7 @@ const indeterminate = computed(
 const showEditDeleteBtn = computed(() => selectedTableRows.value.length > 0);
 const appliedFilterCount = computed(() => {
   let count = 0;
-  if (tableFilterOptions.store_name?.length > 0) count++;
+  if (tableFilterOptions.store_name_or_code?.length > 0) count++;
   if (tableFilterOptions.showDeleted !== 'onlyNonDeleted') count++;
   if (tableFilterOptions.showActive !== 'both') count++;
   return count;
@@ -170,7 +170,9 @@ const onGoToPageClicked = (data) => {
         ...tableSortOptions.value,
       }),
       tableFilterOptions: {
-        store_name: !!tableFilterOptions?.store_name ? tableFilterOptions.store_name : undefined,
+        store_name_or_code: !!tableFilterOptions?.store_name_or_code
+          ? tableFilterOptions.store_name_or_code
+          : undefined,
         showDeleted: tableFilterOptions.showDeleted,
         showActive: tableFilterOptions.showActive,
       },
@@ -263,7 +265,7 @@ const onResetFiltersClicked = (controlName, value) => {
     tableFilterOptions.reset(controlName);
   } else {
     tableFilterOptions.defaults({
-      store_name: '',
+      store_name_or_code: '',
       showDeleted: 'onlyNonDeleted',
       showActive: 'both',
     });
@@ -313,18 +315,20 @@ watch(editBulkActive, (val) => {
               @submit.prevent="onGoToPageClicked"
             >
               <div class="grid gap-2 col-span-2">
-                <label for="store_name" class="block text-sm font-medium leading-6 text-gray-900">Store Name</label>
+                <label for="store_name_or_code" class="block text-sm font-medium leading-6 text-gray-900"
+                  >Store Name/ Code</label
+                >
                 <div class="join">
                   <input
                     type="text"
-                    name="store_name"
+                    name="store_name_or_code"
                     class="input join-item input-bordered input-sm w-full"
-                    v-model="tableFilterOptions.store_name"
+                    v-model="tableFilterOptions.store_name_or_code"
                   />
                   <button
                     type="button"
                     class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
-                    @click="onResetFiltersClicked('store_name', '')"
+                    @click="onResetFiltersClicked('store_name_or_code', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>

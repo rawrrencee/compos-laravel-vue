@@ -53,12 +53,13 @@ class StoreController extends Controller
         }
 
         // Filters
-        $store_name = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['store_name']  ?? null : null;
+        $store_name_or_code = isset($request['tableFilterOptions']) ? $request['tableFilterOptions']['store_name_or_code']  ?? null : null;
 
         $stores = Store::query();
-        if (!empty($store_name)) {
-            $stores->where(function ($q) use ($store_name) {
-                $q->where('store_name', 'like', '%' . $store_name . '%');
+        if (!empty($store_name_or_code)) {
+            $stores->where(function ($q) use ($store_name_or_code) {
+                $q->where('store_name', 'like', '%' . $store_name_or_code . '%')
+                    ->orWhere('store_code', 'like', '%' . $store_name_or_code . '%');
             });
         }
 
@@ -221,11 +222,7 @@ class StoreController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'success')
-                ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e);
         }
     }
 
@@ -306,11 +303,7 @@ class StoreController extends Controller
                 } catch (\Exception $e) {
                     DB::rollBack();
 
-                    return Inertia::render('Admin/Infrastructure/Stores/AddOrEditStore')
-                        ->with('show', true)
-                        ->with('type', 'default')
-                        ->with('status', 'success')
-                        ->with('message', 'Failed to update record: ' . $this->CommonController->formatException($e));
+                    return $this->CommonController->handleException($e);
                 }
             }
         }
