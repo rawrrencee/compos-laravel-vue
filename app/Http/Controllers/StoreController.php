@@ -518,11 +518,7 @@ class StoreController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'Failed to delete record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e, 'default', 'delete');
         }
     }
 

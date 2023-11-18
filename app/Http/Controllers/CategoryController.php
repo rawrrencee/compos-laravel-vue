@@ -294,9 +294,10 @@ class CategoryController extends Controller
         // Retrieve the ids
         $ids = $request->get('ids');
 
-        DB::beginTransaction();
 
         try {
+            DB::beginTransaction();
+
             // Delete the records
             $deletedCount = Category::destroy($ids);
 
@@ -313,11 +314,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'Failed to delete record: ' . $this->CommonController->formatException($e));
+            return $this->CommonController->handleException($e, 'default', 'delete');
         }
     }
 
