@@ -178,7 +178,7 @@ const deletePhoto = () => {
                   class="input input-bordered w-full max-w-lg"
                   v-model="companyForm[input.key]"
                   :class="companyForm.errors[input.key] ? 'border-error' : ''"
-                  @input="() => companyForm.clearErrors([input.key])"
+                  @input="() => companyForm.clearErrors(input.key)"
                 />
                 <span v-if="companyForm.errors[input.key]" class="text-error">
                   {{ companyForm.errors[input.key] }}

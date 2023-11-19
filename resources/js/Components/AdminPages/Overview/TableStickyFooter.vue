@@ -50,7 +50,7 @@ defineEmits(['buttonClicked']);
         </div>
       </button>
     </div>
-    <div class="join flex" v-else>
+    <div class="join flex" v-else-if="addNewUrl">
       <Link
         as="button"
         :href="route(addNewUrl)"

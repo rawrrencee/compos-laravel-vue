@@ -185,7 +185,7 @@ const deletePhoto = () => {
                     brandForm.errors[input.key] ? 'border-error' : '',
                     input.key === 'brand_code' && 'uppercase',
                   ]"
-                  @input="() => brandForm.clearErrors([input.key])"
+                  @input="() => brandForm.clearErrors(input.key)"
                 />
                 <span v-if="brandForm.errors[input.key]" class="text-error">
                   {{ brandForm.errors[input.key] }}

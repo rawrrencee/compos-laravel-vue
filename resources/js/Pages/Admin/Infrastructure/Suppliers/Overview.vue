@@ -413,12 +413,7 @@ watch(editBulkActive, (val) => {
                 v-model="selectedTableRows"
               />
             </td>
-            <td
-              :class="[
-                'py-4 pr-3 text-sm font-medium',
-                selectedTableRows.includes(supplier.id) ? 'text-primary' : 'text-gray-900',
-              ]"
-            >
+            <td class="py-4 pr-3 text-sm">
               <button
                 type="button"
                 class="link text-left font-semibold text-primary"
@@ -437,7 +432,7 @@ watch(editBulkActive, (val) => {
                   <ColouredBadge :data="supplier.active" data-type="boolean" />
                 </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
-                <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                <dd class="mt-2 truncate text-gray-500 sm:hidden">
                   {{
                     new Date(supplier.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',

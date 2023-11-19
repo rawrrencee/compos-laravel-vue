@@ -18,6 +18,10 @@ const props = defineProps({
   showFilters: Boolean,
   appliedFilterCount: Number,
   isLoading: Boolean,
+  isBulkEditable: {
+    default: true,
+    type: Boolean,
+  },
   showAdditionalMenu: {
     default: true,
     type: Boolean,
@@ -35,6 +39,7 @@ defineEmits(['buttonClicked']);
         class="btn btn-primary"
         :class="isLoading ? 'loading' : ''"
         @click="$emit('buttonClicked', { action: 'edit' })"
+        v-if="isBulkEditable"
       >
         <div class="flex items-center gap-2">
           <PencilIcon class="h-5 w-5" />
@@ -66,7 +71,7 @@ defineEmits(['buttonClicked']);
         >
       </button>
     </div>
-    <div class="hidden sm:join">
+    <div class="hidden sm:join" v-if="addNewUrl">
       <Link as="button" :href="route(addNewUrl)" class="btn btn-primary join-item" :class="isLoading ? 'loading' : ''">
         <div class="flex items-center gap-2">
           <PlusCircleIcon class="h-5 w-5" />

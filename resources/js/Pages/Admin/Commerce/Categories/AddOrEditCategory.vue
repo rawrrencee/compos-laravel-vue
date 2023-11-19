@@ -133,7 +133,7 @@ const submit = () => {
                     categoryForm.errors[input.key] ? 'border-error' : '',
                     input.key.includes('_code') && 'uppercase',
                   ]"
-                  @input="() => categoryForm.clearErrors([input.key])"
+                  @input="() => categoryForm.clearErrors(input.key)"
                 />
                 <span v-if="categoryForm.errors[input.key]" class="text-error">
                   {{ categoryForm.errors[input.key] }}

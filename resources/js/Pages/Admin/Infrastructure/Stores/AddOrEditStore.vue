@@ -223,7 +223,7 @@ const deletePhoto = () => {
                     storeForm.errors[input.key] ? 'border-error' : '',
                     input.key === 'store_code' && 'uppercase',
                   ]"
-                  @input="() => storeForm.clearErrors([input.key])"
+                  @input="() => storeForm.clearErrors(input.key)"
                 />
                 <span v-if="storeForm.errors[input.key]" class="text-error">
                   {{ storeForm.errors[input.key] }}

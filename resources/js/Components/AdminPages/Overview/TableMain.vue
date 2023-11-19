@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <div class="grow pb-4">
+  <div class="flex-grow pb-4">
     <div class="overflow-x-scroll ring-1 ring-gray-200 sm:mx-0 sm:rounded-lg">
       <table class="min-w-full divide-y divide-gray-200">
         <thead>

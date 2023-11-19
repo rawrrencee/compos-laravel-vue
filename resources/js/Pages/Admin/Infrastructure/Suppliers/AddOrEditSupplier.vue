@@ -180,7 +180,7 @@ const deletePhoto = () => {
                   class="input input-bordered w-full max-w-lg"
                   v-model="supplierForm[input.key]"
                   :class="supplierForm.errors[input.key] ? 'border-error' : ''"
-                  @input="() => supplierForm.clearErrors([input.key])"
+                  @input="() => supplierForm.clearErrors(input.key)"
                 />
                 <span v-if="supplierForm.errors[input.key]" class="text-error">
                   {{ supplierForm.errors[input.key] }}

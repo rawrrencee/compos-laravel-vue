@@ -163,7 +163,7 @@ defineEmits(['dialogCloseClicked', 'dialogSaveClicked']);
                                       input.key.includes('_code') && 'uppercase',
                                     ]"
                                     v-model="form[input.key]"
-                                    @input="() => form.clearErrors([input.key])"
+                                    @input="() => form.clearErrors(input.key)"
                                   />
                                 </div>
                               </div>

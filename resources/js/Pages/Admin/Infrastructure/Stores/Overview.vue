@@ -111,8 +111,8 @@ const onBulkEditSaveClicked = () => {
         phone_number: store.phone_number ?? '',
         mobile_number: store.mobile_number ?? '',
         website: store.website ?? '',
-        active: store.active === 0 ? false : true,
-        include_tax: store.include_tax === 0 ? false : true,
+        active: store.active === false ? false : true,
+        include_tax: store.include_tax === false ? false : true,
         tax_percentage: store.tax_percentage ?? '',
         img_url: store.img_url ?? '',
       }))
@@ -428,12 +428,7 @@ watch(editBulkActive, (val) => {
                 v-model="selectedTableRows"
               />
             </td>
-            <td
-              :class="[
-                'py-4 pr-3 text-sm font-medium',
-                selectedTableRows.includes(store.id) ? 'text-primary' : 'text-gray-900',
-              ]"
-            >
+            <td class="py-4 pr-3 text-sm">
               <button
                 type="button"
                 class="link text-left font-semibold text-primary"
@@ -460,7 +455,7 @@ watch(editBulkActive, (val) => {
                   <ColouredBadge :data="store.active" data-type="boolean" />
                 </dd>
                 <dt class="sr-only sm:hidden">Created At</dt>
-                <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                <dd class="mt-2 truncate text-gray-500 sm:hidden">
                   {{
                     new Date(store.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',

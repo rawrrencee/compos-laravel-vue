@@ -391,12 +391,7 @@ watch(editBulkActive, (val) => {
                 v-model="selectedTableRows"
               />
             </td>
-            <td
-              :class="[
-                'py-4 pr-3 text-sm font-medium',
-                selectedTableRows.includes(category.id) ? 'text-primary' : 'text-gray-900',
-              ]"
-            >
+            <td class="py-4 pr-3 text-sm">
               <button
                 type="button"
                 class="link text-left font-semibold text-primary"
@@ -411,11 +406,11 @@ watch(editBulkActive, (val) => {
               </button>
               <dl class="font-normal lg:hidden">
                 <dt class="sr-only">Category Code</dt>
-                <dd class="mt-1 truncate text-gray-500">
+                <dd class="mt-2 truncate text-gray-500">
                   {{ category.category_code }}
                 </dd>
                 <dt class="sr-only">Created At</dt>
-                <dd class="mt-1 truncate text-gray-500">
+                <dd class="mt-2 truncate text-gray-500">
                   {{
                     new Date(category.created_at).toLocaleString('en-SG', {
                       dateStyle: 'medium',

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use \App\Http\Controllers\CompanyController;
-use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeRequestController;
 use \App\Http\Controllers\StoreController;
 use \App\Http\Controllers\SupplierController;
 
@@ -288,8 +288,10 @@ Route::middleware([
                     return Inertia::render('Error/404');
                 })->name('admin/users/employees/permissions');
 
-                Route::get('/requests', [EmployeeController::class, 'employeeRequestsPage'])->name('admin/users/employees/requests');
-                Route::post('/updateEmployeeRequestKey', [EmployeeController::class, 'updateEmployeeRequestKey'])->name('admin/users/employees/requests.key-update');
+                Route::get('/requests', [EmployeeRequestController::class, 'index'])->name('admin/users/employees/requests');
+                Route::get('/requests/view', [EmployeeRequestController::class, 'view'])->name('admin/users/employees/requests/view');
+
+                Route::post('/updateEmployeeRequestKey', [EmployeeRequestController::class, 'updateEmployeeRequestKey'])->name('admin/users/employees/requests.key-update');
             });
 
             Route::get('/customers', function () {
