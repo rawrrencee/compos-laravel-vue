@@ -6,15 +6,15 @@ const props = defineProps({
   data: Number | Object | String,
 });
 
-const binaryColourMap = new Map([
-  [false, 'red'],
-  [true, 'green'],
+const binarySpanColourMap = new Map([
+  [false, 'bg-red-100 text-red-700'],
+  [true, 'bg-green-100 text-green-700'],
 ]);
 
-const enumColourMap = new Map([
-  ['APPROVED', 'green'],
-  ['PENDING', 'gray'],
-  ['REJECTED', 'red'],
+const enumSpanColourMap = new Map([
+  ['APPROVED', 'bg-green-100 text-green-700'],
+  ['PENDING', 'bg-gray-100 text-gray-700'],
+  ['REJECTED', 'bg-red-100 text-red-700'],
 ]);
 
 const spanColourClass = computed(() => {
@@ -25,17 +25,28 @@ const spanColourClass = computed(() => {
     switch (props.dataType) {
       case 'yesNo':
       case 'boolean':
-        colourCode = binaryColourMap.get(!!props.data);
+        colourCode = binarySpanColourMap.get(!!props.data);
         break;
       case 'enum':
-        colourCode = enumColourMap.get(props.data);
+        colourCode = enumSpanColourMap.get(props.data);
         break;
       default:
         break;
     }
   }
-  return colourCode ? `bg-${colourCode}-100 text-${colourCode}-700` : defaultColour;
+  return colourCode ?? defaultColour;
 });
+
+const binaryFillColourMap = new Map([
+  [false, 'fill-red-500'],
+  [true, 'fill-green-500'],
+]);
+
+const enumFillColourMap = new Map([
+  ['APPROVED', 'fill-green-500'],
+  ['PENDING', 'fill-gray-500'],
+  ['REJECTED', 'fill-red-500'],
+]);
 
 const svgColourClass = computed(() => {
   let colourCode;
@@ -45,17 +56,17 @@ const svgColourClass = computed(() => {
     switch (props.dataType) {
       case 'yesNo':
       case 'boolean':
-        colourCode = binaryColourMap.get(!!props.data);
+        colourCode = binaryFillColourMap.get(!!props.data);
         break;
       case 'enum':
-        colourCode = enumColourMap.get(props.data);
+        colourCode = enumFillColourMap.get(props.data);
         break;
       default:
         break;
     }
   }
 
-  return colourCode ? `fill-${colourCode}-500` : defaultColour;
+  return colourCode ?? defaultColour;
 });
 
 const badgeTitle = computed(() => {
@@ -75,7 +86,7 @@ const badgeTitle = computed(() => {
 <template>
   <div class="max-w-sm">
     <span class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium" :class="spanColourClass">
-      <svg class="h-1.5 w-1.5 fill-green-500" :class="svgColourClass" viewBox="0 0 6 6" aria-hidden="true">
+      <svg class="h-1.5 w-1.5" :class="svgColourClass" viewBox="0 0 6 6" aria-hidden="true">
         <circle cx="3" cy="3" r="3" />
       </svg>
       {{ badgeTitle }}
