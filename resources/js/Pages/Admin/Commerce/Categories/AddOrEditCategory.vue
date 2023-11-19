@@ -148,9 +148,9 @@ const submit = () => {
             <template #thead>
               <tr class="text-left text-sm leading-6">
                 <th scope="col" class="table-cell px-3 md:hidden">Subcategory Details</th>
-                <th scope="col" class="hidden px-3 md:table-cell">Subcategory Name</th>
-                <th scope="col" class="hidden px-3 md:table-cell md:w-40">Subcategory Code</th>
-                <th scope="col" class="hidden px-3 md:table-cell">Description</th>
+                <th scope="col" class="hidden w-4/12 px-3 md:table-cell">Subcategory Name</th>
+                <th scope="col" class="hidden w-2/12 px-3 md:table-cell md:w-40">Subcategory Code</th>
+                <th scope="col" class="hidden w-4/12 px-3 md:table-cell">Description</th>
                 <th scope="col" class="hidden px-3 md:table-cell"></th>
               </tr>
             </template>
