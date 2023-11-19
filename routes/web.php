@@ -11,6 +11,7 @@ use \App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeRequestController;
 use \App\Http\Controllers\StoreController;
 use \App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UnauthenticatedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,18 +24,24 @@ use \App\Http\Controllers\SupplierController;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Route::get('/', function () {
+//     return Inertia::render('Unauthenticated/Login', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
+
+Route::get('/', [UnauthenticatedController::class, 'loginPage'])->name('unauth/login');
 
 Route::get('/404', function () {
     return Inertia::render('Error/404');
 })->name('404');
+
+Route::prefix('/register')->group(function () {
+    Route::get('/employee', [UnauthenticatedController::class, 'registerEmployeePage'])->name('unauth/register/employee');
+});
 
 Route::middleware([
     'auth:sanctum',
