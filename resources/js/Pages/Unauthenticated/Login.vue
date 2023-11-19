@@ -1,6 +1,6 @@
 <script setup>
 import { ExclamationTriangleIcon, LockClosedIcon } from '@heroicons/vue/24/outline';
-import { Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
   companyName: String,
@@ -26,6 +26,7 @@ const submit = () => {
 
 <template>
   <main class="relative h-full bg-gray-800">
+    <Head title="Login" />
     <div class="grid h-full grid-cols-1 md:grid-cols-12">
       <div class="col-span-5 hidden h-full flex-col text-gray-200 md:flex">
         <div class="flex h-full flex-col place-content-center place-items-center gap-24 px-6">
