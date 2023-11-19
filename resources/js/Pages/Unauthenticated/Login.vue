@@ -51,7 +51,7 @@ const submit = () => {
           >
         </div>
       </div>
-      <div class="col-span-1 h-full rounded-lg bg-gray-200 md:col-span-7">
+      <div class="col-span-1 h-full bg-gray-200 md:col-span-7 md:rounded-lg">
         <div class="flex h-full flex-col place-content-center place-items-center gap-12 px-6 py-12 md:gap-24">
           <div class="max-w-sm md:hidden md:w-96">
             <div class="flex flex-col gap-4">
