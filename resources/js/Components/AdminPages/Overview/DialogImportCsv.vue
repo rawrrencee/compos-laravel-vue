@@ -109,7 +109,7 @@ const onDownloadFileClicked = (url, data) => {
                               type="file"
                               name="import_csv"
                               accept=".csv, .txt"
-                              class="file-input file-input-sm file-input-bordered w-full max-w-xs"
+                              class="file-input file-input-bordered file-input-sm w-full max-w-xs"
                               :class="importForm.errors.import_file ? 'file-input-error' : ''"
                               @change="(event) => $emit('importFileAdded', event)"
                             />
@@ -121,13 +121,13 @@ const onDownloadFileClicked = (url, data) => {
                       </div>
                     </div>
                   </div>
-                  <div class="grid grid-cols-2 sm:flex sm:flex-shrink-0 gap-2 justify-end px-4 py-4">
-                    <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="$emit('dialogCloseClicked')">
+                  <div class="grid grid-cols-2 justify-end gap-2 px-4 py-4 sm:flex sm:flex-shrink-0">
+                    <button type="button" class="btn sm:max-w-[10rem] sm:grow" @click="$emit('dialogCloseClicked')">
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      class="btn btn-primary sm:grow sm:max-w-[10rem]"
+                      class="btn btn-primary sm:max-w-[10rem] sm:grow"
                       :class="isLoading ? 'loading' : ''"
                     >
                       Import

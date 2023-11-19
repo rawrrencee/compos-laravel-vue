@@ -19,25 +19,25 @@ defineProps({
       class="absolute inset-0 -z-10 h-full w-full object-cover object-top"
     />
 
-    <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-right">
+    <div v-if="canLogin" class="fixed right-0 top-0 p-6 text-right">
       <Link
         v-if="$page.props.auth.user"
         :href="route('dashboard')"
-        class="font-semibold text-gray-100 hover:text-gray-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+        class="font-semibold text-gray-100 hover:text-gray-300 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500"
         >Dashboard</Link
       >
 
       <template v-else>
         <Link
           :href="route('login')"
-          class="font-semibold text-gray-100 hover:text-gray-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+          class="font-semibold text-gray-100 hover:text-gray-300 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500"
           >Log in</Link
         >
 
         <Link
           v-if="canRegister"
           :href="route('register')"
-          class="ml-4 font-semibold text-gray-100 hover:text-gray-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+          class="ml-4 font-semibold text-gray-100 hover:text-gray-300 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500"
           >Register</Link
         >
       </template>

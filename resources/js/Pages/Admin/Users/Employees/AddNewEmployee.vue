@@ -6,6 +6,6 @@ import { Head } from '@inertiajs/vue3';
 <template>
   <EmployeesLayout>
     <Head title="Add New Employee" />
-    <div class="h-full flex flex-col">Add</div>
+    <div class="flex h-full flex-col">Add</div>
   </EmployeesLayout>
 </template>

@@ -52,15 +52,15 @@ const onAdminAlertButtonClicked = () => {
           <div>
             <div class="-m-1 flex">
               <div
-                class="h-24 w-24 sm:h-40 sm:w-40 lg:h-48 lg:w-48 flex items-center justify-center bg-white rounded-lg shadow-md border-4 border-white"
+                class="flex h-24 w-24 items-center justify-center rounded-lg border-4 border-white bg-white shadow-md sm:h-40 sm:w-40 lg:h-48 lg:w-48"
               >
                 <img
                   v-if="viewBrand?.img_url || viewBrand?.img_path"
                   :src="viewBrand?.img_path ? getImgSrcFromPath(viewBrand?.img_path) : viewBrand?.img_url"
-                  class="w-full h-auto"
+                  class="h-auto w-full"
                 />
                 <PhotoIcon
-                  class="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 text-gray-300"
+                  class="h-24 w-24 flex-shrink-0 text-gray-300 sm:h-40 sm:w-40 lg:h-48 lg:w-48"
                   aria-hidden="true"
                   v-else
                 />
@@ -80,7 +80,7 @@ const onAdminAlertButtonClicked = () => {
               <Link
                 :href="route(editUrl, { id: viewBrand.id })"
                 as="button"
-                class="btn btn-sm btn-block btn-primary sm:max-w-[7rem]"
+                class="btn btn-primary btn-sm btn-block sm:max-w-[7rem]"
               >
                 Edit
               </Link>

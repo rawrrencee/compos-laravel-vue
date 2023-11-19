@@ -16,7 +16,7 @@ const currentRoute = ref(route().current());
       :href="route(item.href)"
       :class="[
         isCurrent(item, currentRoute) ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:bg-gray-200',
-        'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700',
+        'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-gray-700',
       ]"
     >
       <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />

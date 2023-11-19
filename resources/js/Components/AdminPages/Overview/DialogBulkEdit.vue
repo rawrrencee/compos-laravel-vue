@@ -81,7 +81,7 @@ defineEmits(['dialogCloseClicked', 'dialogSaveClicked']);
                         :default-open="true"
                       >
                         <DisclosureButton
-                          class="sticky top-0 bg-gray-500 text-white p-4 font-semibold w-full flex gap-2 items-center justify-between border-t-2 border-t-gray-400"
+                          class="sticky top-0 flex w-full items-center justify-between gap-2 border-t-2 border-t-gray-400 bg-gray-500 p-4 font-semibold text-white"
                         >
                           <span class="text-left">Editing ID {{ form.id }}: {{ form[editableHeaderKey] }}</span>
                           <ChevronUpIcon v-if="open" class="h-4 w-4" />
@@ -95,7 +95,7 @@ defineEmits(['dialogCloseClicked', 'dialogSaveClicked']);
                           leave-from-class="opacity-100 translate-y-0"
                           leave-to-class="opacity-0 -translate-y-2"
                         >
-                          <DisclosurePanel class="p-4 grid grid-cols-1 gap-y-4">
+                          <DisclosurePanel class="grid grid-cols-1 gap-y-4 p-4">
                             <template v-for="input in inputFields" :key="input.key">
                               <div v-if="input.key === 'active'">
                                 <label for="active" class="block text-sm font-medium leading-6 text-gray-900"
@@ -173,13 +173,13 @@ defineEmits(['dialogCloseClicked', 'dialogSaveClicked']);
                       </Disclosure>
                     </div>
                   </div>
-                  <div class="grid grid-cols-2 sm:flex sm:flex-shrink-0 gap-2 justify-end px-4 py-4">
-                    <button type="button" class="btn sm:grow sm:max-w-[10rem]" @click="$emit('dialogCloseClicked')">
+                  <div class="grid grid-cols-2 justify-end gap-2 px-4 py-4 sm:flex sm:flex-shrink-0">
+                    <button type="button" class="btn sm:max-w-[10rem] sm:grow" @click="$emit('dialogCloseClicked')">
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      class="btn btn-primary sm:grow sm:max-w-[10rem]"
+                      class="btn btn-primary sm:max-w-[10rem] sm:grow"
                       :class="isLoading ? 'loading' : ''"
                     >
                       Save

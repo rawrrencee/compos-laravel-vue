@@ -270,7 +270,7 @@ watch(editBulkActive, (val) => {
 <template>
   <CompanyLayout>
     <Head title="Overview" />
-    <div class="h-full flex flex-col sm:px-6 lg:px-8" v-if="paginatedResults?.data.length >= 0">
+    <div class="flex h-full flex-col sm:px-6 lg:px-8" v-if="paginatedResults?.data.length >= 0">
       <TableToolbar
         :selected-items="selectedTableRows"
         :show-edit-delete-btn="showEditDeleteBtn"
@@ -293,10 +293,10 @@ watch(editBulkActive, (val) => {
             leave-to="opacity-0 -translate-y-4"
           >
             <form
-              class="mb-4 p-7 border border-gray-200 sm:rounded-lg flex flex-col gap-2 sm:gap-4 md:grid md:grid-cols-3"
+              class="mb-4 flex flex-col gap-2 border border-gray-200 p-7 sm:gap-4 sm:rounded-lg md:grid md:grid-cols-3"
               @submit.prevent="onGoToPageClicked"
             >
-              <div class="grid gap-2 col-span-2">
+              <div class="col-span-2 grid gap-2">
                 <label for="company_name" class="block text-sm font-medium leading-6 text-gray-900">Company Name</label>
                 <div class="join">
                   <input
@@ -307,14 +307,14 @@ watch(editBulkActive, (val) => {
                   />
                   <button
                     type="button"
-                    class="btn join-item btn-square btn-outline border-gray-300 btn-sm"
+                    class="btn btn-square btn-outline join-item btn-sm border-gray-300"
                     @click="onResetFiltersClicked('company_name', '')"
                   >
                     <XMarkIcon class="h-3 w-3" />
                   </button>
                 </div>
               </div>
-              <div class="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="col-span-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div class="grid gap-2">
                   <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900"
                     >Show Deleted Items</label
@@ -336,9 +336,9 @@ watch(editBulkActive, (val) => {
                   </select>
                 </div>
               </div>
-              <div class="col-span-2 mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="col-span-2 mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 <button type="button" class="btn btn-sm" @click="onResetFiltersClicked()">Reset</button>
-                <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+                <button type="submit" class="btn btn-primary btn-sm">Apply</button>
               </div>
             </form>
           </TransitionRoot>
@@ -347,7 +347,7 @@ watch(editBulkActive, (val) => {
       <TableMain>
         <template #thead>
           <tr>
-            <th scope="col" class="relative px-7 w-4 sm:w-12 sm:px-6">
+            <th scope="col" class="relative w-4 px-7 sm:w-12 sm:px-6">
               <input
                 type="checkbox"
                 class="checkbox absolute left-4 top-1/2 -mt-2 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
@@ -371,8 +371,8 @@ watch(editBulkActive, (val) => {
                   i === 0
                     ? 'pr-3 sm:w-96'
                     : tableHeaderTitles.length > 2 && i < tableHeaderTitles.length - 1
-                    ? 'hidden lg:table-cell px-3'
-                    : 'hidden sm:table-cell px-3',
+                      ? 'hidden px-3 lg:table-cell'
+                      : 'hidden px-3 sm:table-cell',
                   'py-3.5 text-left text-sm font-semibold text-gray-900',
                 ]"
                 @table-header-clicked="onTableHeaderClicked"
@@ -398,7 +398,7 @@ watch(editBulkActive, (val) => {
               'hover:bg-gray-50',
             ]"
           >
-            <td class="relative px-7 w-4 sm:w-12 sm:px-6">
+            <td class="relative w-4 px-7 sm:w-12 sm:px-6">
               <div
                 v-if="selectedTableRows.includes(company.id)"
                 class="absolute inset-y-0 left-0 w-0.5 bg-primary"
@@ -419,10 +419,10 @@ watch(editBulkActive, (val) => {
             >
               <button
                 type="button"
-                class="link text-primary font-semibold text-left"
+                class="link text-left font-semibold text-primary"
                 @click="onViewItemClicked(company.id)"
               >
-                <div class="flex gap-2 items-center">
+                <div class="flex items-center gap-2">
                   <span :class="company.company_name?.length > 50 ? 'break-all' : 'break-words'">{{
                     company.company_name
                   }}</span>
@@ -494,7 +494,7 @@ watch(editBulkActive, (val) => {
       @dialog-save-clicked="onBulkEditSaveClicked"
     >
       <template #bulk-fields>
-        <div class="grid grid-cols-1 px-4 gap-2 pb-6">
+        <div class="grid grid-cols-1 gap-2 px-4 pb-6">
           <span class="font-semibold leading-6 text-gray-900">Bulk update</span>
           <div class="flex items-center gap-2">
             <label for="bulk_active" class="block text-sm font-medium leading-6 text-gray-900">Active</label>

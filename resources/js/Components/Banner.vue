@@ -14,11 +14,11 @@ watch(message, async () => {
 <template>
   <div>
     <div v-if="show && message" :class="{ 'bg-indigo-500': style == 'success', 'bg-red-700': style == 'danger' }">
-      <div class="max-w-screen-xl mx-auto py-2 px-3 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between flex-wrap">
-          <div class="w-0 flex-1 flex items-center min-w-0">
+      <div class="mx-auto max-w-screen-xl px-3 py-2 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-center justify-between">
+          <div class="flex w-0 min-w-0 flex-1 items-center">
             <span
-              class="flex p-2 rounded-lg"
+              class="flex rounded-lg p-2"
               :class="{ 'bg-indigo-600': style == 'success', 'bg-red-600': style == 'danger' }"
             >
               <svg
@@ -54,7 +54,7 @@ watch(message, async () => {
               </svg>
             </span>
 
-            <p class="ml-3 font-medium text-sm text-white truncate">
+            <p class="ml-3 truncate text-sm font-medium text-white">
               {{ message }}
             </p>
           </div>
@@ -62,7 +62,7 @@ watch(message, async () => {
           <div class="shrink-0 sm:ml-3">
             <button
               type="button"
-              class="-mr-1 flex p-2 rounded-md focus:outline-none sm:-mr-2 transition"
+              class="-mr-1 flex rounded-md p-2 transition focus:outline-none sm:-mr-2"
               :class="{
                 'hover:bg-indigo-600 focus:bg-indigo-600': style == 'success',
                 'hover:bg-red-600 focus:bg-red-600': style == 'danger',

@@ -26,7 +26,7 @@ const secondaryNavigation = [
 <template>
   <AdminLayout :secondary-navigation="secondaryNavigation">
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-900 leading-tight">Brands</h2>
+      <h2 class="text-xl font-semibold leading-tight text-gray-900">Brands</h2>
     </template>
 
     <div class="h-full">

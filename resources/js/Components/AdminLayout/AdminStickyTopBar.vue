@@ -26,7 +26,7 @@ defineEmits(['update:isMobileSidebarOpen', 'update:isDesktopNarrowSidebarShown']
 
     <button
       type="button"
-      class="-m-2.5 p-2.5 text-gray-500 hidden lg:block"
+      class="-m-2.5 hidden p-2.5 text-gray-500 lg:block"
       @click="$emit('update:isDesktopNarrowSidebarShown', !isDesktopNarrowSidebarShown)"
     >
       <span class="sr-only">Use narrow sidebar</span>
@@ -34,7 +34,7 @@ defineEmits(['update:isMobileSidebarOpen', 'update:isDesktopNarrowSidebarShown']
       <Bars3CenterLeftIcon v-else class="h-5 w-5" aria-hidden="true" />
     </button>
 
-    <div class="flex flex-1 gap-x-4 self-center justify-end lg:gap-x-6">
+    <div class="flex flex-1 justify-end gap-x-4 self-center lg:gap-x-6">
       <Menu as="div" class="ml-3">
         <div>
           <MenuButton
@@ -57,7 +57,7 @@ defineEmits(['update:isMobileSidebarOpen', 'update:isDesktopNarrowSidebarShown']
           leave-to-class="transform opacity-0 scale-95"
         >
           <MenuItems
-            class="absolute right-0 z-10 mt-2 mr-4 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            class="absolute right-0 z-10 mr-4 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
             <MenuItem v-slot="{ active }">
               <Link

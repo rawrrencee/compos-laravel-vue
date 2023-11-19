@@ -29,9 +29,9 @@ const pagesArray = computed(() => {
 </script>
 
 <template>
-  <div class="py-4 flex flex-col items-center gap-4 justify-center sm:flex-row sm:justify-between">
+  <div class="flex flex-col items-center justify-center gap-4 py-4 sm:flex-row sm:justify-between">
     <Popover v-slot="{ close }" class="relative">
-      <PopoverButton class="btn btn-sm btn-outline">
+      <PopoverButton class="btn btn-outline btn-sm">
         Showing {{ paginatedResults?.from }} - {{ paginatedResults?.to }} of {{ paginatedResults?.total }} results
       </PopoverButton>
 
@@ -44,23 +44,23 @@ const pagesArray = computed(() => {
         leave-to-class="translate-y-1 opacity-0"
       >
         <PopoverPanel
-          class="absolute z-40 left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-3 w-96 bottom-14 transform px-4 sm:px-0 lg:max-w-3xl"
+          class="absolute bottom-14 left-1/2 z-40 mt-3 w-96 -translate-x-1/2 transform px-4 sm:left-0 sm:translate-x-0 sm:px-0 lg:max-w-3xl"
         >
           <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-            <div class="relative grid gap-4 bg-white p-4 items-center">
+            <div class="relative grid items-center gap-4 bg-white p-4">
               <h3 class="font-bold">Pagination Options</h3>
               <div class="flex flex-col gap-2">
                 <label for="go_to_page" class="block text-sm font-medium leading-6 text-gray-900">Go to page</label>
                 <input
                   type="number"
                   name="go_to_page"
-                  class="input input-sm input-bordered w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  class="input input-bordered input-sm w-full [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   v-model="goToPage"
                 />
               </div>
               <div class="flex flex-col gap-2">
                 <label for="per_page" class="block text-sm font-medium leading-6 text-gray-900">Items per page</label>
-                <select name="per_page" class="select select-sm select-bordered w-full" v-model="perPage">
+                <select name="per_page" class="select select-bordered select-sm w-full" v-model="perPage">
                   <template
                     v-for="selectOption in ['10', '20', '50', '100', '200', '500', '1000', '2000']"
                     :key="selectOption"
@@ -74,11 +74,11 @@ const pagesArray = computed(() => {
                   </template>
                 </select>
               </div>
-              <div class="grid grid-cols-2 gap-2 my-2">
+              <div class="my-2 grid grid-cols-2 gap-2">
                 <button type="button" class="btn btn-sm" @click="close">Cancel</button>
                 <button
                   type="button"
-                  class="btn btn-sm btn-primary"
+                  class="btn btn-primary btn-sm"
                   @click="
                     $emit('goToPageClicked', {
                       page: 1,
@@ -94,11 +94,11 @@ const pagesArray = computed(() => {
         </PopoverPanel>
       </transition>
     </Popover>
-    <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+    <div class="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
       <button
         :disabled="paginatedResults?.current_page === 1"
         @click="$emit('goToPageClicked', { page: 1, perPage })"
-        class="btn btn-sm btn-ghost disabled:bg-gray-50"
+        class="btn btn-ghost btn-sm disabled:bg-gray-50"
       >
         <ChevronDoubleLeftIcon class="h-3 w-3" />
       </button>
@@ -110,7 +110,7 @@ const pagesArray = computed(() => {
             perPage,
           })
         "
-        class="btn btn-sm btn-ghost disabled:bg-gray-50"
+        class="btn btn-ghost btn-sm disabled:bg-gray-50"
       >
         <ChevronLeftIcon class="h-3 w-3" />
       </button>
@@ -133,7 +133,7 @@ const pagesArray = computed(() => {
               perPage,
             })
         "
-        class="btn btn-sm btn-ghost disabled:bg-gray-50"
+        class="btn btn-ghost btn-sm disabled:bg-gray-50"
       >
         <ChevronRightIcon class="h-3 w-3" />
       </button>
@@ -145,7 +145,7 @@ const pagesArray = computed(() => {
             perPage,
           })
         "
-        class="btn btn-sm btn-ghost disabled:bg-gray-50"
+        class="btn btn-ghost btn-sm disabled:bg-gray-50"
       >
         <ChevronDoubleRightIcon class="h-3 w-3" />
       </button>

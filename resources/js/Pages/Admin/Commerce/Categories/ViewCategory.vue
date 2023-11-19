@@ -37,8 +37,8 @@ const onAdminAlertButtonClicked = () => {
     <Head title="View Company" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
     <div class="h-full divide-y divide-gray-200">
-      <div class="mt-6 flex flex-col sm:flex-row pb-6 px-4 sm:px-6 gap-4 sm:gap-0">
-        <div class="flex-grow flex flex-col items-start gap-1">
+      <div class="mt-6 flex flex-col gap-4 px-4 pb-6 sm:flex-row sm:gap-0 sm:px-6">
+        <div class="flex flex-grow flex-col items-start gap-1">
           <h3 class="text-xl font-bold text-gray-900 sm:text-2xl">
             {{ viewCategory.category_name }}
           </h3>
@@ -47,7 +47,7 @@ const onAdminAlertButtonClicked = () => {
           <Link
             :href="route(editUrl, { id: viewCategory.id })"
             as="button"
-            class="btn btn-sm btn-block btn-primary sm:min-w-[7rem]"
+            class="btn btn-primary btn-sm btn-block sm:min-w-[7rem]"
           >
             Edit
           </Link>

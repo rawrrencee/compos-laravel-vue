@@ -19,7 +19,7 @@ const currentRoute = ref(route().current());
       :href="route(item.href)"
       :class="[
         isCurrent(item, currentRoute) ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:bg-gray-200',
-        'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700',
+        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700',
       ]"
     >
       <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -30,7 +30,7 @@ const currentRoute = ref(route().current());
       <div
         :class="[
           isCurrent(item, currentRoute) ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:bg-gray-200',
-          'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700',
+          'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-gray-700',
         ]"
       >
         <Link :href="route(item.href)" class="flex gap-x-3">
@@ -59,7 +59,7 @@ const currentRoute = ref(route().current());
               :href="route(subItem.href)"
               :class="[
                 isCurrent(subItem, currentRoute) ? 'font-semibold' : '',
-                'hover:text-secondary block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700',
+                'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-gray-700 hover:text-secondary',
               ]"
             >
               {{ subItem.name }}</Link

@@ -133,7 +133,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
 </script>
 
 <template>
-  <div class="h-full flex flex-col">
+  <div class="flex h-full flex-col">
     <TransitionRoot as="template" :show="isMobileSidebarOpen">
       <Dialog as="div" class="relative z-50 lg:hidden" @close="isMobileSidebarOpen = false">
         <TransitionChild
@@ -207,7 +207,7 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
     <div
       :class="[
         isDesktopNarrowSidebarShown ? 'lg:pl-20' : 'lg:pl-72',
-        'transition-[padding] ease-in-out duration-150 h-full flex flex-col',
+        'flex h-full flex-col transition-[padding] duration-150 ease-in-out',
       ]"
     >
       <AdminStickyTopBar
@@ -215,8 +215,8 @@ watch(isDesktopNarrowSidebarShown, (isDesktopNarrowSidebarShown) => {
         v-model:is-mobile-sidebar-open="isMobileSidebarOpen"
       />
 
-      <header v-if="$slots.header" class="bg-white shadow z-10">
-        <div :class="[secondaryNavigation?.length > 0 ? 'pb-4' : 'pb-6', 'max-w-7xl pt-6 px-4 sm:px-6 lg:px-8']">
+      <header v-if="$slots.header" class="z-10 bg-white shadow">
+        <div :class="[secondaryNavigation?.length > 0 ? 'pb-4' : 'pb-6', 'max-w-7xl px-4 pt-6 sm:px-6 lg:px-8']">
           <slot name="header" />
         </div>
         <!-- Secondary navigation -->

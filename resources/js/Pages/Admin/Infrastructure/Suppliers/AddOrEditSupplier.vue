@@ -96,23 +96,23 @@ const deletePhoto = () => {
   <SupplierLayout>
     <Head :title="`${!!supplier ? 'Edit' : 'Add New'} Supplier`" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
-    <form class="sm:px-6 lg:px-8 px-4 pt-4 flex flex-col gap-x-6 gap-y-8 h-full" @submit.prevent="submit">
-      <div class="flex-grow flex flex-col gap-x-6 gap-y-8">
-        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 pb-12">
+    <form class="flex h-full flex-col gap-x-6 gap-y-8 px-4 pt-4 sm:px-6 lg:px-8" @submit.prevent="submit">
+      <div class="flex flex-grow flex-col gap-x-6 gap-y-8">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-8 pb-12 sm:grid-cols-6">
           <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
             <template v-if="input.key === 'supplier_photo'">
               <label for="supplier_photo" class="block text-sm font-medium leading-6 text-gray-900"
                 >Supplier Photo</label
               >
               <div
-                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 max-w-lg"
+                class="mt-2 flex max-w-lg justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
               >
-                <div class="text-center flex flex-col gap-2 justify-center">
-                  <div v-if="!photoPreview" class="mt-2 flex flex-col gap-4 items-center">
+                <div class="flex flex-col justify-center gap-2 text-center">
+                  <div v-if="!photoPreview" class="mt-2 flex flex-col items-center gap-4">
                     <img
                       v-if="supplier?.img_url || supplier?.img_path"
                       :src="supplier?.img_path ? getImgSrcFromPath(supplier?.img_path) : supplier?.img_url"
-                      class="rounded-lg h-20 w-20 object-cover"
+                      class="h-20 w-20 rounded-lg object-cover"
                     />
                     <PhotoIcon class="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" v-else />
                     <button
@@ -122,23 +122,23 @@ const deletePhoto = () => {
                       :disabled="!!supplier?.img_url && !supplier?.img_path"
                       @click="deletePhoto"
                     >
-                      <div class="flex gap-2 items-center">
+                      <div class="flex items-center gap-2">
                         <XMarkIcon class="h-3 w-3" />
                         <span>Remove</span>
                       </div>
                     </button>
-                    <span class="text-gray-600 text-xs" v-if="supplier?.img_url && !supplier?.img_path"
+                    <span class="text-xs text-gray-600" v-if="supplier?.img_url && !supplier?.img_path"
                       >Image populated from Image URL (filled in below)</span
                     >
                   </div>
                   <div v-else class="self-center">
                     <span
-                      class="block rounded-lg w-20 h-20 bg-cover bg-no-repeat bg-center"
+                      class="block h-20 w-20 rounded-lg bg-cover bg-center bg-no-repeat"
                       :style="'background-image: url(\'' + photoPreview + '\');'"
                     />
                   </div>
                   <div class="flex flex-col">
-                    <div class="flex text-sm leading-6 justify-center">
+                    <div class="flex justify-center text-sm leading-6">
                       <label
                         for="supplier_photo"
                         class="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-secondary"

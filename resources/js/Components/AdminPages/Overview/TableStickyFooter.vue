@@ -25,27 +25,27 @@ defineEmits(['buttonClicked']);
 </script>
 
 <template>
-  <div class="bottom-0 sticky py-4 px-4 sm:hidden z-40">
+  <div class="sticky bottom-0 z-40 px-4 py-4 sm:hidden">
     <div class="grid grid-cols-2 gap-2" v-if="showEditDeleteBtn">
       <button
         type="button"
-        class="btn btn-block btn-primary"
+        class="btn btn-primary btn-block"
         :class="isLoading ? 'loading' : ''"
         @click="$emit('buttonClicked', { action: 'edit' })"
       >
-        <div class="flex gap-2 items-center">
-          <PencilIcon class="w-5 h-5" />
+        <div class="flex items-center gap-2">
+          <PencilIcon class="h-5 w-5" />
           <span>Edit ({{ selectedItems.length }})</span>
         </div>
       </button>
       <button
         type="button"
-        class="btn btn-block btn-error"
+        class="btn btn-error btn-block"
         :class="isLoading ? 'loading' : ''"
         @click="$emit('buttonClicked', { action: 'delete' })"
       >
-        <div class="flex gap-2 items-center">
-          <XMarkIcon class="w-5 h-5" />
+        <div class="flex items-center gap-2">
+          <XMarkIcon class="h-5 w-5" />
           <span>Delete ({{ selectedItems.length }})</span>
         </div>
       </button>
@@ -57,8 +57,8 @@ defineEmits(['buttonClicked']);
         class="btn btn-primary join-item grow"
         :class="isLoading ? 'loading' : ''"
       >
-        <div class="flex gap-2 items-center">
-          <PlusCircleIcon class="w-5 h-5" />
+        <div class="flex items-center gap-2">
+          <PlusCircleIcon class="h-5 w-5" />
           <span>Add New</span>
         </div>
       </Link>
@@ -84,7 +84,7 @@ defineEmits(['buttonClicked']);
                 <button
                   :class="[
                     active ? 'bg-primary text-white' : 'text-gray-900',
-                    'group flex w-full gap-2 items-center rounded-t-md px-3 py-3 text-xs font-semibold uppercase',
+                    'group flex w-full items-center gap-2 rounded-t-md px-3 py-3 text-xs font-semibold uppercase',
                   ]"
                   @click="$emit('buttonClicked', { action: 'import' })"
                 >
@@ -97,7 +97,7 @@ defineEmits(['buttonClicked']);
                   type="button"
                   :class="[
                     active ? 'bg-primary text-white' : 'text-gray-900',
-                    'group flex w-full gap-2 items-center rounded-b-md px-3 py-3 text-xs font-semibold uppercase',
+                    'group flex w-full items-center gap-2 rounded-b-md px-3 py-3 text-xs font-semibold uppercase',
                   ]"
                   @click="$emit('buttonClicked', { action: 'export' })"
                 >

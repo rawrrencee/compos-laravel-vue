@@ -30,12 +30,12 @@ const onEditEmployeeRequestSaveClicked = () => {
 <template>
   <EmployeesLayout>
     <Head title="Employee Requests" />
-    <div class="h-full flex flex-col sm:px-6 lg:px-8 gap-4">
-      <div class="py-4 px-6 sm:px-0 flex flex-col gap-2">
-        <label for="employee_request" class="block text-md font-semibold leading-6 text-gray-900"
+    <div class="flex h-full flex-col gap-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-2 px-6 py-4 sm:px-0">
+        <label for="employee_request" class="text-md block font-semibold leading-6 text-gray-900"
           >Employee Request Key</label
         >
-        <small class="text-secondary font-medium"
+        <small class="font-medium text-secondary"
           >This is the key required for submitting an Employee Request to create a new Employee account.</small
         >
         <form
@@ -57,8 +57,8 @@ const onEditEmployeeRequestSaveClicked = () => {
             </span>
           </div>
           <div class="flex flex-row gap-2">
-            <button type="submit" class="btn btn-sm btn-primary grow max-w-[8rem]">Save</button
-            ><button type="button" class="btn btn-sm grow max-w-[8rem]" @click="editEmployeeRequestKey = false">
+            <button type="submit" class="btn btn-primary btn-sm max-w-[8rem] grow">Save</button
+            ><button type="button" class="btn btn-sm max-w-[8rem] grow" @click="editEmployeeRequestKey = false">
               Cancel
             </button>
           </div>
@@ -66,12 +66,12 @@ const onEditEmployeeRequestSaveClicked = () => {
         <template v-else>
           <div class="flex flex-col gap-2 sm:flex-row sm:gap-5">
             <div class="flex flex-row items-center gap-4 text-sm font-normal leading-6 text-gray-900">
-              <LockClosedIcon class="w-3 h-3" />
+              <LockClosedIcon class="h-3 w-3" />
               <span> {{ employeeRequest?.global_value ?? 'Not Set' }}</span>
             </div>
-            <button type="button" class="btn btn-sm sm:btn-xs btn-primary" @click="editEmployeeRequestKey = true">
-              <div class="flex gap-2 items-center">
-                <PencilIcon class="w-3 h-3" />
+            <button type="button" class="btn btn-primary btn-sm sm:btn-xs" @click="editEmployeeRequestKey = true">
+              <div class="flex items-center gap-2">
+                <PencilIcon class="h-3 w-3" />
                 <span>Edit</span>
               </div>
             </button>
@@ -79,7 +79,7 @@ const onEditEmployeeRequestSaveClicked = () => {
         </template>
       </div>
       <div class="flex flex-col gap-2">
-        <span class="px-6 sm:px-0 block text-md font-semibold leading-6 text-gray-900">Employee Requests</span>
+        <span class="text-md block px-6 font-semibold leading-6 text-gray-900 sm:px-0">Employee Requests</span>
         <table class="table">
           <!-- head -->
           <thead>

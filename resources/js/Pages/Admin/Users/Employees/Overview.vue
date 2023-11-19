@@ -162,7 +162,7 @@ const goToPage = (nextPageNumber) => {
       appear
       :show="true"
       as="div"
-      class="h-full flex flex-col"
+      class="flex h-full flex-col"
       enter="transition-opacity duration-500"
       enter-from="opacity-0"
       enter-to="opacity-100"
@@ -228,7 +228,7 @@ const goToPage = (nextPageNumber) => {
               ]"
             >
               <a href="#" class="btn btn-link btn-sm pl-0 normal-case">
-                <div class="flex gap-2 items-center">
+                <div class="flex items-center gap-2">
                   <span>{{ person.name }}</span>
                   <EyeIcon class="h-5 w-5" />
                 </div>
@@ -266,13 +266,13 @@ const goToPage = (nextPageNumber) => {
         </template>
       </TableMain>
 
-      <div class="py-4 flex flex-col items-center gap-4 justify-center sm:flex-row sm:justify-between">
+      <div class="flex flex-col items-center justify-center gap-4 py-4 sm:flex-row sm:justify-between">
         <div>Showing 1 - 10 of 97 results</div>
-        <div class="flex items-center justify-center sm:justify-end gap-2">
-          <button :disabled="currentPage === 1" @click="() => goToPage(1)" class="btn btn-sm btn-ghost">
+        <div class="flex items-center justify-center gap-2 sm:justify-end">
+          <button :disabled="currentPage === 1" @click="() => goToPage(1)" class="btn btn-ghost btn-sm">
             <ChevronDoubleLeftIcon class="h-3 w-3" />
           </button>
-          <button :disabled="currentPage === 1" @click="() => prevPage()" class="btn btn-sm btn-ghost">
+          <button :disabled="currentPage === 1" @click="() => prevPage()" class="btn btn-ghost btn-sm">
             <ChevronLeftIcon class="h-3 w-3" />
           </button>
           <div class="flex gap-2">
@@ -282,13 +282,13 @@ const goToPage = (nextPageNumber) => {
               </button>
             </template>
           </div>
-          <button :disabled="currentPage === totalPages" @click="() => nextPage()" class="btn btn-sm btn-ghost">
+          <button :disabled="currentPage === totalPages" @click="() => nextPage()" class="btn btn-ghost btn-sm">
             <ChevronRightIcon class="h-3 w-3" />
           </button>
           <button
             :disabled="currentPage === totalPages"
             @click="() => goToPage(totalPages)"
-            class="btn btn-sm btn-ghost"
+            class="btn btn-ghost btn-sm"
           >
             <ChevronDoubleRightIcon class="h-3 w-3" />
           </button>

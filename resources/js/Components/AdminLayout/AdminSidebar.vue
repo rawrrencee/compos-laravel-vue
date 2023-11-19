@@ -14,13 +14,13 @@ defineProps({
     </div>
     <nav class="flex flex-1 flex-col">
       <ul role="list" class="flex flex-1 flex-col gap-y-5">
-        <span class="font-semibold text-gray-400 uppercase">Employee</span>
+        <span class="font-semibold uppercase text-gray-400">Employee</span>
         <li>
           <ul role="list" class="-mx-2 space-y-1">
             <SidebarItems :navigation="employeeNavigation" />
           </ul>
         </li>
-        <span class="font-semibold text-gray-400 uppercase">Admin</span>
+        <span class="font-semibold uppercase text-gray-400">Admin</span>
         <li>
           <ul role="list" class="-mx-2 space-y-1">
             <SidebarItems :navigation="adminNavigation" />

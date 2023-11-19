@@ -2,7 +2,7 @@
 
 <template>
   <div class="grow pb-4">
-    <div class="ring-1 ring-gray-200 sm:mx-0 sm:rounded-lg overflow-x-scroll">
+    <div class="overflow-x-scroll ring-1 ring-gray-200 sm:mx-0 sm:rounded-lg">
       <table class="min-w-full divide-y divide-gray-200">
         <thead>
           <slot name="thead" />

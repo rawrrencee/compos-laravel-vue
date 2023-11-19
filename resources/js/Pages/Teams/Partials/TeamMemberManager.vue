@@ -120,14 +120,14 @@ const displayableRole = (role) => {
             <InputLabel for="roles" value="Role" />
             <InputError :message="addTeamMemberForm.errors.role" class="mt-2" />
 
-            <div class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer">
+            <div class="relative z-0 mt-1 cursor-pointer rounded-lg border border-gray-200">
               <button
                 v-for="(role, i) in availableRoles"
                 :key="role.key"
                 type="button"
-                class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                class="relative inline-flex w-full rounded-lg px-4 py-3 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 :class="{
-                  'border-t border-gray-200 focus:border-none rounded-t-none': i > 0,
+                  'rounded-t-none border-t border-gray-200 focus:border-none': i > 0,
                   'rounded-b-none': i != Object.keys(availableRoles).length - 1,
                 }"
                 @click="addTeamMemberForm.role = role.key"
@@ -157,7 +157,7 @@ const displayableRole = (role) => {
                   </div>
 
                   <!-- Role Description -->
-                  <div class="mt-2 text-xs text-gray-600 text-left">
+                  <div class="mt-2 text-left text-xs text-gray-600">
                     {{ role.description }}
                   </div>
                 </div>
@@ -207,7 +207,7 @@ const displayableRole = (role) => {
                 <!-- Cancel Team Invitation -->
                 <button
                   v-if="userPermissions.canRemoveTeamMembers"
-                  class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
+                  class="ml-6 cursor-pointer text-sm text-red-500 focus:outline-none"
                   @click="cancelTeamInvitation(invitation)"
                 >
                   Cancel
@@ -233,7 +233,7 @@ const displayableRole = (role) => {
           <div class="space-y-6">
             <div v-for="user in team.users" :key="user.id" class="flex items-center justify-between">
               <div class="flex items-center">
-                <img class="w-8 h-8 rounded-full" :src="user.profile_photo_url" :alt="user.name" />
+                <img class="h-8 w-8 rounded-full" :src="user.profile_photo_url" :alt="user.name" />
                 <div class="ml-4">
                   {{ user.name }}
                 </div>
@@ -256,7 +256,7 @@ const displayableRole = (role) => {
                 <!-- Leave Team -->
                 <button
                   v-if="$page.props.auth.user.id === user.id"
-                  class="cursor-pointer ml-6 text-sm text-red-500"
+                  class="ml-6 cursor-pointer text-sm text-red-500"
                   @click="confirmLeavingTeam"
                 >
                   Leave
@@ -265,7 +265,7 @@ const displayableRole = (role) => {
                 <!-- Remove Team Member -->
                 <button
                   v-else-if="userPermissions.canRemoveTeamMembers"
-                  class="cursor-pointer ml-6 text-sm text-red-500"
+                  class="ml-6 cursor-pointer text-sm text-red-500"
                   @click="confirmTeamMemberRemoval(user)"
                 >
                   Remove
@@ -283,14 +283,14 @@ const displayableRole = (role) => {
 
       <template #content>
         <div v-if="managingRoleFor">
-          <div class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer">
+          <div class="relative z-0 mt-1 cursor-pointer rounded-lg border border-gray-200">
             <button
               v-for="(role, i) in availableRoles"
               :key="role.key"
               type="button"
-              class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              class="relative inline-flex w-full rounded-lg px-4 py-3 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               :class="{
-                'border-t border-gray-200 focus:border-none rounded-t-none': i > 0,
+                'rounded-t-none border-t border-gray-200 focus:border-none': i > 0,
                 'rounded-b-none': i !== Object.keys(availableRoles).length - 1,
               }"
               @click="updateRoleForm.role = role.key"

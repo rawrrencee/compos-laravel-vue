@@ -28,7 +28,7 @@ const breadcrumbChild = computed(() => {
 <template>
   <nav>
     <div
-      class="flex min-w-full flex-none gap-x-6 text-sm font-semibold text-gray-400 px-4 pb-4 sm:px-6 lg:px-8"
+      class="flex min-w-full flex-none gap-x-6 px-4 pb-4 text-sm font-semibold text-gray-400 sm:px-6 lg:px-8"
       v-if="breadcrumbChild"
     >
       <nav class="flex" aria-label="Breadcrumb">
@@ -53,10 +53,10 @@ const breadcrumbChild = computed(() => {
       </nav>
     </div>
     <template v-else>
-      <Menu as="div" class="px-4 pb-4 sm:px-6 lg:px-8 md:hidden">
+      <Menu as="div" class="px-4 pb-4 sm:px-6 md:hidden lg:px-8">
         <div>
           <MenuButton
-            class="inline-flex w-full justify-between items-center py-2 rounded-md bg-gray-100 text-gray-600 font-medium hover:bg-gray-200"
+            class="inline-flex w-full items-center justify-between rounded-md bg-gray-100 py-2 font-medium text-gray-600 hover:bg-gray-200"
           >
             <span class="pl-4">{{ currentRouteName }}</span>
             <span class="pointer-events-none pr-2">
@@ -75,7 +75,7 @@ const breadcrumbChild = computed(() => {
             leave-to-class="transform scale-95 opacity-0"
           >
             <MenuItems
-              class="absolute z-10 w-full mt-2 origin-top-right divide-y divide-gray-100 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              class="absolute z-10 mt-2 w-full origin-top-right divide-y divide-gray-100 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
             >
               <MenuItem v-for="item in secondaryNavigation" :key="item.name" v-slot="{ active }">
                 <Link
@@ -88,10 +88,10 @@ const breadcrumbChild = computed(() => {
           </transition>
         </div>
       </Menu>
-      <div class="hidden md:flex overflow-x-auto border-b border-white/10 pb-4">
+      <div class="hidden overflow-x-auto border-b border-white/10 pb-4 md:flex">
         <ul
           role="list"
-          class="flex min-w-full flex-none gap-x-6 text-sm font-semibold text-gray-400 px-4 sm:px-6 lg:px-8"
+          class="flex min-w-full flex-none gap-x-6 px-4 text-sm font-semibold text-gray-400 sm:px-6 lg:px-8"
         >
           <li v-for="item in secondaryNavigation" :key="item.name">
             <Link
