@@ -86,7 +86,8 @@ const employeeRequestForm = useForm(
   Object.assign(
     {},
     ...[
-      ...Array.from(employeeRequestFields, ([key]) => ({ [key]: props.viewEmployeeRequest?.[key] ?? '' })),
+      ...Array.from(employeeRequestFields, ([key]) => ({ [key]: props.viewEmployeeRequest?.[key]?.trim() ?? '' })),
+      { username: props.viewEmployeeRequest?.username?.replace(/\s+/g, '') ?? '' },
       { status: props.viewEmployeeRequest?.status },
     ]
   )
@@ -610,9 +611,9 @@ const onViewRequestCloseClicked = (val) => {
                   </div>
                   <StickyFooter
                     cancel-button-type="button"
-                    cancel-button-text="Discard Changes"
+                    cancel-button-text="Cancel"
                     save-button-type="button"
-                    save-button-text="Save and Approve"
+                    save-button-text="Approve"
                     @cancel-clicked="onViewRequestCloseClicked(false)"
                   />
                 </DialogPanel>

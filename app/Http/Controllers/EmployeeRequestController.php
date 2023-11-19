@@ -142,6 +142,7 @@ class EmployeeRequestController extends Controller
         }
 
         return Inertia::render('Admin/Users/Employees/Requests', [
+            'employeeRequestStatuses' => $this->getEmployeeRequestStatuses(),
             'viewEmployeeRequest' => $employeeRequest
         ]);
     }
