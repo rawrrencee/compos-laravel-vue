@@ -70,6 +70,7 @@ const employeeRequestFields = new Map([
   ['date_of_birth', 'Date Of Birth'],
   ['nationality', 'Nationality'],
   ['residency_status', 'Residency Status'],
+  ['pr_conversion_date', 'PR Conversion Date'],
   ['emergency_name', 'Emergency Name'],
   ['emergency_relationship', 'Emergency Relationship'],
   ['emergency_address_1', 'Emergency Address Line 1'],

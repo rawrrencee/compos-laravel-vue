@@ -43,6 +43,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('nationality')->nullable();
             $table->string('residency_status')->nullable();
+            $table->date('pr_conversion_date')->nullable();
             $table->string('emergency_name')->nullable();
             $table->string('emergency_relationship')->nullable();
             $table->string('emergency_address_1')->nullable();

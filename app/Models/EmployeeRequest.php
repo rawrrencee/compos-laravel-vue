@@ -39,6 +39,7 @@ class EmployeeRequest extends Model
         'date_of_birth',
         'nationality',
         'residency_status',
+        'pr_conversion_date',
         'emergency_name',
         'emergency_relationship',
         'emergency_address_1',
