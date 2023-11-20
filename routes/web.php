@@ -33,6 +33,7 @@ use App\Http\Controllers\UnauthenticatedController;
 // });
 
 Route::get('/', [UnauthenticatedController::class, 'loginPage'])->name('unauth/login');
+Route::post('/unauth/organisation-key', [UnauthenticatedController::class, 'validateOrganisationKey'])->name('unauth/organisation.key-validate');
 
 Route::get('/404', function () {
     return Inertia::render('Error/404');
@@ -40,6 +41,7 @@ Route::get('/404', function () {
 
 Route::prefix('/register')->group(function () {
     Route::get('/employee', [UnauthenticatedController::class, 'registerEmployeePage'])->name('unauth/register/employee');
+    Route::post('/employee', [UnauthenticatedController::class, 'registerEmployeePage'])->name('unauth/register/employee-validate');
 });
 
 Route::middleware([

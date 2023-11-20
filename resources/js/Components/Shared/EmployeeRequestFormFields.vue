@@ -3,6 +3,10 @@ import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest.js';
 
 defineProps({
   employeeRequestForm: Object,
+  authenticated: {
+    type: Boolean,
+    default: true,
+  },
 });
 </script>
 
@@ -49,8 +53,9 @@ defineProps({
           :id="field[0]"
           :name="field[0]"
           v-model="employeeRequestForm[field[0]]"
-          class="input input-bordered w-full"
+          class="input input-bordered w-full disabled:bg-gray-300"
           :class="[employeeRequestForm.errors[field[0]] ? 'border-error' : '']"
+          :disabled="!authenticated"
           @input="() => employeeRequestForm.clearErrors(field[0])"
         />
         <span v-if="employeeRequestForm.errors[field[0]]" class="text-error">
