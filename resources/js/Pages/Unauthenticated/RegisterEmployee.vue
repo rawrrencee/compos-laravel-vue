@@ -67,7 +67,9 @@ const checkOrganisationKey = () => {
                 {{ organisationKeyForm.errors.organisationKey }}
               </span>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm mt-2">Unlock</button>
+            <button type="submit" class="btn btn-primary btn-sm mt-2" :disabled="organisationKeyForm.processing">
+              Unlock
+            </button>
           </form>
           <EmployeeRequestFormFields :employee-request-form="employeeRequestForm" :authenticated="authenticated" />
         </div>
