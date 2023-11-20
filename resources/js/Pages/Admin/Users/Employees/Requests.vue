@@ -7,9 +7,11 @@ import TablePagination from '@/Components/AdminPages/Overview/TablePagination.vu
 import TableSortableHeader from '@/Components/AdminPages/Overview/TableSortableHeader.vue';
 import TableStickyFooter from '@/Components/AdminPages/Overview/TableStickyFooter.vue';
 import TableToolbar from '@/Components/AdminPages/Overview/TableToolbar.vue';
+import EmployeeRequestFormFields from '@/Components/Shared/EmployeeRequestFormFields.vue';
+import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest.js';
 import EmployeesLayout from '@/Pages/Admin/Users/Employees/EmployeesLayout.vue';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { EyeIcon, LockClosedIcon, PencilIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { EyeIcon, KeyIcon, PencilIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -44,49 +46,11 @@ const tableHeaderTitles = [
   { key: 'status', title: 'Status' },
   { key: 'created_at', title: 'Created At' },
 ];
-const employeeRequestFields = new Map([
-  ['username', 'Username'],
-  ['email', 'Email'],
-  ['password', 'Password'],
-  ['commencement_date', 'Commencement Date'],
-  ['first_name', 'First Name'],
-  ['middle_name', 'Middle Name'],
-  ['last_name', 'Last Name'],
-  ['preferred_name', 'Preferred Name'],
-  ['nric', 'NRIC'],
-  ['phone_number', 'Phone Number'],
-  ['mobile_number', 'Mobile Number'],
-  ['address_1', 'Address Line 1'],
-  ['address_2', 'Address Line 2'],
-  ['address_3', 'Address Line 3'],
-  ['address_4', 'Address Line 4'],
-  ['city', 'City'],
-  ['state', 'State'],
-  ['postal_code', 'Postal Code'],
-  ['country', 'Country'],
-  ['gender', 'Gender'],
-  ['race', 'Race'],
-  ['ethnic_name', 'Ethnic Name'],
-  ['date_of_birth', 'Date Of Birth'],
-  ['nationality', 'Nationality'],
-  ['residency_status', 'Residency Status'],
-  ['pr_conversion_date', 'PR Conversion Date'],
-  ['emergency_name', 'Emergency Name'],
-  ['emergency_relationship', 'Emergency Relationship'],
-  ['emergency_address_1', 'Emergency Address Line 1'],
-  ['emergency_address_2', 'Emergency Address Line 2'],
-  ['emergency_address_3', 'Emergency Address Line 3'],
-  ['emergency_address_4', 'Emergency Address Line 4'],
-  ['emergency_contact_number', 'Emergency Contact Number'],
-  ['bank_name', 'Bank Name'],
-  ['bank_account_number', 'Bank Account Number'],
-  ['remarks', 'Remarks'],
-]);
 const employeeRequestForm = useForm(
   Object.assign(
     {},
     ...[
-      ...Array.from(employeeRequestFields, ([key]) => ({ [key]: props.viewEmployeeRequest?.[key]?.trim() ?? '' })),
+      ...Array.from(EMPLOYEE_REQUEST_FIELD_MAP, ([key]) => ({ [key]: props.viewEmployeeRequest?.[key]?.trim() ?? '' })),
       { username: props.viewEmployeeRequest?.username?.replace(/\s+/g, '') ?? '' },
       { status: props.viewEmployeeRequest?.status },
     ]
@@ -259,7 +223,7 @@ const onViewRequestCloseClicked = (val) => {
         <template v-else>
           <div class="flex flex-col gap-2 sm:flex-row sm:gap-5">
             <div class="flex flex-row items-center gap-4 text-sm font-normal leading-6 text-gray-900">
-              <LockClosedIcon class="h-3 w-3" />
+              <KeyIcon class="h-3 w-3" />
               <span> {{ employeeRequestKey?.global_value ?? 'Not Set' }}</span>
             </div>
             <button type="button" class="btn btn-primary btn-sm sm:btn-xs" @click="editEmployeeRequestKey = true">
@@ -550,64 +514,7 @@ const onViewRequestCloseClicked = (val) => {
                     </template>
                   </div>
                   <div class="flex flex-col gap-4 pb-8">
-                    <div class="flex flex-col gap-1" v-for="field in employeeRequestFields.entries()">
-                      <template
-                        v-if="
-                          [
-                            'commencement_date',
-                            'nric',
-                            'address_1',
-                            'gender',
-                            'date_of_birth',
-                            'emergency_name',
-                            'bank_name',
-                            'remarks',
-                          ].includes(field[0])
-                        "
-                      >
-                        <div class="divider pt-10"></div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'commencement_date'">
-                          Main Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'nric'">Contact Info</div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'address_1'">
-                          Location Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'gender'">
-                          Ethnic Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'date_of_birth'">
-                          Nationality Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'emergency_name'">
-                          Emergency Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'bank_name'">
-                          Bank Information
-                        </div>
-                        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'remarks'">
-                          Other Information
-                        </div>
-                      </template>
-
-                      <label :for="field[0]" class="block text-sm font-medium leading-6 text-gray-900">{{
-                        field[1]
-                      }}</label>
-                      <div class="flex flex-col gap-1">
-                        <input
-                          type="text"
-                          :id="field[0]"
-                          :name="field[0]"
-                          v-model="employeeRequestForm[field[0]]"
-                          class="input input-bordered w-full"
-                          :class="[employeeRequestForm.errors[field[0]] ? 'border-error' : '']"
-                          @input="() => employeeRequestForm.clearErrors(field[0])"
-                        />
-                        <span v-if="employeeRequestForm.errors[field[0]]" class="text-error">
-                          {{ employeeRequestForm.errors[field[0]] }}
-                        </span>
-                      </div>
-                    </div>
+                    <EmployeeRequestFormFields :employee-request-form="employeeRequestForm" />
                   </div>
                   <StickyFooter
                     cancel-button-type="button"

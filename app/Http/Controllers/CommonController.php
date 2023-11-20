@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\GlobalSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CommonController extends Controller
 {
+    protected $COMPANY_NAME = 'COMPANY_NAME';
+
+    public function getCompanyName()
+    {
+        return GlobalSettings::where('global_key', 'COMPANY_NAME')->first()?->global_value;
+    }
+
     public function showPhoto(Request $request)
     {
         return response()->file(storage_path('app/private/' . $request['img_path']));

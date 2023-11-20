@@ -9,15 +9,24 @@ use Inertia\Inertia;
 
 class UnauthenticatedController extends Controller
 {
+    protected $CommonController;
+
+    public function __construct(CommonController $CommonController)
+    {
+        $this->CommonController = $CommonController;
+    }
+
     public function loginPage()
     {
         return Inertia::render('Unauthenticated/Login', [
-            'companyName' => GlobalSettings::where('global_key', 'COMPANY_NAME')->first()?->global_value
+            'companyName' => $this->CommonController->getCompanyName()
         ]);
     }
 
-    public function registerEmployeePage(Request $request)
+    public function registerEmployeePage()
     {
-        return Inertia::render('Unauthenticated/RegisterEmployee');
+        return Inertia::render('Unauthenticated/RegisterEmployee', [
+            'companyName' => $this->CommonController->getCompanyName()
+        ]);
     }
 }
