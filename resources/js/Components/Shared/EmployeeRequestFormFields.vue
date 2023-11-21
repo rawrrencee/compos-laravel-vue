@@ -1,5 +1,6 @@
 <script setup>
 import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest.js';
+import GenericFormFields from './GenericFormFields.vue';
 
 defineProps({
   employeeRequestForm: Object,
@@ -28,7 +29,7 @@ defineProps({
           ].includes(field[0])
         "
       >
-        <div class="divider pt-10"></div>
+        <div class="divider pt-4"></div>
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'username'">Login Information</div>
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'commencement_date'">
           Main Information
@@ -46,22 +47,14 @@ defineProps({
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'remarks'">Other Information</div>
       </template>
 
-      <label :for="field[0]" class="block text-sm font-medium leading-6 text-gray-900">{{ field[1] }}</label>
-      <div class="flex flex-col gap-1">
-        <input
-          type="text"
-          :id="field[0]"
-          :name="field[0]"
-          v-model="employeeRequestForm[field[0]]"
-          class="input input-bordered w-full disabled:bg-gray-300"
-          :class="[employeeRequestForm.errors[field[0]] ? 'border-error' : '']"
-          :disabled="!authenticated"
-          @input="() => employeeRequestForm.clearErrors(field[0])"
-        />
-        <span v-if="employeeRequestForm.errors[field[0]]" class="text-error">
-          {{ employeeRequestForm.errors[field[0]] }}
-        </span>
-      </div>
+      <GenericFormFields
+        :data="field[1].data"
+        :disabled="!authenticated"
+        :form="employeeRequestForm"
+        :label="field[1].label"
+        :name="field[1].name"
+        :type="field[1].type"
+      />
     </div>
   </div>
 </template>

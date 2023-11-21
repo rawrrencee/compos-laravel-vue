@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.16",
-    "@heroicons/vue": "^2.0.18"
+    "@heroicons/vue": "^2.0.18",
+    "@popperjs/core": "^2.11.8",
+    "v-calendar": "^3.1.2"
   }
 }
