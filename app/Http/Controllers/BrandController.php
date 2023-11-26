@@ -118,7 +118,7 @@ class BrandController extends Controller
         $brand = Brand::withTrashed()->where('id', '=', $id)->first();
 
         if (!isset($brand)) {
-            return redirect()->route('admin/commerce/brands');
+            return redirect()->route('commerce.brands.viewLandingPage');
         }
 
         return Inertia::render('Admin/Commerce/Brands/ViewBrand', ['viewBrand' => $brand]);
@@ -150,12 +150,12 @@ class BrandController extends Controller
             $brand = Brand::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/commerce/brands')
+            return redirect()->route('commerce.brands.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Brand created successfully.')
-                ->with('route', 'admin/commerce/brands/edit')
+                ->with('route', 'commerce.brands.viewEditPageById')
                 ->with('id', $brand->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -229,12 +229,12 @@ class BrandController extends Controller
             $brand->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/commerce/brands')
+            return redirect()->route('commerce.brands.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Brand updated successfully.')
-                ->with('route', 'admin/commerce/brands/edit')
+                ->with('route', 'commerce.brands.viewEditPageById')
                 ->with('id', $brand->id);
         } catch (\Exception $e) {
             DB::rollBack();

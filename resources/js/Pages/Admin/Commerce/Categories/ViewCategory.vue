@@ -8,8 +8,7 @@ const props = defineProps({
   viewCategory: Object,
 });
 
-const moduleUrl = 'admin/commerce/categories';
-const editUrl = `${moduleUrl}/edit`;
+const editUrl = `commerce.categories.viewEditPageById`;
 const viewCategoryLabels = [
   { key: 'category_code', title: 'Category Code' },
   { key: 'subcategories', title: 'Subcategories' },

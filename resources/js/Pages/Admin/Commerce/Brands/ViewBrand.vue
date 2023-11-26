@@ -12,8 +12,7 @@ const props = defineProps({
   viewBrand: Object,
 });
 
-const moduleUrl = 'admin/commerce/brands';
-const editUrl = `${moduleUrl}/edit`;
+const editUrl = `commerce.brands.viewEditPageById`;
 const viewSupplierLabels = [
   { key: 'brand_code', title: 'Brand Code' },
   { key: 'address_1', title: 'Address Line 1' },

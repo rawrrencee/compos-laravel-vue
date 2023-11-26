@@ -151,12 +151,12 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin/commerce/categories')
+            return redirect()->route('commerce.categories.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Category created successfully.')
-                ->with('route', 'admin/commerce/categories/edit')
+                ->with('route', 'commerce.categories.viewEditPageById')
                 ->with('id', $category->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -228,12 +228,12 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin/commerce/categories')
+            return redirect()->route('commerce.categories.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Category updated successfully.')
-                ->with('route', 'admin/commerce/categories/edit')
+                ->with('route', 'commerce.categories.viewEditPageById')
                 ->with('id', $category->id);
         } catch (\Exception $e) {
             DB::rollBack();

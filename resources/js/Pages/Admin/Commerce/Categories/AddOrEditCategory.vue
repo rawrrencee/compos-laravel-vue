@@ -93,7 +93,7 @@ const submit = () => {
         subcategory_code: s.subcategory_code?.toLocaleUpperCase(),
       })),
     }))
-    .post(route(`admin/commerce/categories/${props.category ? 'edit.update' : 'add.store'}`));
+    .post(route(`commerce.categories.viewLandingPage/${props.category ? 'edit.update' : 'add.store'}`));
 };
 // #endregion Functions
 </script>
@@ -266,7 +266,7 @@ const submit = () => {
         </div>
       </div>
 
-      <StickyFooter back-url="admin/commerce/categories" />
+      <StickyFooter back-url="commerce.categories.viewLandingPage" />
     </form>
   </CategoryLayout>
 </template>

@@ -33,9 +33,9 @@ const tableFilterOptions = useForm({
   subcategory_name_or_code: props?.tableFilterOptions?.subcategory_name_or_code ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
 });
-const addNewUrl = `categories.create`;
-const editUrl = `categories.update`;
-const exportUrl = `${route('admin/commerce/categories/export')}`;
+const addNewUrl = `commerce.categories.create`;
+const editUrl = `commerce.categories.update`;
+const exportUrl = `${route('commerce.categories.export')}`;
 const tableHeaderTitles = [
   { key: 'category_name', title: 'Category Name' },
   { key: 'category_code', title: 'Category Code' },
@@ -87,7 +87,7 @@ const onBulkEditSaveClicked = () => {
         category_code: category.category_code ?? '',
       }))
     )
-    .post(route('admin/commerce/categories/edit.bulk'), {
+    .post(route('commerce.categories.bulkUpdate'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -99,7 +99,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/commerce/categories/delete'),
+    route('commerce.categories.delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -222,7 +222,7 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/commerce/categories/view', { id }));
+  router.visit(route('commerce.categories.viewReadOnlyPageById', { id }));
 };
 // #endregion Functions
 

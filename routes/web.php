@@ -191,48 +191,40 @@ Route::middleware([
         Route::prefix('commerce')->group(function () {
             Route::get('/', function () {
                 return Inertia::render('Error/404');
-            })->name('admin/commerce');
+            })->name('commerce');
 
             Route::prefix('brands')->group(function () {
-                Route::get('/', [BrandController::class, 'index'])->name('admin/commerce/brands');
-
+                Route::get('/', [BrandController::class, 'index'])->name('commerce.brands.viewLandingPage');
                 Route::get('/add', function () {
                     return Inertia::render('Admin/Commerce/Brands/AddOrEditBrand');
-                })->name('admin/commerce/brands/add');
-                Route::post('/add', [BrandController::class, 'store'])->name('admin/commerce/brands/add.store');
+                })->name('commerce.brands.viewCreatePage');
+                Route::get('/edit', [BrandController::class, 'edit'])->name('commerce.brands.viewEditPageById');
+                Route::get('/view', [BrandController::class, 'view'])->name('commerce.brands.viewReadOnlyPageById');
 
-                Route::get('/edit', [BrandController::class, 'edit'])->name('admin/commerce/brands/edit');
-                Route::post('/edit', [BrandController::class, 'update'])->name('admin/commerce/brands/edit.update');
-                Route::post('/edit-bulk', [BrandController::class, 'bulkUpdate'])->name('admin/commerce/brands/edit.bulk');
-
-                Route::get('/view', [BrandController::class, 'view'])->name('admin/commerce/brands/view');
-                Route::post('/delete-photo', [BrandController::class, 'deletePhoto'])->name('admin/commerce/brands/photo.delete');
-
-                Route::post('/import', [BrandController::class, 'importCsv'])->name('admin/commerce/brands/import');
-                Route::post('/export', [BrandController::class, 'exportCsv'])->name('admin/commerce/brands/export');
-
-                Route::post('/delete', [BrandController::class, 'destroy'])->name('admin/commerce/brands/delete');
+                Route::post('/add', [BrandController::class, 'store'])->name('commerce.brands.create');
+                Route::post('/delete-photo', [BrandController::class, 'deletePhoto'])->name('commerce.brandPhoto.delete');
+                Route::post('/delete', [BrandController::class, 'destroy'])->name('commerce.brands.delete');
+                Route::post('/edit-bulk', [BrandController::class, 'bulkUpdate'])->name('commerce.brands.bulkUpdate');
+                Route::post('/edit', [BrandController::class, 'update'])->name('commerce.brands.update');
+                Route::post('/export', [BrandController::class, 'exportCsv'])->name('commerce.brands.export');
+                Route::post('/import', [BrandController::class, 'importCsv'])->name('commerce.brands.import');
             });
 
             Route::prefix('categories')->group(function () {
-                Route::get('/', [CategoryController::class, 'index'])->name('admin/commerce/categories');
-
+                Route::get('/', [CategoryController::class, 'index'])->name('commerce.categories.viewLandingPage');
                 Route::get('/add', function () {
                     return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory');
-                })->name('admin/commerce/categories/add');
-                Route::post('/add', [CategoryController::class, 'store'])->name('admin/commerce/categories/add.store');
+                })->name('commerce.categories.viewCreatePage');
+                Route::get('/edit', [CategoryController::class, 'edit'])->name('commerce.categories.viewEditPageById');
+                Route::get('/view', [CategoryController::class, 'view'])->name('commerce.categories.viewReadOnlyPageById');
 
-                Route::get('/edit', [CategoryController::class, 'edit'])->name('admin/commerce/categories/edit');
-                Route::post('/edit', [CategoryController::class, 'update'])->name('admin/commerce/categories/edit.update');
-                Route::post('/edit-bulk', [CategoryController::class, 'bulkUpdate'])->name('admin/commerce/categories/edit.bulk');
-
-                Route::get('/view', [CategoryController::class, 'view'])->name('admin/commerce/categories/view');
-                Route::post('/delete-photo', [CategoryController::class, 'deletePhoto'])->name('admin/commerce/categories/photo.delete');
-
-                Route::post('/import', [CategoryController::class, 'importCsv'])->name('admin/commerce/categories/import');
-                Route::post('/export', [CategoryController::class, 'exportCsv'])->name('admin/commerce/categories/export');
-
-                Route::post('/delete', [CategoryController::class, 'destroy'])->name('admin/commerce/categories/delete');
+                Route::post('/add', [CategoryController::class, 'store'])->name('commerce.categories.create');
+                Route::post('/delete-photo', [CategoryController::class, 'deletePhoto'])->name('commerce.categoryPhoto.delete');
+                Route::post('/delete', [CategoryController::class, 'destroy'])->name('commerce.categories.delete');
+                Route::post('/edit-bulk', [CategoryController::class, 'bulkUpdate'])->name('commerce.categories.bulkUpdate');
+                Route::post('/edit', [CategoryController::class, 'update'])->name('commerce.categories.update');
+                Route::post('/export', [CategoryController::class, 'exportCsv'])->name('commerce.categories.export');
+                Route::post('/import', [CategoryController::class, 'importCsv'])->name('commerce.categories.import');
             });
 
             Route::get('/items', function () {

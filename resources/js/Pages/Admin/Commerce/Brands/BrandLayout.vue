@@ -4,19 +4,19 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 const secondaryNavigation = [
   {
     name: 'Overview',
-    href: 'admin/commerce/brands',
+    href: 'commerce.brands.viewLandingPage',
     children: [
       {
         name: 'Add New Brand',
-        href: 'admin/commerce/brands/add',
+        href: 'commerce.brands.viewCreatePage',
       },
       {
         name: 'Edit Brand',
-        href: 'admin/commerce/brands/edit',
+        href: 'commerce.brands.viewEditPageById',
       },
       {
         name: 'View Brand',
-        href: 'admin/commerce/brands/view',
+        href: 'commerce.brands.viewReadOnlyPageById',
       },
     ],
   },

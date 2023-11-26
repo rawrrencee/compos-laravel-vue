@@ -39,9 +39,9 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const addNewUrl = `brands.create`;
-const editUrl = `brands.update`;
-const exportUrl = `${route('admin/commerce/brands/export')}`;
+const addNewUrl = `commerce.brands.create`;
+const editUrl = `commerce.brands.update`;
+const exportUrl = `${route('commerce.brands.export')}`;
 const tableHeaderTitles = [
   { key: 'brand_name', title: 'Brand Name' },
   { key: 'brand_code', title: 'Brand Code' },
@@ -109,7 +109,7 @@ const onBulkEditSaveClicked = () => {
         img_url: brand.img_url ?? '',
       }))
     )
-    .post(route('admin/commerce/brands/edit.bulk'), {
+    .post(route('commerce.brands.bulkUpdate'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -121,7 +121,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/commerce/brands/delete'),
+    route('commerce.brands.delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -181,7 +181,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/commerce/brands/import'), {
+  importForm.post(route('commerce.brands.import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -263,7 +263,7 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/commerce/brands/view', { id }));
+  router.visit(route('commerce.brands.viewReadOnlyPageById', { id }));
 };
 // #endregion Functions
 

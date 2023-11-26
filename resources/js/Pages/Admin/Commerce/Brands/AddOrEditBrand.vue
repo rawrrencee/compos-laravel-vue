@@ -72,7 +72,7 @@ const submit = () => {
           brand_photo: photoFile.value,
         }),
       }))
-      .post(route('admin/commerce/brands/add.store'));
+      .post(route('commerce.brands.create'));
   } else {
     brandForm
       .transform((data) => ({
@@ -83,12 +83,12 @@ const submit = () => {
         }),
         id: props.brand.id,
       }))
-      .post(route('admin/commerce/brands/edit.update'));
+      .post(route('commerce.brands.update'));
   }
 };
 const deletePhoto = () => {
   if (props.brand && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('admin/commerce/brands/photo.delete'), {
+    router.post(route('commerce.brandPhoto.delete'), {
       id: props.brand.id,
       img_path: props.brand.img_path,
     });
@@ -196,7 +196,7 @@ const deletePhoto = () => {
         </div>
       </div>
 
-      <StickyFooter back-url="admin/commerce/brands" />
+      <StickyFooter back-url="commerce.brands.viewLandingPage" />
     </form>
   </BrandLayout>
 </template>

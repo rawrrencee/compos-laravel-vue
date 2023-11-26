@@ -95,10 +95,10 @@ const adminNavigation = [
   {
     name: 'Commerce',
     icon: BuildingStorefrontIcon,
-    href: 'admin/commerce',
+    href: 'commerce',
     children: [
-      { name: 'Brands', href: 'admin/commerce/brands' },
-      { name: 'Categories', href: 'admin/commerce/categories' },
+      { name: 'Brands', href: 'commerce.brands.viewLandingPage' },
+      { name: 'Categories', href: 'commerce.categories.viewLandingPage' },
       { name: 'Items', href: 'admin/commerce/items' },
       { name: 'Item Kits', href: 'admin/commerce/item-kits' },
       { name: 'Stocktakes', href: 'admin/commerce/stocktake' },
