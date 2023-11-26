@@ -42,7 +42,7 @@ const onAdminAlertButtonClicked = () => {
 
 <template>
   <BrandLayout>
-    <Head title="View Supplier" />
+    <Head title="View Brand" />
     <AdminAlert :flash="flashError" @button-clicked="onAdminAlertButtonClicked" />
     <div class="h-full divide-y divide-gray-200">
       <div class="pb-6">

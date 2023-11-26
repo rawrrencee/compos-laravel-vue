@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\GlobalSettings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
 class CommonController extends Controller
@@ -14,6 +15,13 @@ class CommonController extends Controller
     public function getCompanyName()
     {
         return GlobalSettings::where('global_key', 'COMPANY_NAME')->first()?->global_value;
+    }
+
+    public function getRoutes()
+    {
+        return collect(Route::getRoutes())->map(function ($route) {
+            return $route->uri();
+        });
     }
 
     public function showPhoto(Request $request)
