@@ -120,11 +120,7 @@ class CompanyController extends Controller
             ->firstOrFail();
 
         if (!isset($company)) {
-            return Inertia::render('Admin/Infrastructure/Companies/Overview')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'An error occurred.');
+            return redirect()->route('admin/infrastructure/companies');
         }
 
         return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);

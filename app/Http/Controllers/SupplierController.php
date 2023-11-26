@@ -112,11 +112,7 @@ class SupplierController extends Controller
         $supplier = Supplier::withTrashed()->where('id', '=', $id)->first();
 
         if (!isset($supplier)) {
-            return Inertia::render('Admin/Infrastructure/Suppliers/Overview')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'An error occurred.');
+            return redirect()->route('admin/infrastructure/suppliers');
         }
 
         return Inertia::render('Admin/Infrastructure/Suppliers/ViewSupplier', ['viewSupplier' => $supplier]);

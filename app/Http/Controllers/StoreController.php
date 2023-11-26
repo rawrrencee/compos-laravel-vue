@@ -130,11 +130,7 @@ class StoreController extends Controller
             ->first();
 
         if (!isset($store)) {
-            return Inertia::render('Admin/Infrastructure/Stores/Overview')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'An error occurred.');
+            return redirect()->route('admin/infrastructure/stores');
         }
 
         return Inertia::render('Admin/Infrastructure/Stores/ViewStore', ['viewStore' => $store]);

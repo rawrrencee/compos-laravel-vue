@@ -52,7 +52,7 @@ const flashError = computed(() => {
     show: storeForm.hasErrors && showFlashError.value,
     type: 'default',
     status: 'error',
-    message: 'Please complete or correct the required fields.',
+    message: 'Please complete or correct the highlighted fields.',
   };
 });
 

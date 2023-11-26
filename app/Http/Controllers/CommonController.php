@@ -43,4 +43,13 @@ class CommonController extends Controller
             ->with('status', 'error')
             ->with('message', 'Failed to ' . $messageModifier . ' record: ' . $this->formatException($e));
     }
+
+    public function redirectBackWithGenericError()
+    {
+        return redirect()->back()
+            ->with('show', true)
+            ->with('type', 'default')
+            ->with('status', 'error')
+            ->with('message', 'An error occurred.');
+    }
 }

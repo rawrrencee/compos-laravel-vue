@@ -34,6 +34,11 @@ class EmployeeRequestController extends Controller
         return array_column(EmployeeRequestStatus::cases(), 'value');
     }
 
+    public function validateEmployeeKey($key)
+    {
+        return $this->getEmployeeRequestKey()->global_value == $key;
+    }
+
     public function index(Request $request)
     {
         $request['sortBy'] = $request['sortBy'] ?? 'employee_name';
@@ -134,11 +139,7 @@ class EmployeeRequestController extends Controller
             ->first();
 
         if (!isset($employeeRequest)) {
-            return Inertia::render('Admin/Users/Employees/Requests')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'An error occurred.');
+            return redirect()->route('admin/users/employees/requests');
         }
 
         return Inertia::render('Admin/Users/Employees/Requests', [

@@ -8,6 +8,10 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  countries: Array,
+  genders: Array,
+  races: Array,
+  residencyStatuses: Array,
 });
 </script>
 
@@ -47,14 +51,59 @@ defineProps({
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'remarks'">Other Information</div>
       </template>
 
-      <GenericFormFields
-        :data="field[1].data"
-        :disabled="!authenticated"
-        :form="employeeRequestForm"
-        :label="field[1].label"
-        :name="field[1].name"
-        :type="field[1].type"
-      />
+      <template v-if="['country', 'nationality'].includes(field[0])">
+        <GenericFormFields
+          :data="{
+            dropdown: {
+              disabledSelect: {
+                label: 'Select a country',
+              },
+              options: countries?.map((c) => ({
+                key: c.num_code,
+                value: c.en_short_name,
+                text: field[0] === 'country' ? c.en_short_name : c.nationality,
+              })),
+            },
+          }"
+          :disabled="!authenticated"
+          :form="employeeRequestForm"
+          :label="field[1].label"
+          :name="field[1].name"
+          :type="field[1].type"
+        />
+      </template>
+      <template v-else-if="['gender', 'race', 'residency_status'].includes(field[0])">
+        <GenericFormFields
+          :data="{
+            dropdown: {
+              disabledSelect: {
+                label: `Select a ${field[0].replace('_', ' ')}`,
+              },
+              options: (field[0] === 'gender' ? genders : field[0] === 'race' ? races : residencyStatuses)?.map(
+                (c) => ({
+                  key: c.key,
+                  value: c.value,
+                  text: c.value,
+                })
+              ),
+            },
+          }"
+          :disabled="!authenticated"
+          :form="employeeRequestForm"
+          :label="field[1].label"
+          :name="field[1].name"
+          :type="field[1].type"
+        />
+      </template>
+      <template v-else>
+        <GenericFormFields
+          :disabled="!authenticated"
+          :form="employeeRequestForm"
+          :label="field[1].label"
+          :name="field[1].name"
+          :type="field[1].type"
+        />
+      </template>
     </div>
   </div>
 </template>

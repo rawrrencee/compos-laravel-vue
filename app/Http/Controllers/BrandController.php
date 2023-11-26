@@ -118,11 +118,7 @@ class BrandController extends Controller
         $brand = Brand::withTrashed()->where('id', '=', $id)->first();
 
         if (!isset($brand)) {
-            return Inertia::render('Admin/Commerce/Brands/Overview')
-                ->with('show', true)
-                ->with('type', 'default')
-                ->with('status', 'error')
-                ->with('message', 'An error occurred.');
+            return redirect()->route('admin/commerce/brands');
         }
 
         return Inertia::render('Admin/Commerce/Brands/ViewBrand', ['viewBrand' => $brand]);
