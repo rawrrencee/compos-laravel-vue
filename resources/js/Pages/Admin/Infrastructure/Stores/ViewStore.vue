@@ -12,7 +12,7 @@ const props = defineProps({
   viewStore: Object,
 });
 
-const editUrl = `stores.viewEditPageById`;
+const editUrl = `infrastructure.stores.viewEditPageById`;
 const viewSupplierLabels = [
   { key: 'company_name', title: 'Company Name' },
   { key: 'store_code', title: 'Store Code' },
@@ -114,7 +114,7 @@ const onAdminAlertButtonClicked = () => {
                 <template v-else-if="['company_name'].includes(label.key)">
                   <Link
                     class="link flex items-center gap-1"
-                    :href="route('companies.viewReadOnlyPageById', { id: viewStore.company.id })"
+                    :href="route('infrastructure.companies.viewReadOnlyPageById', { id: viewStore.company.id })"
                   >
                     <span>{{ viewStore.company?.company_name }}</span>
                     <ArrowRightOnRectangleIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true" />

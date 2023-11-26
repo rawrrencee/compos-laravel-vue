@@ -38,9 +38,9 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const addNewUrl = `suppliers.create`;
-const editUrl = `suppliers.update`;
-const exportUrl = `${route('admin/infrastructure/suppliers/export')}`;
+const addNewUrl = `infrastructure.suppliers.create`;
+const editUrl = `infrastructure.suppliers.update`;
+const exportUrl = `${route('infrastructure.suppliers.export')}`;
 const tableHeaderTitles = [
   { key: 'supplier_name', title: 'Supplier Name' },
   { key: 'active', title: 'Active' },
@@ -104,7 +104,7 @@ const onBulkEditSaveClicked = () => {
         img_url: supplier.img_url ?? '',
       }))
     )
-    .post(route('admin/infrastructure/suppliers/edit.bulk'), {
+    .post(route('infrastructure.suppliers.bulkUpdate'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -116,7 +116,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/infrastructure/suppliers/delete'),
+    route('infrastructure.suppliers.delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -175,7 +175,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/infrastructure/suppliers/import'), {
+  importForm.post(route('infrastructure.suppliers.import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -255,7 +255,7 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/infrastructure/suppliers/view', { id }));
+  router.visit(route('infrastructure.suppliers.viewReadOnlyPageById', { id }));
 };
 // #endregion Functions
 

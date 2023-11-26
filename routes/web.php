@@ -136,59 +136,55 @@ Route::middleware([
         Route::prefix('infrastructure')->group(function () {
             Route::get('/', function () {
                 return Inertia::render('Error/404');
-            })->name('admin/infrastructure');
+            })->name('infrastructure');
 
             Route::prefix('companies')->group(function () {
-                Route::get('/', [CompanyController::class, 'index'])->name('companies.viewLandingPage');
+                Route::get('/', [CompanyController::class, 'index'])->name('infrastructure.companies.viewLandingPage');
                 Route::get('/add', function () {
                     return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany');
-                })->name('companies.viewCreatePage');
-                Route::get('/edit', [CompanyController::class, 'edit'])->name('companies.viewEditPageById');
-                Route::get('/view', [CompanyController::class, 'view'])->name('companies.viewReadOnlyPageById');
+                })->name('infrastructure.companies.viewCreatePage');
+                Route::get('/edit', [CompanyController::class, 'edit'])->name('infrastructure.companies.viewEditPageById');
+                Route::get('/view', [CompanyController::class, 'view'])->name('infrastructure.companies.viewReadOnlyPageById');
 
-                Route::post('/add', [CompanyController::class, 'store'])->name('companies.create');
-                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('companyPhoto.delete');
-                Route::post('/delete', [CompanyController::class, 'destroy'])->name('companies.delete');
-                Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('companies.bulkUpdate');
-                Route::post('/edit', [CompanyController::class, 'update'])->name('companies.update');
-                Route::post('/export', [CompanyController::class, 'exportCsv'])->name('companies.export');
-                Route::post('/import', [CompanyController::class, 'importCsv'])->name('companies.import');
+                Route::post('/add', [CompanyController::class, 'store'])->name('infrastructure.companies.create');
+                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('infrastructure.companyPhoto.delete');
+                Route::post('/delete', [CompanyController::class, 'destroy'])->name('infrastructure.companies.delete');
+                Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('infrastructure.companies.bulkUpdate');
+                Route::post('/edit', [CompanyController::class, 'update'])->name('infrastructure.companies.update');
+                Route::post('/export', [CompanyController::class, 'exportCsv'])->name('infrastructure.companies.export');
+                Route::post('/import', [CompanyController::class, 'importCsv'])->name('infrastructure.companies.import');
             });
 
             Route::prefix('stores')->group(function () {
-                Route::get('/', [StoreController::class, 'index'])->name('stores.viewLandingPage');
-                Route::get('/add', [StoreController::class, 'add'])->name('stores.viewCreatePage');
-                Route::get('/edit', [StoreController::class, 'edit'])->name('stores.viewEditPageById');
-                Route::get('/view', [StoreController::class, 'view'])->name('stores.viewReadOnlyPageById');
+                Route::get('/', [StoreController::class, 'index'])->name('infrastructure.stores.viewLandingPage');
+                Route::get('/add', [StoreController::class, 'add'])->name('infrastructure.stores.viewCreatePage');
+                Route::get('/edit', [StoreController::class, 'edit'])->name('infrastructure.stores.viewEditPageById');
+                Route::get('/view', [StoreController::class, 'view'])->name('infrastructure.stores.viewReadOnlyPageById');
 
-                Route::post('/add', [StoreController::class, 'store'])->name('stores.create');
-                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('storePhoto.delete');
-                Route::post('/delete', [StoreController::class, 'destroy'])->name('stores.delete');
-                Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('stores.bulkUpdate');
-                Route::post('/edit', [StoreController::class, 'update'])->name('stores.update');
-                Route::post('/export', [StoreController::class, 'exportCsv'])->name('stores.export');
-                Route::post('/import', [StoreController::class, 'importCsv'])->name('stores.import');
+                Route::post('/add', [StoreController::class, 'store'])->name('infrastructure.stores.create');
+                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('infrastructure.storePhoto.delete');
+                Route::post('/delete', [StoreController::class, 'destroy'])->name('infrastructure.stores.delete');
+                Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('infrastructure.stores.bulkUpdate');
+                Route::post('/edit', [StoreController::class, 'update'])->name('infrastructure.stores.update');
+                Route::post('/export', [StoreController::class, 'exportCsv'])->name('infrastructure.stores.export');
+                Route::post('/import', [StoreController::class, 'importCsv'])->name('infrastructure.stores.import');
             });
 
             Route::prefix('suppliers')->group(function () {
-                Route::get('/', [SupplierController::class, 'index'])->name('admin/infrastructure/suppliers');
-
+                Route::get('/', [SupplierController::class, 'index'])->name('infrastructure.suppliers.viewLandingPage');
                 Route::get('/add', function () {
-                    return Inertia::render('Admin/Infrastructure/Suppliers/AddOrEditSupplier');
-                })->name('admin/infrastructure/suppliers/add');
-                Route::post('/add', [SupplierController::class, 'store'])->name('admin/infrastructure/suppliers/add.store');
+                    return Inertia::render('suppliers.viewCreatePageOrEditSupplier');
+                })->name('infrastructure.suppliers.viewCreatePage');
+                Route::get('/edit', [SupplierController::class, 'edit'])->name('infrastructure.suppliers.viewEditPageById');
+                Route::get('/view', [SupplierController::class, 'view'])->name('infrastructure.suppliers.viewReadOnlyPageById');
 
-                Route::get('/edit', [SupplierController::class, 'edit'])->name('admin/infrastructure/suppliers/edit');
-                Route::post('/edit', [SupplierController::class, 'update'])->name('admin/infrastructure/suppliers/edit.update');
-                Route::post('/edit-bulk', [SupplierController::class, 'bulkUpdate'])->name('admin/infrastructure/suppliers/edit.bulk');
-
-                Route::get('/view', [SupplierController::class, 'view'])->name('admin/infrastructure/suppliers/view');
-                Route::post('/delete-photo', [SupplierController::class, 'deletePhoto'])->name('admin/infrastructure/suppliers/photo.delete');
-
-                Route::post('/import', [SupplierController::class, 'importCsv'])->name('admin/infrastructure/suppliers/import');
-                Route::post('/export', [SupplierController::class, 'exportCsv'])->name('admin/infrastructure/suppliers/export');
-
-                Route::post('/delete', [SupplierController::class, 'destroy'])->name('admin/infrastructure/suppliers/delete');
+                Route::post('/add', [SupplierController::class, 'store'])->name('infrastructure.suppliers.create');
+                Route::post('/delete-photo', [SupplierController::class, 'deletePhoto'])->name('infrastructure.supplierPhoto.delete');
+                Route::post('/delete', [SupplierController::class, 'destroy'])->name('infrastructure.suppliers.delete');
+                Route::post('/edit-bulk', [SupplierController::class, 'bulkUpdate'])->name('infrastructure.suppliers.bulkUpdate');
+                Route::post('/edit', [SupplierController::class, 'update'])->name('infrastructure.suppliers.update');
+                Route::post('/export', [SupplierController::class, 'exportCsv'])->name('infrastructure.suppliers.export');
+                Route::post('/import', [SupplierController::class, 'importCsv'])->name('infrastructure.suppliers.import');
             });
         });
 

@@ -69,7 +69,7 @@ const submit = () => {
           supplier_photo: photoFile.value,
         }),
       }))
-      .post(route('admin/infrastructure/suppliers/add.store'));
+      .post(route('infrastructure.suppliers.create'));
   } else {
     supplierForm
       .transform((data) => ({
@@ -79,12 +79,12 @@ const submit = () => {
         }),
         id: props.supplier.id,
       }))
-      .post(route('admin/infrastructure/suppliers/edit.update'));
+      .post(route('infrastructure.suppliers.update'));
   }
 };
 const deletePhoto = () => {
   if (props.supplier && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('admin/infrastructure/suppliers/photo.delete'), {
+    router.post(route('infrastructure.supplierPhoto.delete'), {
       id: props.supplier.id,
       img_path: props.supplier.img_path,
     });
@@ -191,7 +191,7 @@ const deletePhoto = () => {
         </div>
       </div>
 
-      <StickyFooter back-url="admin/infrastructure/suppliers" />
+      <StickyFooter back-url="infrastructure.suppliers.viewLandingPage" />
     </form>
   </SupplierLayout>
 </template>

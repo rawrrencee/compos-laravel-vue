@@ -39,9 +39,9 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const addNewUrl = `stores.create`;
-const editUrl = `stores.update`;
-const exportUrl = `${route('stores.export')}`;
+const addNewUrl = `infrastructure.stores.create`;
+const editUrl = `infrastructure.stores.update`;
+const exportUrl = `${route('infrastructure.stores.export')}`;
 const tableHeaderTitles = [
   { key: 'store_name', title: 'Store Name' },
   { key: 'store_code', title: 'Store Code' },
@@ -116,7 +116,7 @@ const onBulkEditSaveClicked = () => {
         img_url: store.img_url ?? '',
       }))
     )
-    .post(route('stores.bulkUpdate'), {
+    .post(route('infrastructure.stores.bulkUpdate'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -128,7 +128,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('stores.delete'),
+    route('infrastructure.stores.delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -189,7 +189,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('stores.import'), {
+  importForm.post(route('infrastructure.stores.import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -273,7 +273,7 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('stores.viewReadOnlyPageById', { id }));
+  router.visit(route('infrastructure.stores.viewReadOnlyPageById', { id }));
 };
 // #endregion Functions
 

@@ -12,8 +12,7 @@ const props = defineProps({
   viewSupplier: Object,
 });
 
-const moduleUrl = 'admin/infrastructure/suppliers';
-const editUrl = `${moduleUrl}/edit`;
+const editUrl = `infrastructure.suppliers.viewEditPageById`;
 const viewSupplierLabels = [
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },

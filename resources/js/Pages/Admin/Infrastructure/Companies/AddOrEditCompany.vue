@@ -69,7 +69,7 @@ const submit = () => {
           company_photo: photoFile.value,
         }),
       }))
-      .post(route('companies.create'));
+      .post(route('infrastructure.companies.create'));
   } else {
     companyForm
       .transform((data) => ({
@@ -79,12 +79,12 @@ const submit = () => {
         }),
         id: props.company.id,
       }))
-      .post(route('companies.update'));
+      .post(route('infrastructure.companies.update'));
   }
 };
 const deletePhoto = () => {
   if (props.company && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('companyPhoto.delete'), {
+    router.post(route('infrastructure.companyPhoto.delete'), {
       id: props.company.id,
       img_path: props.company.img_path,
     });
@@ -189,7 +189,7 @@ const deletePhoto = () => {
         </div>
       </div>
 
-      <StickyFooter back-url="companies.viewLandingPage" />
+      <StickyFooter back-url="infrastructure.companies.viewLandingPage" />
     </form>
   </CompanyLayout>
 </template>

@@ -112,7 +112,7 @@ class SupplierController extends Controller
         $supplier = Supplier::withTrashed()->where('id', '=', $id)->first();
 
         if (!isset($supplier)) {
-            return redirect()->route('admin/infrastructure/suppliers');
+            return redirect()->route('infrastructure.suppliers.viewLandingPage');
         }
 
         return Inertia::render('Admin/Infrastructure/Suppliers/ViewSupplier', ['viewSupplier' => $supplier]);
@@ -143,12 +143,12 @@ class SupplierController extends Controller
             $supplier = Supplier::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/suppliers')
+            return redirect()->route('infrastructure.suppliers.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Supplier created successfully.')
-                ->with('route', 'admin/infrastructure/suppliers/edit')
+                ->with('route', 'infrastructure.suppliers.viewEditPageById')
                 ->with('id', $supplier->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -216,12 +216,12 @@ class SupplierController extends Controller
             $supplier->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/suppliers')
+            return redirect()->route('infrastructure.suppliers.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Supplier updated successfully.')
-                ->with('route', 'admin/infrastructure/suppliers/edit')
+                ->with('route', 'infrastructure.suppliers.viewEditPageById')
                 ->with('id', $supplier->id);
         } catch (\Exception $e) {
             DB::rollBack();

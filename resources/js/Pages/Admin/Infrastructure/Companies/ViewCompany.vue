@@ -12,7 +12,7 @@ const props = defineProps({
   viewCompany: Object,
 });
 
-const editUrl = `companies.viewEditPageById`;
+const editUrl = `infrastructure.companies.viewEditPageById`;
 const viewCompanyLabels = [
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
@@ -110,7 +110,7 @@ const onAdminAlertButtonClicked = () => {
                     <li v-for="(store, index) in viewCompany.stores" :class="index !== 0 && 'mt-3'">
                       <Link
                         class="link flex items-center gap-1"
-                        :href="route('stores.viewReadOnlyPageById', { id: store.id })"
+                        :href="route('infrastructure.stores.viewReadOnlyPageById', { id: store.id })"
                       >
                         <span>{{ store.store_name }}&nbsp;({{ store.store_code }})</span>
                         <ArrowRightOnRectangleIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true" />
