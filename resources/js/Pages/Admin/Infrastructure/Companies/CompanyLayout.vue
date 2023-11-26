@@ -4,19 +4,19 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 const secondaryNavigation = [
   {
     name: 'Overview',
-    href: 'admin/infrastructure/companies',
+    href: 'companies.viewLandingPage',
     children: [
       {
         name: 'Add New Company',
-        href: 'admin/infrastructure/companies/add',
+        href: 'companies.viewCreatePage',
       },
       {
         name: 'Edit Company',
-        href: 'admin/infrastructure/companies/edit',
+        href: 'companies.viewEditPageById',
       },
       {
         name: 'View Company',
-        href: 'admin/infrastructure/companies/view',
+        href: 'companies.viewReadOnlyPageById',
       },
     ],
   },

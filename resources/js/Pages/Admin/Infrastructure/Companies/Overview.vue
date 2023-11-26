@@ -38,10 +38,9 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const moduleUrl = 'admin/infrastructure/companies';
-const addNewUrl = `${moduleUrl}/add`;
-const editUrl = `${moduleUrl}/edit`;
-const exportUrl = `${route('admin/infrastructure/companies/export')}`;
+const addNewUrl = `companies.create`;
+const editUrl = `companies.update`;
+const exportUrl = `${route('companies.export')}`;
 const tableHeaderTitles = [
   { key: 'company_name', title: 'Company Name' },
   { key: 'active', title: 'Active' },
@@ -105,7 +104,7 @@ const onBulkEditSaveClicked = () => {
         img_url: company.img_url ?? '',
       }))
     )
-    .post(route('admin/infrastructure/companies/edit.bulk'), {
+    .post(route('companies.bulkUpdate'), {
       onStart: () => (isLoading.value = true),
       onFinish: () => {
         isLoading.value = false;
@@ -117,7 +116,7 @@ const onBulkEditSaveClicked = () => {
 };
 const onDeleteRowsClicked = (rows) => {
   router.post(
-    route('admin/infrastructure/companies/delete'),
+    route('companies.delete'),
     { ids: rows },
     {
       onStart: () => (isLoading.value = true),
@@ -176,7 +175,7 @@ const onImportFileAdded = (event) => {
   importForm.import_file = event.target.files[0];
 };
 const onImportFileSaveClicked = () => {
-  importForm.post(route('admin/infrastructure/companies/import'), {
+  importForm.post(route('companies.import'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => (isLoading.value = false),
   });
@@ -256,7 +255,7 @@ const onResetFiltersClicked = (controlName, value) => {
   onGoToPageClicked();
 };
 const onViewItemClicked = (id) => {
-  router.visit(route('admin/infrastructure/companies/view', { id }));
+  router.visit(route('companies.viewReadOnlyPageById', { id }));
 };
 // #endregion Functions
 

@@ -139,24 +139,20 @@ Route::middleware([
             })->name('admin/infrastructure');
 
             Route::prefix('companies')->group(function () {
-                Route::get('/', [CompanyController::class, 'index'])->name('admin/infrastructure/companies');
-
+                Route::get('/', [CompanyController::class, 'index'])->name('companies.viewLandingPage');
                 Route::get('/add', function () {
                     return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany');
-                })->name('admin/infrastructure/companies/add');
-                Route::post('/add', [CompanyController::class, 'store'])->name('admin/infrastructure/companies/add.store');
+                })->name('companies.viewCreatePage');
+                Route::get('/edit', [CompanyController::class, 'edit'])->name('companies.viewEditPageById');
+                Route::get('/view', [CompanyController::class, 'view'])->name('companies.viewReadOnlyPageById');
 
-                Route::get('/edit', [CompanyController::class, 'edit'])->name('admin/infrastructure/companies/edit');
-                Route::post('/edit', [CompanyController::class, 'update'])->name('admin/infrastructure/companies/edit.update');
-                Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('admin/infrastructure/companies/edit.bulk');
-
-                Route::get('/view', [CompanyController::class, 'view'])->name('admin/infrastructure/companies/view');
-                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('admin/infrastructure/companies/photo.delete');
-
-                Route::post('/import', [CompanyController::class, 'importCsv'])->name('admin/infrastructure/companies/import');
-                Route::post('/export', [CompanyController::class, 'exportCsv'])->name('admin/infrastructure/companies/export');
-
-                Route::post('/delete', [CompanyController::class, 'destroy'])->name('admin/infrastructure/companies/delete');
+                Route::post('/add', [CompanyController::class, 'store'])->name('companies.create');
+                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('companyPhoto.delete');
+                Route::post('/delete', [CompanyController::class, 'destroy'])->name('companies.delete');
+                Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('companies.bulkUpdate');
+                Route::post('/edit', [CompanyController::class, 'update'])->name('companies.update');
+                Route::post('/export', [CompanyController::class, 'exportCsv'])->name('companies.export');
+                Route::post('/import', [CompanyController::class, 'importCsv'])->name('companies.import');
             });
 
             Route::prefix('stores')->group(function () {

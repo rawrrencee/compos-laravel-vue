@@ -120,7 +120,7 @@ class CompanyController extends Controller
             ->firstOrFail();
 
         if (!isset($company)) {
-            return redirect()->route('admin/infrastructure/companies');
+            return redirect()->route('companies.viewLandingPage');
         }
 
         return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
@@ -151,12 +151,12 @@ class CompanyController extends Controller
             $company = Company::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('companies.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Company created successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
+                ->with('route', 'companies.viewEditPageById')
                 ->with('id', $company->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -224,12 +224,12 @@ class CompanyController extends Controller
             $company->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/companies')
+            return redirect()->route('companies.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Company updated successfully.')
-                ->with('route', 'admin/infrastructure/companies/edit')
+                ->with('route', 'companies.viewEditPageById')
                 ->with('id', $company->id);
         } catch (\Exception $e) {
             DB::rollBack();

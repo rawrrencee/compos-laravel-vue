@@ -115,7 +115,7 @@ const onAdminAlertButtonClicked = () => {
                 <template v-else-if="['company_name'].includes(label.key)">
                   <Link
                     class="link flex items-center gap-1"
-                    :href="route('admin/infrastructure/companies/view', { id: viewStore.company.id })"
+                    :href="route('companies.viewReadOnlyPageById', { id: viewStore.company.id })"
                   >
                     <span>{{ viewStore.company?.company_name }}</span>
                     <ArrowRightOnRectangleIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true" />
