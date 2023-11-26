@@ -156,22 +156,18 @@ Route::middleware([
             });
 
             Route::prefix('stores')->group(function () {
-                Route::get('/', [StoreController::class, 'index'])->name('admin/infrastructure/stores');
+                Route::get('/', [StoreController::class, 'index'])->name('stores.viewLandingPage');
+                Route::get('/add', [StoreController::class, 'add'])->name('stores.viewCreatePage');
+                Route::get('/edit', [StoreController::class, 'edit'])->name('stores.viewEditPageById');
+                Route::get('/view', [StoreController::class, 'view'])->name('stores.viewReadOnlyPageById');
 
-                Route::get('/add', [StoreController::class, 'add'])->name('admin/infrastructure/stores/add');
-                Route::post('/add', [StoreController::class, 'store'])->name('admin/infrastructure/stores/add.store');
-
-                Route::get('/edit', [StoreController::class, 'edit'])->name('admin/infrastructure/stores/edit');
-                Route::post('/edit', [StoreController::class, 'update'])->name('admin/infrastructure/stores/edit.update');
-                Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('admin/infrastructure/stores/edit.bulk');
-
-                Route::get('/view', [StoreController::class, 'view'])->name('admin/infrastructure/stores/view');
-                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('admin/infrastructure/stores/photo.delete');
-
-                Route::post('/import', [StoreController::class, 'importCsv'])->name('admin/infrastructure/stores/import');
-                Route::post('/export', [StoreController::class, 'exportCsv'])->name('admin/infrastructure/stores/export');
-
-                Route::post('/delete', [StoreController::class, 'destroy'])->name('admin/infrastructure/stores/delete');
+                Route::post('/add', [StoreController::class, 'store'])->name('stores.create');
+                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('storePhoto.delete');
+                Route::post('/delete', [StoreController::class, 'destroy'])->name('stores.delete');
+                Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('stores.bulkUpdate');
+                Route::post('/edit', [StoreController::class, 'update'])->name('stores.update');
+                Route::post('/export', [StoreController::class, 'exportCsv'])->name('stores.export');
+                Route::post('/import', [StoreController::class, 'importCsv'])->name('stores.import');
             });
 
             Route::prefix('suppliers')->group(function () {

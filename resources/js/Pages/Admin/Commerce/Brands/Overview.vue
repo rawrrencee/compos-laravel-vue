@@ -39,9 +39,8 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const moduleUrl = 'admin/commerce/brands';
-const addNewUrl = `${moduleUrl}/add`;
-const editUrl = `${moduleUrl}/edit`;
+const addNewUrl = `brands.create`;
+const editUrl = `brands.update`;
 const exportUrl = `${route('admin/commerce/brands/export')}`;
 const tableHeaderTitles = [
   { key: 'brand_name', title: 'Brand Name' },

@@ -33,9 +33,8 @@ const tableFilterOptions = useForm({
   subcategory_name_or_code: props?.tableFilterOptions?.subcategory_name_or_code ?? '',
   showDeleted: props?.tableFilterOptions?.showDeleted ?? 'onlyNonDeleted',
 });
-const moduleUrl = 'admin/commerce/categories';
-const addNewUrl = `${moduleUrl}/add`;
-const editUrl = `${moduleUrl}/edit`;
+const addNewUrl = `categories.create`;
+const editUrl = `categories.update`;
 const exportUrl = `${route('admin/commerce/categories/export')}`;
 const tableHeaderTitles = [
   { key: 'category_name', title: 'Category Name' },

@@ -130,7 +130,7 @@ class StoreController extends Controller
             ->first();
 
         if (!isset($store)) {
-            return redirect()->route('admin/infrastructure/stores');
+            return redirect()->route('stores.viewLandingPage');
         }
 
         return Inertia::render('Admin/Infrastructure/Stores/ViewStore', ['viewStore' => $store]);
@@ -150,12 +150,12 @@ class StoreController extends Controller
             $store = Store::create($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/stores')
+            return redirect()->route('stores.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Store created successfully.')
-                ->with('route', 'admin/infrastructure/stores/edit')
+                ->with('route', 'stores.viewEditPageById')
                 ->with('id', $store->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -212,12 +212,12 @@ class StoreController extends Controller
             $store->update($request->all());
             DB::commit();
 
-            return redirect()->route('admin/infrastructure/stores')
+            return redirect()->route('stores.viewLandingPage')
                 ->with('show', true)
                 ->with('type', 'default')
                 ->with('status', 'success')
                 ->with('message', 'Store updated successfully.')
-                ->with('route', 'admin/infrastructure/stores/edit')
+                ->with('route', 'stores.viewEditPageById')
                 ->with('id', $store->id);
         } catch (\Exception $e) {
             DB::rollBack();

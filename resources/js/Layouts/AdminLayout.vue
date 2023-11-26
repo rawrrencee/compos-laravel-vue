@@ -88,7 +88,7 @@ const adminNavigation = [
     href: 'admin/infrastructure',
     children: [
       { name: 'Companies', href: 'companies.viewLandingPage' },
-      { name: 'Stores', href: 'admin/infrastructure/stores' },
+      { name: 'Stores', href: 'stores.viewLandingPage' },
       { name: 'Suppliers', href: 'admin/infrastructure/suppliers' },
     ],
   },

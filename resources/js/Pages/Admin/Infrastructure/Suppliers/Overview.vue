@@ -38,9 +38,8 @@ const tableFilterOptions = useForm({
 const importForm = useForm({
   import_file: null,
 });
-const moduleUrl = 'admin/infrastructure/suppliers';
-const addNewUrl = `${moduleUrl}/add`;
-const editUrl = `${moduleUrl}/edit`;
+const addNewUrl = `suppliers.create`;
+const editUrl = `suppliers.update`;
 const exportUrl = `${route('admin/infrastructure/suppliers/export')}`;
 const tableHeaderTitles = [
   { key: 'supplier_name', title: 'Supplier Name' },

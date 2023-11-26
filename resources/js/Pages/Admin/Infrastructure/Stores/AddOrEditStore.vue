@@ -79,7 +79,7 @@ const submit = () => {
           store_photo: photoFile.value,
         }),
       }))
-      .post(route('admin/infrastructure/stores/add.store'));
+      .post(route('stores.create'));
   } else {
     storeForm
       .transform((data) => ({
@@ -90,12 +90,12 @@ const submit = () => {
         }),
         id: props.store.id,
       }))
-      .post(route('admin/infrastructure/stores/edit.update'));
+      .post(route('stores.update'));
   }
 };
 const deletePhoto = () => {
   if (props.store && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('admin/infrastructure/stores/photo.delete'), {
+    router.post(route('storePhoto.delete'), {
       id: props.store.id,
       img_path: props.store.img_path,
     });
@@ -234,7 +234,7 @@ const deletePhoto = () => {
         </div>
       </div>
 
-      <StickyFooter back-url="admin/infrastructure/stores" />
+      <StickyFooter back-url="stores.viewLandingPage" />
     </form>
   </StoreLayout>
 </template>
