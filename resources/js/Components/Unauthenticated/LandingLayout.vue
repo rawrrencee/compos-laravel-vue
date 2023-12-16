@@ -9,7 +9,7 @@ defineProps({
 <template>
   <div class="grid h-full grid-cols-1 md:grid-cols-12">
     <div class="col-span-5 hidden h-full flex-col text-gray-200 md:flex">
-      <div class="flex h-full flex-col place-content-center place-items-center gap-24 px-6">
+      <div class="flex h-full w-full flex-col place-content-center gap-24 px-6">
         <div class="flex flex-col gap-4">
           <div>
             <img

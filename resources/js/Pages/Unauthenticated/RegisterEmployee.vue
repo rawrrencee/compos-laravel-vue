@@ -12,6 +12,7 @@ defineProps({
   authenticated: Boolean,
   countries: Array,
   genders: Array,
+  identityTypes: Array,
   races: Array,
   residencyStatuses: Array,
 });
@@ -106,6 +107,7 @@ const resetPage = () => {
             :countries="countries"
             :genders="genders"
             :races="races"
+            :identity-types="identityTypes"
             :residency-statuses="residencyStatuses"
           />
         </div>

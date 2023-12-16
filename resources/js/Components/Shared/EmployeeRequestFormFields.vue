@@ -10,6 +10,7 @@ defineProps({
   },
   countries: Array,
   genders: Array,
+  identityTypes: Array,
   races: Array,
   residencyStatuses: Array,
 });
@@ -23,7 +24,7 @@ defineProps({
           [
             'username',
             'commencement_date',
-            'nric',
+            'phone_number',
             'address_1',
             'gender',
             'date_of_birth',
@@ -38,7 +39,7 @@ defineProps({
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'commencement_date'">
           Main Information
         </div>
-        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'nric'">Contact Info</div>
+        <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'phone_number'">Contact Info</div>
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'address_1'">Location Information</div>
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'gender'">Ethnic Information</div>
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'date_of_birth'">
@@ -72,20 +73,25 @@ defineProps({
           :type="field[1].type"
         />
       </template>
-      <template v-else-if="['gender', 'race', 'residency_status'].includes(field[0])">
+      <template v-else-if="['gender', 'race', 'identity_type', 'residency_status'].includes(field[0])">
         <GenericFormFields
           :data="{
             dropdown: {
               disabledSelect: {
                 label: `Select a ${field[0].replace('_', ' ')}`,
               },
-              options: (field[0] === 'gender' ? genders : field[0] === 'race' ? races : residencyStatuses)?.map(
-                (c) => ({
-                  key: c.key,
-                  value: c.value,
-                  text: c.value,
-                })
-              ),
+              options: (field[0] === 'gender'
+                ? genders
+                : field[0] === 'race'
+                  ? races
+                  : field[0] === 'identity_type'
+                    ? identityTypes
+                    : residencyStatuses
+              )?.map((c) => ({
+                key: c.key,
+                value: c.value,
+                text: c.value,
+              })),
             },
           }"
           :disabled="!authenticated"

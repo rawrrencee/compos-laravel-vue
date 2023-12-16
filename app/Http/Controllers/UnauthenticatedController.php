@@ -34,13 +34,11 @@ class UnauthenticatedController extends Controller
             $authenticated = $this->EmployeeRequestController->validateEmployeeKey($request['organisationKey']);
 
             if (!$authenticated) {
-                return Inertia::render('Unauthenticated/RegisterEmployee')
-                    ->with('flash', [
-                        'show' => true,
-                        'type' => 'default',
-                        'status' => 'error',
-                        'message' => 'An invalid organisation key was provided.'
-                    ]);
+                return redirect()->route('unauth/register/employee')
+                    ->with('show', true)
+                    ->with('type', 'default')
+                    ->with('status', 'error')
+                    ->with('message', 'An invalid organisation key was provided.');
             }
         }
 
@@ -50,6 +48,7 @@ class UnauthenticatedController extends Controller
             'authenticated' => $authenticated,
             'countries' => $this->HardcodedDataController->getCountries(),
             'genders' => $this->HardcodedDataController->getGenders(),
+            'identityTypes' => $this->HardcodedDataController->getIdentityTypes(),
             'races' => $this->HardcodedDataController->getRaces(),
             'residencyStatuses' => $this->HardcodedDataController->getResidencyStatuses(),
         ]);

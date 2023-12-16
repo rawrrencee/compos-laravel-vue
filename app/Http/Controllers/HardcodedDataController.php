@@ -2027,6 +2027,33 @@ class HardcodedDataController extends Controller
         return $genders;
     }
 
+    public function getIdentityTypes()
+    {
+        $identityTypes = [];
+
+        $identityTypes[] = [
+            'key' => 'NRIC',
+            'value' => 'NRIC'
+        ];
+
+        $identityTypes[] = [
+            'key' => 'FIN',
+            'value' => 'FIN'
+        ];
+
+        $identityTypes[] = [
+            'key' => 'PASSPORT',
+            'value' => 'Passport'
+        ];
+
+        $identityTypes[] = [
+            'key' => 'OTHERS',
+            'value' => 'Others'
+        ];
+
+        return $identityTypes;
+    }
+
     public function getRaces()
     {
         $races = [];
