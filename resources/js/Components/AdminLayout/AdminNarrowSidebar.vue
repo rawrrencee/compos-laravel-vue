@@ -9,7 +9,7 @@ defineProps({
 
 <template>
   <div
-    class="hidden border-r border-gray-200 pr-8 lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-gray-50 lg:pl-6"
+    class="hidden border-r border-gray-200 pr-8 lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:bg-gray-50 lg:pl-6"
   >
     <div class="flex h-16 shrink-0 items-center">
       <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
