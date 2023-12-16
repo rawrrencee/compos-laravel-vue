@@ -93,7 +93,7 @@ const submit = () => {
         subcategory_code: s.subcategory_code?.toLocaleUpperCase(),
       })),
     }))
-    .post(route(`commerce.categories.viewLandingPage/${props.category ? 'edit.update' : 'add.store'}`));
+    .post(route(props.category ? 'commerce.categories.update' : 'commerce.categories.create'));
 };
 // #endregion Functions
 </script>
