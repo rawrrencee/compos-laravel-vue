@@ -63,6 +63,7 @@ const submit = () => {
     companyForm
       .transform((data) => ({
         ...data,
+        identity_number: data.identity_number?.toLocaleUpperCase(),
         ...(photoFile.value && {
           company_photo: photoFile.value,
         }),
@@ -72,6 +73,7 @@ const submit = () => {
     companyForm
       .transform((data) => ({
         ...data,
+        identity_number: data.identity_number?.toLocaleUpperCase(),
         ...(photoFile.value && {
           company_photo: photoFile.value,
         }),
@@ -167,7 +169,7 @@ const deletePhoto = () => {
                     },
                     options: countries?.map((c) => ({
                       key: c.num_code,
-                      value: c.en_short_name,
+                      value: c.alpha_3_code,
                       text: c.en_short_name,
                     })),
                   },
@@ -187,7 +189,7 @@ const deletePhoto = () => {
                     },
                     options: (field[0] === 'identity_type' ? companyIdentityTypes : currencies)?.map((c) => ({
                       key: c.key,
-                      value: c.value,
+                      value: c.key,
                       text:
                         field[0] === 'identity_type' ? c.value : `${c.value}${c.symbol ? `&nbsp;(${c.symbol})` : ''}`,
                     })),

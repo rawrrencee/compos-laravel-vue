@@ -61,7 +61,7 @@ defineProps({
               },
               options: countries?.map((c) => ({
                 key: c.num_code,
-                value: c.en_short_name,
+                value: c.alpha_3_code,
                 text: field[0] === 'country' ? c.en_short_name : c.nationality,
               })),
             },
@@ -89,7 +89,7 @@ defineProps({
                     : residencyStatuses
               )?.map((c) => ({
                 key: c.key,
-                value: c.value,
+                value: c.key,
                 text: c.value,
               })),
             },
