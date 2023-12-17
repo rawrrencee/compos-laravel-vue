@@ -84,7 +84,7 @@ const submit = () => {
 };
 const deletePhoto = () => {
   if (props.supplier && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('infrastructure.supplierPhoto.delete'), {
+    router.post(route('infrastructure.suppliers.photo.delete'), {
       id: props.supplier.id,
       img_path: props.supplier.img_path,
     });

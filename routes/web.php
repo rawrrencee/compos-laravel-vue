@@ -32,7 +32,7 @@ use App\Http\Controllers\UnauthenticatedController;
 //     ]);
 // });
 
-Route::get('/', [UnauthenticatedController::class, 'loginPage'])->name('unauth/login');
+Route::get('/', [UnauthenticatedController::class, 'loginPage'])->name('unauth.employees.login');
 
 Route::get('/404', function () {
     return Inertia::render('Error/404');
@@ -40,10 +40,10 @@ Route::get('/404', function () {
 
 Route::prefix('register')->group(function () {
     Route::prefix('employee')->group(function () {
-        Route::get('/', [UnauthenticatedController::class, 'viewRegisterEmployeePage'])->name('unauth/register/employee');
-        Route::get('/success', [UnauthenticatedController::class, 'viewRegistrationSuccessfulPage'])->name('unauth/register/employee/success');
+        Route::get('/', [UnauthenticatedController::class, 'viewRegisterEmployeePage'])->name('unauth.employees.register.view');
+        Route::get('/success', [UnauthenticatedController::class, 'viewRegistrationSuccessfulPage'])->name('unauth.employees.register.success');
 
-        Route::post('/submit', [UnauthenticatedController::class, 'submitEmployeeRegistration'])->name('unauth/register/employee/submit');
+        Route::post('/submit', [UnauthenticatedController::class, 'submitEmployeeRegistration'])->name('unauth.employees.register.submit');
     });
 });
 
@@ -149,7 +149,7 @@ Route::middleware([
                 Route::get('/view', [CompanyController::class, 'view'])->name('infrastructure.companies.viewReadOnlyPageById');
 
                 Route::post('/add', [CompanyController::class, 'store'])->name('infrastructure.companies.create');
-                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('infrastructure.companyPhoto.delete');
+                Route::post('/delete-photo', [CompanyController::class, 'deletePhoto'])->name('infrastructure.companies.photo.delete');
                 Route::post('/delete', [CompanyController::class, 'destroy'])->name('infrastructure.companies.delete');
                 Route::post('/edit-bulk', [CompanyController::class, 'bulkUpdate'])->name('infrastructure.companies.bulkUpdate');
                 Route::post('/edit', [CompanyController::class, 'update'])->name('infrastructure.companies.update');
@@ -164,7 +164,7 @@ Route::middleware([
                 Route::get('/view', [StoreController::class, 'view'])->name('infrastructure.stores.viewReadOnlyPageById');
 
                 Route::post('/add', [StoreController::class, 'store'])->name('infrastructure.stores.create');
-                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('infrastructure.storePhoto.delete');
+                Route::post('/delete-photo', [StoreController::class, 'deletePhoto'])->name('infrastructure.stores.photo.delete');
                 Route::post('/delete', [StoreController::class, 'destroy'])->name('infrastructure.stores.delete');
                 Route::post('/edit-bulk', [StoreController::class, 'bulkUpdate'])->name('infrastructure.stores.bulkUpdate');
                 Route::post('/edit', [StoreController::class, 'update'])->name('infrastructure.stores.update');
@@ -181,7 +181,7 @@ Route::middleware([
                 Route::get('/view', [SupplierController::class, 'view'])->name('infrastructure.suppliers.viewReadOnlyPageById');
 
                 Route::post('/add', [SupplierController::class, 'store'])->name('infrastructure.suppliers.create');
-                Route::post('/delete-photo', [SupplierController::class, 'deletePhoto'])->name('infrastructure.supplierPhoto.delete');
+                Route::post('/delete-photo', [SupplierController::class, 'deletePhoto'])->name('infrastructure.suppliers.photo.delete');
                 Route::post('/delete', [SupplierController::class, 'destroy'])->name('infrastructure.suppliers.delete');
                 Route::post('/edit-bulk', [SupplierController::class, 'bulkUpdate'])->name('infrastructure.suppliers.bulkUpdate');
                 Route::post('/edit', [SupplierController::class, 'update'])->name('infrastructure.suppliers.update');
@@ -204,7 +204,7 @@ Route::middleware([
                 Route::get('/view', [BrandController::class, 'view'])->name('commerce.brands.viewReadOnlyPageById');
 
                 Route::post('/add', [BrandController::class, 'store'])->name('commerce.brands.create');
-                Route::post('/delete-photo', [BrandController::class, 'deletePhoto'])->name('commerce.brandPhoto.delete');
+                Route::post('/delete-photo', [BrandController::class, 'deletePhoto'])->name('commerce.brands.photo.delete');
                 Route::post('/delete', [BrandController::class, 'destroy'])->name('commerce.brands.delete');
                 Route::post('/edit-bulk', [BrandController::class, 'bulkUpdate'])->name('commerce.brands.bulkUpdate');
                 Route::post('/edit', [BrandController::class, 'update'])->name('commerce.brands.update');
@@ -221,12 +221,9 @@ Route::middleware([
                 Route::get('/view', [CategoryController::class, 'view'])->name('commerce.categories.viewReadOnlyPageById');
 
                 Route::post('/add', [CategoryController::class, 'store'])->name('commerce.categories.create');
-                Route::post('/delete-photo', [CategoryController::class, 'deletePhoto'])->name('commerce.categoryPhoto.delete');
                 Route::post('/delete', [CategoryController::class, 'destroy'])->name('commerce.categories.delete');
                 Route::post('/edit-bulk', [CategoryController::class, 'bulkUpdate'])->name('commerce.categories.bulkUpdate');
                 Route::post('/edit', [CategoryController::class, 'update'])->name('commerce.categories.update');
-                Route::post('/export', [CategoryController::class, 'exportCsv'])->name('commerce.categories.export');
-                Route::post('/import', [CategoryController::class, 'importCsv'])->name('commerce.categories.import');
             });
 
             Route::get('/items', function () {

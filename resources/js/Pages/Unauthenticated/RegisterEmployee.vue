@@ -31,14 +31,14 @@ const submit = () => {
       ...data,
       organisationKey: organisationKeyForm.organisationKey,
     }))
-    .post(route('unauth/register/employee/submit'));
+    .post(route('unauth.employees.register.submit'));
 };
 const checkOrganisationKey = () => {
   showFlashError.value = true;
-  organisationKeyForm.get(route('unauth/register/employee'));
+  organisationKeyForm.get(route('unauth.employees.register.view'));
 };
 const resetPage = () => {
-  router.visit(route('unauth/register/employee'));
+  router.visit(route('unauth.employees.register.view'));
 };
 </script>
 
@@ -50,7 +50,7 @@ const resetPage = () => {
       <form class="flex flex-col gap-12 px-6 py-6" @submit.prevent="submit">
         <div class="flex flex-col gap-4">
           <div>
-            <button type="button" class="btn btn-link pl-0" @click="router.get(route('unauth/login'))">
+            <button type="button" class="btn btn-link pl-0" @click="router.get(route('unauth.employees.login'))">
               <ArrowLeftIcon class="h-3 w-3 text-primary" /><span>Back</span>
             </button>
           </div>
@@ -112,7 +112,11 @@ const resetPage = () => {
           />
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <button type="button" class="btn btn-secondary text-gray-200" @click="router.get(route('unauth/login'))">
+          <button
+            type="button"
+            class="btn btn-secondary text-gray-200"
+            @click="router.get(route('unauth.employees.login'))"
+          >
             Back
           </button>
           <button type="submit" class="btn btn-primary">Submit</button>

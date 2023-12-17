@@ -1,5 +1,7 @@
 <script setup>
 import StickyFooter from '@/Components/AdminPages/AddOrEdit/StickyFooter.vue';
+import GenericFormFields from '@/Components/Shared/GenericFormFields.vue';
+import { COMPANY_CREATE_FORM_FIELDS } from '@/Constants/CompanyCreate';
 import CompanyLayout from '@/Pages/Admin/Infrastructure/Companies/CompanyLayout.vue';
 import { getImgSrcFromPath } from '@/Util/Photo';
 import { PhotoIcon, XMarkIcon } from '@heroicons/vue/24/outline';
@@ -11,17 +13,6 @@ const props = defineProps({
   errorMessage: String,
   company: Object | undefined,
 });
-const inputFields = [
-  { key: 'company_name', title: 'Company Name' },
-  { key: 'company_photo', title: 'Company Photo' },
-  { key: 'active', title: 'Active' },
-  { key: 'address_1', title: 'Address Line 1' },
-  { key: 'address_2', title: 'Address Line 2' },
-  { key: 'phone_number', title: 'Phone Number' },
-  { key: 'mobile_number', title: 'Mobile Number' },
-  { key: 'website', title: 'Website URL' },
-  { key: 'img_url', title: 'Image URL' },
-];
 const companyForm = useForm({
   company_name: props.company?.company_name ?? '',
   active: props.company?.active === 0 ? false : true,
@@ -84,7 +75,7 @@ const submit = () => {
 };
 const deletePhoto = () => {
   if (props.company && confirm('Are you sure you want to remove this photo? It is not recoverable.')) {
-    router.post(route('infrastructure.companyPhoto.delete'), {
+    router.post(route('infrastructure.companies.photo.delete'), {
       id: props.company.id,
       img_path: props.company.img_path,
     });
@@ -99,8 +90,8 @@ const deletePhoto = () => {
     <form class="flex h-full flex-col gap-x-6 gap-y-8 px-4 pt-4 sm:px-6 lg:px-8" @submit.prevent="submit">
       <div class="flex flex-grow flex-col gap-x-6 gap-y-8">
         <div class="grid grid-cols-1 gap-x-6 gap-y-8 pb-12 sm:grid-cols-6">
-          <div class="sm:col-span-4" v-for="input in inputFields" :key="input.key">
-            <template v-if="input.key === 'company_photo'">
+          <div class="sm:col-span-4" v-for="field in COMPANY_CREATE_FORM_FIELDS.entries()" :key="field.key">
+            <template v-if="field[0] === 'company_photo'">
               <label for="company_photo" class="block text-sm font-medium leading-6 text-gray-900">Company Photo</label>
               <div
                 class="mt-2 flex max-w-lg justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
@@ -160,30 +151,13 @@ const deletePhoto = () => {
                 </div>
               </div>
             </template>
-            <template v-else-if="input.key === 'active'">
-              <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Active</label>
-              <div class="mt-2">
-                <input type="checkbox" name="active" class="toggle toggle-primary" v-model="companyForm.active" />
-              </div>
-            </template>
             <template v-else>
-              <label :for="input.key" class="block text-sm font-medium leading-6 text-gray-900">{{
-                input.title
-              }}</label>
-              <div class="mt-2 flex flex-col gap-1">
-                <input
-                  type="text"
-                  :id="input.key"
-                  :name="input.key"
-                  class="input input-bordered w-full max-w-lg"
-                  v-model="companyForm[input.key]"
-                  :class="companyForm.errors[input.key] ? 'border-error' : ''"
-                  @input="() => companyForm.clearErrors(input.key)"
-                />
-                <span v-if="companyForm.errors[input.key]" class="text-error">
-                  {{ companyForm.errors[input.key] }}
-                </span>
-              </div>
+              <GenericFormFields
+                :form="companyForm"
+                :label="field[1].label"
+                :name="field[1].name"
+                :type="field[1].type"
+              />
             </template>
           </div>
         </div>

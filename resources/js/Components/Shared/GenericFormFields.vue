@@ -83,6 +83,9 @@ const popover = ref({
         @input="() => form.clearErrors(name)"
       ></textarea>
     </template>
+    <template v-else-if="type === 'toggle'">
+      <input type="checkbox" :name="name" class="toggle toggle-primary" v-model="form[name]" />
+    </template>
     <span v-if="form.errors[name]" class="text-error">
       {{ form.errors[name] }}
     </span>

@@ -56,7 +56,7 @@ const submit = () => {
               class="flex flex-col items-start gap-1 text-xs text-gray-500 md:flex-row md:items-center md:gap-2 md:leading-6"
             >
               <p>New employee?</p>
-              <Link :href="route('unauth/register/employee')" class="underline hover:text-gray-900"
+              <Link :href="route('unauth.employees.register.view')" class="underline hover:text-gray-900"
                 >Register here with your organisation key.</Link
               >
             </div>

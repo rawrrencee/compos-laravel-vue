@@ -31,7 +31,7 @@ class JetstreamServiceProvider extends ServiceProvider
         $this->configurePermissions();
 
         Fortify::loginView(function () {
-            return to_route('unauth/login');
+            return to_route('unauth.employees.login');
         });
 
         Jetstream::createTeamsUsing(CreateTeam::class);

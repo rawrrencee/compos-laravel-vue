@@ -39,7 +39,7 @@ class UnauthenticatedController extends Controller
             $authenticated = $this->EmployeeRequestController->validateEmployeeKey($request['organisationKey']);
 
             if (!$authenticated) {
-                return redirect()->route('unauth/register/employee')
+                return redirect()->route('unauth.employees.register.view')
                     ->with('show', true)
                     ->with('type', 'default')
                     ->with('status', 'error')
