@@ -2009,7 +2009,7 @@ class HardcodedDataController extends Controller
     {
         $identityTypes = array(
             array(
-                'key' => 'UENLC',
+                'key' => 'UEN',
                 'value' => 'UEN LOCAL COMPANY'
             ),
             array(
