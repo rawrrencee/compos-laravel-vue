@@ -12,12 +12,19 @@ import AdminAlert from '../../../../Components/AdminLayout/AdminAlert.vue';
 const props = defineProps({
   errorMessage: String,
   company: Object | undefined,
+  countries: Array,
+  currencies: Array,
+  companyIdentityTypes: Array,
 });
 const companyForm = useForm({
   company_name: props.company?.company_name ?? '',
+  identity_type: props.company?.identity_type ?? '',
+  identity_number: props.company?.identity_number ?? '',
+  currency: props.company?.currency ?? '',
   active: props.company?.active === 0 ? false : true,
   address_1: props.company?.address_1 ?? '',
   address_2: props.company?.address_2 ?? '',
+  country: props.company?.country ?? '',
   email: props.company?.email ?? '',
   phone_number: props.company?.phone_number ?? '',
   mobile_number: props.company?.mobile_number ?? '',
@@ -150,6 +157,47 @@ const deletePhoto = () => {
                   </div>
                 </div>
               </div>
+            </template>
+            <template v-else-if="['country', 'nationality'].includes(field[0])">
+              <GenericFormFields
+                :data="{
+                  dropdown: {
+                    disabledSelect: {
+                      label: 'Select a country',
+                    },
+                    options: countries?.map((c) => ({
+                      key: c.num_code,
+                      value: c.en_short_name,
+                      text: c.en_short_name,
+                    })),
+                  },
+                }"
+                :form="companyForm"
+                :label="field[1].label"
+                :name="field[1].name"
+                :type="field[1].type"
+              />
+            </template>
+            <template v-else-if="['identity_type', 'currency'].includes(field[0])">
+              <GenericFormFields
+                :data="{
+                  dropdown: {
+                    disabledSelect: {
+                      label: `Select a ${field[0].replace('_', ' ')}`,
+                    },
+                    options: (field[0] === 'identity_type' ? companyIdentityTypes : currencies)?.map((c) => ({
+                      key: c.key,
+                      value: c.value,
+                      text:
+                        field[0] === 'identity_type' ? c.value : `${c.value}${c.symbol ? `&nbsp;(${c.symbol})` : ''}`,
+                    })),
+                  },
+                }"
+                :form="companyForm"
+                :label="field[1].label"
+                :name="field[1].name"
+                :type="field[1].type"
+              />
             </template>
             <template v-else>
               <GenericFormFields

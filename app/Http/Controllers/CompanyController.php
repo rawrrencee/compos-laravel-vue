@@ -14,10 +14,12 @@ use Inertia\Inertia;
 class CompanyController extends Controller
 {
     protected $CommonController;
+    protected $HardcodedDataController;
 
-    public function __construct(CommonController $CommonController)
+    public function __construct(CommonController $CommonController, HardcodedDataController $HardcodedDataController)
     {
         $this->CommonController = $CommonController;
+        $this->HardcodedDataController = $HardcodedDataController;
     }
 
     public function index(Request $request)
@@ -126,20 +128,18 @@ class CompanyController extends Controller
         return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
     }
 
+    public function viewCreatePage()
+    {
+        return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
+            'countries' => $this->HardcodedDataController->getCountries(),
+            'currencies' => $this->HardcodedDataController->getCurrencies(),
+            'companyIdentityTypes' => $this->HardcodedDataController->getCompanyIdentityTypes(),
+        ]);
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'company_name' => 'required|max:255',
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
-        ]);
+        $this->getCompanyValidator($request->all(), false)->validate();
 
         if (!empty($request['company_photo'])) {
             $path = $request->file('company_photo')->store('company-photos', 'private');
@@ -179,24 +179,17 @@ class CompanyController extends Controller
             return redirect()->route('404');
         }
 
-        return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', ['company' => $company]);
+        return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany', [
+            'company' => $company,
+            'countries' => $this->HardcodedDataController->getCountries(),
+            'currencies' => $this->HardcodedDataController->getCurrencies(),
+            'companyIdentityTypes' => $this->HardcodedDataController->getCompanyIdentityTypes(),
+        ]);
     }
 
     public function update(Request $request)
     {
-        $request->validate([
-            'id' => 'required',
-            'company_name' => 'required|max:255',
-            'address_1' => 'nullable|max:255',
-            'address_2' => 'nullable|max:255',
-            'phone_number' => 'nullable|max:255',
-            'mobile_number' => 'nullable|max:255',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'img_url' => 'nullable|url',
-            'active' => 'required|boolean',
-            'company_photo' => 'nullable|image',
-        ]);
+        $this->getCompanyValidator($request->all(), true)->validate();
 
         $company = Company::find($request['id']);
 
@@ -526,5 +519,31 @@ class CompanyController extends Controller
     public function getValidCompanies()
     {
         return Company::all();
+    }
+
+    public function getCompanyValidator(array $requestArray, bool $isEdit)
+    {
+        $rules = [
+            'company_name' => 'required|max:255',
+            'identity_type' => 'required|max:255',
+            'identity_number' => 'required|max:255',
+            'currency' => 'nullable|max:255',
+            'address_1' => 'nullable|max:255',
+            'address_2' => 'nullable|max:255',
+            'country' => 'nullable|max:255',
+            'phone_number' => 'nullable|max:255',
+            'mobile_number' => 'nullable|max:255',
+            'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'img_url' => 'nullable|url',
+            'active' => 'required|boolean',
+            'company_photo' => 'nullable|image',
+        ];
+
+        if ($isEdit) {
+            $rules['id'] = 'required|exists:companies,id';
+        }
+
+        return Validator::make($requestArray, $rules);
     }
 }

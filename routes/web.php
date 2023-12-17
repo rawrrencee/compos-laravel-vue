@@ -142,9 +142,7 @@ Route::middleware([
 
             Route::prefix('companies')->group(function () {
                 Route::get('/', [CompanyController::class, 'index'])->name('infrastructure.companies.viewLandingPage');
-                Route::get('/add', function () {
-                    return Inertia::render('Admin/Infrastructure/Companies/AddOrEditCompany');
-                })->name('infrastructure.companies.viewCreatePage');
+                Route::get('/add', [CompanyController::class, 'viewCreatePage'])->name('infrastructure.companies.viewCreatePage');
                 Route::get('/edit', [CompanyController::class, 'edit'])->name('infrastructure.companies.viewEditPageById');
                 Route::get('/view', [CompanyController::class, 'view'])->name('infrastructure.companies.viewReadOnlyPageById');
 
