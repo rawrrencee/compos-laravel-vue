@@ -2842,6 +2842,10 @@ class HardcodedDataController extends Controller
             ),
         );
 
+        foreach ($currencies as &$currency) {
+            $currency['symbol'] = html_entity_decode($currency['symbol']);
+        }
+
         return $currencies;
     }
 

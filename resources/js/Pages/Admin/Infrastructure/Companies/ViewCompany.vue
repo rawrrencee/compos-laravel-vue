@@ -14,8 +14,12 @@ const props = defineProps({
 
 const editUrl = `infrastructure.companies.viewEditPageById`;
 const viewCompanyLabels = [
+  { key: 'identity_type', title: 'Identity Type' },
+  { key: 'identity_number', title: 'Identity Number' },
+  { key: 'currency', title: 'Currency' },
   { key: 'address_1', title: 'Address Line 1' },
   { key: 'address_2', title: 'Address Line 2' },
+  { key: 'country', title: 'Country' },
   { key: 'phone_number', title: 'Phone Number' },
   { key: 'mobile_number', title: 'Mobile Number' },
   { key: 'website', title: 'Website URL' },

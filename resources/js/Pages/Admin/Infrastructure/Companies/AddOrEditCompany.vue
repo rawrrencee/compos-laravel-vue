@@ -168,7 +168,7 @@ const deletePhoto = () => {
                       label: 'Select a country',
                     },
                     options: countries?.map((c) => ({
-                      key: c.num_code,
+                      key: c.alpha_3_code,
                       value: c.alpha_3_code,
                       text: c.en_short_name,
                     })),

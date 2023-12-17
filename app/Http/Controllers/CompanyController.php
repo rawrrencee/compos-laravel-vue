@@ -125,6 +125,19 @@ class CompanyController extends Controller
             return redirect()->route('infrastructure.companies.viewLandingPage');
         }
 
+        $company['identity_type'] = $this->CommonController->findValueByKey($this->HardcodedDataController->getCompanyIdentityTypes(), $company['identity_type']);
+        $currencies = $this->HardcodedDataController->getCurrencies();
+        $currencyLabel = $this->CommonController->findValueByKey($currencies, $company['currency']);
+        if (isset($currencyLabel)) {
+            $symbol = $this->CommonController->findValueByKey($currencies, $company['currency'], 'key', 'symbol');
+            if ($symbol) {
+                $currencyWithSymbol = $currencyLabel . ' (' . html_entity_decode($symbol) . ')';
+            }
+        }
+
+        $company['currency'] = $currencyWithSymbol;
+        $company['country'] = $this->CommonController->findValueByKey($this->HardcodedDataController->getCountries(), $company['country'], 'alpha_3_code', 'en_short_name');
+
         return Inertia::render('Admin/Infrastructure/Companies/ViewCompany', ['viewCompany' => $company]);
     }
 
@@ -243,18 +256,7 @@ class CompanyController extends Controller
             // Loop through each company data
             foreach ($companies as $companyData) {
                 // Validate the data
-                $validator = Validator::make($companyData, [
-                    'id' => 'required|exists:companies,id',
-                    'company_name' => 'required|max:255',
-                    'address_1' => 'nullable|max:255',
-                    'address_2' => 'nullable|max:255',
-                    'phone_number' => 'nullable|max:255',
-                    'mobile_number' => 'nullable|max:255',
-                    'email' => 'nullable|email',
-                    'website' => 'nullable|url',
-                    'img_url' => 'nullable|url',
-                    'active' => 'required|boolean',
-                ]);
+                $validator = $this->getCompanyValidator($companyData, true);
 
                 // If validation fails, stop and return error
                 if ($validator->fails()) {

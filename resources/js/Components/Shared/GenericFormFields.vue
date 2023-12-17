@@ -46,7 +46,7 @@ const popover = ref({
           <option disabled selected>{{ data.dropdown.disabledSelect.label }}</option>
         </template>
         <option v-for="(opt, index) in data?.dropdown?.options ?? []" :key="opt.key ?? index" :value="opt.value">
-          <span v-html="opt.text"></span>
+          {{ opt.text }}
         </option>
       </select>
     </template>

@@ -45,6 +45,16 @@ class CommonController extends Controller
         return false;
     }
 
+    function findValueByKey($array, $searchKey, $keyName = 'key', $valueName = 'value')
+    {
+        foreach ($array as $item) {
+            if ($item[$keyName] === $searchKey) {
+                return $item[$valueName];
+            }
+        }
+        return null;
+    }
+
     public function formatUtcDateToSingaporeDate(?string $dateString)
     {
         if (empty($dateString)) return null;

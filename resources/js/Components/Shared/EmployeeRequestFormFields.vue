@@ -60,7 +60,7 @@ defineProps({
                 label: 'Select a country',
               },
               options: countries?.map((c) => ({
-                key: c.num_code,
+                key: c.alpha_3_code,
                 value: c.alpha_3_code,
                 text: field[0] === 'country' ? c.en_short_name : c.nationality,
               })),
