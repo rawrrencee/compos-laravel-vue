@@ -41,6 +41,8 @@ Route::get('/404', function () {
 Route::prefix('register')->group(function () {
     Route::prefix('employee')->group(function () {
         Route::get('/', [UnauthenticatedController::class, 'viewRegisterEmployeePage'])->name('unauth/register/employee');
+        Route::get('/success', [UnauthenticatedController::class, 'viewRegistrationSuccessfulPage'])->name('unauth/register/employee/success');
+
         Route::post('/submit', [UnauthenticatedController::class, 'submitEmployeeRegistration'])->name('unauth/register/employee/submit');
     });
 });

@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmployeeRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class UnauthenticatedController extends Controller
 {
@@ -58,47 +63,68 @@ class UnauthenticatedController extends Controller
     {
         $authenticated = $this->EmployeeRequestController->validateEmployeeKey($request['organisationKey']);
 
-        if ($authenticated) {
+        if (!$authenticated) {
             return $this->CommonController->redirectBackWithGenericError();
         }
 
-        $request->validate([
+        $requestArray = $request->all();
+        $this->getSubmitEmployeeRegistrationValidator($requestArray)->validate();
+
+        try {
+            DB::beginTransaction();
+
+            $requestArray['password'] = Hash::make($request['password']);
+            $requestArray['commencement_date'] = $this->CommonController->formatUtcDateToSimpleDate($request['commencement_date']);
+            $requestArray['date_of_birth'] = $this->CommonController->formatUtcDateToSimpleDate($request['date_of_birth']);
+            $requestArray['pr_conversion_date'] = $this->CommonController->formatUtcDateToSimpleDate($request['pr_conversion_date']);
+
+            EmployeeRequest::create($requestArray);
+            DB::commit();
+
+            return Inertia::render('Unauthenticated/RegistrationSuccessful', [
+                'username' => 'test',
+                'email' => 'test',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory', [
+                'errorMessage' => 'Failed to create record: ' . $this->CommonController->formatException($e),
+            ]);
+        }
+    }
+
+    private function getSubmitEmployeeRegistrationValidator(array $requestArray)
+    {
+        return Validator::make($requestArray, [
             'username' => 'required',
             'email' => 'required|email',
             'password' => 'required',
             'commencement_date' => 'required',
             'first_name' => 'required',
-            'middle_name' => 'required',
             'last_name' => 'required',
             'preferred_name' => 'required',
-            'nric' => 'required',
-            'phone_number' => 'required',
+            'identity_type' => 'required',
+            'identity_number' => 'required',
             'mobile_number' => 'required',
             'address_1' => 'required',
             'address_2' => 'required',
-            'address_3' => 'required',
-            'address_4' => 'required',
             'city' => 'required',
             'state' => 'required',
             'postal_code' => 'required',
             'country' => 'required',
             'gender' => 'required',
             'race' => 'required',
-            'ethnic_name' => 'required',
             'date_of_birth' => 'required',
             'nationality' => 'required',
             'residency_status' => 'required',
-            'pr_conversion_date' => 'required',
             'emergency_name' => 'required',
             'emergency_relationship' => 'required',
             'emergency_address_1' => 'required',
             'emergency_address_2' => 'required',
-            'emergency_address_3' => 'required',
-            'emergency_address_4' => 'required',
             'emergency_contact_number' => 'required',
             'bank_name' => 'required',
             'bank_account_number' => 'required',
-            'remarks' => 'required',
         ]);
     }
 }

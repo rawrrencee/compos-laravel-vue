@@ -2118,4 +2118,19 @@ class HardcodedDataController extends Controller
 
         return $statuses;
     }
+
+    public function getFrontendUtcDateTimeFormat()
+    {
+        return 'Y-m-d\TH:i:s.u\Z';
+    }
+
+    public function getTimezone()
+    {
+        return 'Asia/Singapore';
+    }
+
+    public function getSqlDateTimeFormat()
+    {
+        return 'Y-m-d H:i:s';
+    }
 }

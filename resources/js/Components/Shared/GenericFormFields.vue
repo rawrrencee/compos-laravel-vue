@@ -40,6 +40,7 @@ const popover = ref({
         :disabled="disabled"
         :name="name"
         v-model="form[name]"
+        @input="() => form.clearErrors(name)"
       >
         <template v-if="data?.dropdown?.disabledSelect">
           <option disabled selected>{{ data.dropdown.disabledSelect.label }}</option>
@@ -50,7 +51,12 @@ const popover = ref({
       </select>
     </template>
     <template v-else-if="type === 'date'">
-      <DatePicker v-model="form[name]" :input-debounce="500" :popover="popover">
+      <DatePicker
+        v-model="form[name]"
+        :input-debounce="500"
+        :popover="popover"
+        @update:modelValue="() => form.clearErrors(name)"
+      >
         <template #default="{ inputValue, inputEvents }">
           <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -74,6 +80,7 @@ const popover = ref({
         :disabled="disabled"
         :name="name"
         v-model="form[name]"
+        @input="() => form.clearErrors(name)"
       ></textarea>
     </template>
     <span v-if="form.errors[name]" class="text-error">
