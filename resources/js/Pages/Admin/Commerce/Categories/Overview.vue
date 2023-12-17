@@ -3,7 +3,6 @@ import DialogBulkEdit from '@/Components/AdminPages/Overview/DialogBulkEdit.vue'
 import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { computed, ref, watch } from 'vue';
 import Error404 from '../../../../Components/AdminPages/Error404.vue';
 import NoResults from '../../../../Components/AdminPages/NoResults.vue';
@@ -35,7 +34,6 @@ const tableFilterOptions = useForm({
 });
 const addNewUrl = `commerce.categories.create`;
 const editUrl = `commerce.categories.update`;
-const exportUrl = `${route('commerce.categories.export')}`;
 const tableHeaderTitles = [
   { key: 'category_name', title: 'Category Name' },
   { key: 'category_code', title: 'Category Code' },
@@ -52,7 +50,6 @@ const inputFields = [
 const isEditDialogOpen = ref(false);
 const editCategoryForms = ref([]);
 const editBulkActive = ref(false);
-const isImportDialogOpen = ref(false);
 const isLoading = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
@@ -109,22 +106,6 @@ const onDeleteRowsClicked = (rows) => {
       },
     }
   );
-};
-const onDownloadFileClicked = (url, data) => {
-  axios({
-    url,
-    method: 'POST',
-    responseType: 'blob',
-    data,
-  }).then((response) => {
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'categories.csv');
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  });
 };
 const onEditDialogCloseClicked = (shouldHideAlert = true) => {
   isEditDialogOpen.value = false;
@@ -194,14 +175,6 @@ const onToolbarBtnClicked = (event) => {
       break;
     case 'filter':
       showFilters.value = !showFilters.value;
-      break;
-    case 'import':
-      isImportDialogOpen.value = true;
-      break;
-    case 'export':
-      if (confirm('This action may take a long time depending on the amount of data. Do not close the browser.')) {
-        onDownloadFileClicked(exportUrl, { with_data: true });
-      }
       break;
     default:
       break;
