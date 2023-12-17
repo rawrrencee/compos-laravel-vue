@@ -30,6 +30,11 @@ const props = defineProps({
   employeeRequestKey: Object,
   employeeRequestStatuses: Array,
   viewEmployeeRequest: Object,
+  countries: Array,
+  genders: Array,
+  identityTypes: Array,
+  races: Array,
+  residencyStatuses: Array,
 });
 const employeeRequestKeyForm = useForm({
   global_value: props.employeeRequestKey?.global_value ?? '',
@@ -514,7 +519,14 @@ const onViewRequestCloseClicked = (val) => {
                     </template>
                   </div>
                   <div class="flex flex-col gap-4 pb-8">
-                    <EmployeeRequestFormFields :employee-request-form="employeeRequestForm" />
+                    <EmployeeRequestFormFields
+                      :employee-request-form="employeeRequestForm"
+                      :countries="countries"
+                      :genders="genders"
+                      :races="races"
+                      :identity-types="identityTypes"
+                      :residency-statuses="residencyStatuses"
+                    />
                   </div>
                   <StickyFooter
                     cancel-button-type="button"

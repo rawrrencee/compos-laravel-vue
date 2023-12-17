@@ -16,11 +16,13 @@ use Inertia\Inertia;
 class EmployeeRequestController extends Controller
 {
     protected $CommonController;
+    protected $HardcodedDataController;
     protected $EMPLOYEE_REQUEST_KEY;
 
-    public function __construct(CommonController $CommonController)
+    public function __construct(CommonController $CommonController, HardcodedDataController $HardcodedDataController)
     {
         $this->CommonController = $CommonController;
+        $this->HardcodedDataController = $HardcodedDataController;
         $this->EMPLOYEE_REQUEST_KEY = 'EMPLOYEE_REQUEST';
     }
 
@@ -123,7 +125,12 @@ class EmployeeRequestController extends Controller
             'tableFilterOptions' => $request['tableFilterOptions'],
             'employeeRequestKey' => $this->getEmployeeRequestKey(),
             'employeeRequestStatuses' => $this->getEmployeeRequestStatuses(),
-            'viewEmployeeRequest' => null
+            'viewEmployeeRequest' => null,
+            'countries' => $this->HardcodedDataController->getCountries(),
+            'genders' => $this->HardcodedDataController->getGenders(),
+            'identityTypes' => $this->HardcodedDataController->getIdentityTypes(),
+            'races' => $this->HardcodedDataController->getRaces(),
+            'residencyStatuses' => $this->HardcodedDataController->getResidencyStatuses(),
         ]);
     }
 
@@ -144,7 +151,12 @@ class EmployeeRequestController extends Controller
 
         return Inertia::render('Admin/Users/Employees/Requests', [
             'employeeRequestStatuses' => $this->getEmployeeRequestStatuses(),
-            'viewEmployeeRequest' => $employeeRequest
+            'viewEmployeeRequest' => $employeeRequest,
+            'countries' => $this->HardcodedDataController->getCountries(),
+            'genders' => $this->HardcodedDataController->getGenders(),
+            'identityTypes' => $this->HardcodedDataController->getIdentityTypes(),
+            'races' => $this->HardcodedDataController->getRaces(),
+            'residencyStatuses' => $this->HardcodedDataController->getResidencyStatuses(),
         ]);
     }
 
