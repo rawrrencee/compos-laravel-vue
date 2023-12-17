@@ -74,9 +74,9 @@ class UnauthenticatedController extends Controller
             DB::beginTransaction();
 
             $requestArray['password'] = Hash::make($request['password']);
-            $requestArray['commencement_date'] = $this->CommonController->formatUtcDateToSimpleDate($request['commencement_date']);
-            $requestArray['date_of_birth'] = $this->CommonController->formatUtcDateToSimpleDate($request['date_of_birth']);
-            $requestArray['pr_conversion_date'] = $this->CommonController->formatUtcDateToSimpleDate($request['pr_conversion_date']);
+            $requestArray['commencement_date'] = $this->CommonController->formatUtcDateToSingaporeDate($request['commencement_date']);
+            $requestArray['date_of_birth'] = $this->CommonController->formatUtcDateToSingaporeDate($request['date_of_birth']);
+            $requestArray['pr_conversion_date'] = $this->CommonController->formatUtcDateToSingaporeDate($request['pr_conversion_date']);
 
             EmployeeRequest::create($requestArray);
             DB::commit();

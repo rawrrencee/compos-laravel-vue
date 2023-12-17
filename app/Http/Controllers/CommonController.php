@@ -45,7 +45,7 @@ class CommonController extends Controller
         return false;
     }
 
-    public function formatUtcDateToSimpleDate(?string $dateString)
+    public function formatUtcDateToSingaporeDate(?string $dateString)
     {
         if (empty($dateString)) return null;
 
