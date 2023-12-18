@@ -7,6 +7,7 @@ import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessu
 import {
   BanknotesIcon,
   BuildingStorefrontIcon,
+  CalendarDaysIcon,
   ChartPieIcon,
   ClockIcon,
   CurrencyDollarIcon,
@@ -113,6 +114,11 @@ const adminNavigation = [
       { name: 'Employees', href: 'admin/users/employees' },
       { name: 'Customers', href: 'admin/users/customers' },
     ],
+  },
+  {
+    name: 'Timecards',
+    icon: CalendarDaysIcon,
+    href: 'admin/timecards',
   },
 ];
 // #endregion Page Variables

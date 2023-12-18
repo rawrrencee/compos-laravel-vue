@@ -246,10 +246,6 @@ Route::middleware([
                 return Inertia::render('Admin/Users/Users');
             })->name('admin/users');
 
-            Route::get('/permissions', function () {
-                return Inertia::render('Error/404');
-            })->name('admin/users/permissions');
-
             Route::prefix('employees')->group(function () {
                 Route::get('/', function () {
                     return Inertia::render('Admin/Users/Employees/Overview');
@@ -283,6 +279,12 @@ Route::middleware([
             Route::get('/customers', function () {
                 return Inertia::render('Error/404');
             })->name('admin/users/customers');
+        });
+
+        Route::prefix('timecards')->group(function () {
+            Route::get('/', function () {
+                return Inertia::render('Error/404');
+            })->name('admin/timecards');
         });
     });
 });

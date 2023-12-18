@@ -17,10 +17,6 @@ const secondaryNavigation = [
     href: 'admin/users/employees/salaries',
   },
   {
-    name: 'Timecards',
-    href: 'admin/users/employees/timecards',
-  },
-  {
     name: 'Designations',
     href: 'admin/users/employees/designations',
   },
