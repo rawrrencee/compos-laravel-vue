@@ -270,10 +270,11 @@ Route::middleware([
                     return Inertia::render('Error/404');
                 })->name('admin/users/employees/permissions');
 
-                Route::get('/requests', [EmployeeRequestController::class, 'index'])->name('admin/users/employees/requests');
-                Route::get('/requests/view', [EmployeeRequestController::class, 'view'])->name('admin/users/employees/requests/view');
+                Route::get('/requests', [EmployeeRequestController::class, 'index'])->name('users.employees.requests.viewLandingPage');
+                Route::get('/requests/view', [EmployeeRequestController::class, 'view'])->name('users.employees.requests.viewById');
 
-                Route::post('/updateEmployeeRequestKey', [EmployeeRequestController::class, 'updateEmployeeRequestKey'])->name('admin/users/employees/requests.key-update');
+                Route::post('/updateEmployeeRequestKey', [EmployeeRequestController::class, 'updateEmployeeRequestKey'])->name('users.employees.requests.updateKey');
+                Route::post('/updateEmployeeRequest', [EmployeeRequestController::class, 'updateEmployeeRequest'])->name('users.employees.requests.update');
             });
 
             Route::get('/customers', function () {

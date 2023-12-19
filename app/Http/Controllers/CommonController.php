@@ -90,6 +90,39 @@ class CommonController extends Controller
         return 'Message: ' . $e->getMessage() . ' Line: ' . $e->getLine();
     }
 
+    public function maskEmail($email)
+    {
+        // Split the email address into local and domain parts
+        list($localPart, $domainPart) = explode('@', $email);
+
+        // Get the length of the local part (before the '@' symbol)
+        $localPartLength = strlen($localPart);
+
+        // Determine the number of characters to display before truncation
+        $displayCharacters = min(3, $localPartLength); // Display at least 3 characters
+
+        // Create the masked email address
+        $maskedLocalPart = substr($localPart, 0, $displayCharacters) . str_repeat('*', $localPartLength - $displayCharacters);
+
+        // Return the masked email address
+        return $maskedLocalPart . '@' . $domainPart;
+    }
+
+    public function maskUsername($username)
+    {
+        // Get the length of the username
+        $usernameLength = strlen($username);
+
+        // Determine the number of characters to display before truncation
+        $displayCharacters = min(3, $usernameLength); // Display at least 3 characters
+
+        // Create the masked username
+        $maskedUsername = substr($username, 0, $displayCharacters) . str_repeat('*', $usernameLength - $displayCharacters);
+
+        // Return the masked username
+        return $maskedUsername;
+    }
+
     public function handleException(\Exception $e, String $type = 'default', String $messageModifier = 'update')
     {
         return redirect()->back()

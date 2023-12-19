@@ -126,8 +126,10 @@ class CompanyController extends Controller
         }
 
         $company['identity_type'] = $this->CommonController->findValueByKey($this->HardcodedDataController->getCompanyIdentityTypes(), $company['identity_type']);
+        $currencyWithSymbol = null;
         $currencies = $this->HardcodedDataController->getCurrencies();
         $currencyLabel = $this->CommonController->findValueByKey($currencies, $company['currency']);
+
         if (isset($currencyLabel)) {
             $symbol = $this->CommonController->findValueByKey($currencies, $company['currency'], 'key', 'symbol');
             if ($symbol) {

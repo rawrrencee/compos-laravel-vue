@@ -59,6 +59,13 @@ class UnauthenticatedController extends Controller
         ]);
     }
 
+    public function viewRegistrationSuccessfulPage()
+    {
+        return Inertia::render('Unauthenticated/RegistrationSuccessful', [
+            'companyName' => $this->CommonController->getCompanyName()
+        ]);
+    }
+
     public function submitEmployeeRegistration(Request $request)
     {
         $authenticated = $this->EmployeeRequestController->validateEmployeeKey($request['organisationKey']);
@@ -81,50 +88,26 @@ class UnauthenticatedController extends Controller
             EmployeeRequest::create($requestArray);
             DB::commit();
 
-            return Inertia::render('Unauthenticated/RegistrationSuccessful', [
-                'username' => 'test',
-                'email' => 'test',
-            ]);
+            $maskedUsername = $this->CommonController->maskUsername($request['username']);
+            $maskedEmail = $this->CommonController->maskEmail($request['email']);
+
+            $outputMessage = 'Your registration with username ' . $maskedUsername . ' was successful. You will be notified via your email, ' . $maskedEmail . ' once your account has been approved.';
+
+            return redirect()
+                ->route('unauth.employees.register.success')
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'success')
+                ->with('message', $outputMessage);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Inertia::render('Admin/Commerce/Categories/AddOrEditCategory', [
-                'errorMessage' => 'Failed to create record: ' . $this->CommonController->formatException($e),
-            ]);
+            return $this->CommonController->handleException($e, 'default', 'create');
         }
     }
 
     private function getSubmitEmployeeRegistrationValidator(array $requestArray)
     {
-        return Validator::make($requestArray, [
-            'username' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'commencement_date' => 'required',
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'preferred_name' => 'required',
-            'identity_type' => 'required',
-            'identity_number' => 'required',
-            'mobile_number' => 'required',
-            'address_1' => 'required',
-            'address_2' => 'required',
-            'city' => 'required',
-            'state' => 'required',
-            'postal_code' => 'required',
-            'country' => 'required',
-            'gender' => 'required',
-            'race' => 'required',
-            'date_of_birth' => 'required',
-            'nationality' => 'required',
-            'residency_status' => 'required',
-            'emergency_name' => 'required',
-            'emergency_relationship' => 'required',
-            'emergency_address_1' => 'required',
-            'emergency_address_2' => 'required',
-            'emergency_contact_number' => 'required',
-            'bank_name' => 'required',
-            'bank_account_number' => 'required',
-        ]);
+        return Validator::make($requestArray, $this->EmployeeRequestController->getEmployeeRequestValidatorRules(true));
     }
 }

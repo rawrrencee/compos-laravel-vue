@@ -9,6 +9,7 @@ use App\Models\GlobalSettings;
 use App\Rules\EnumValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -24,6 +25,11 @@ class EmployeeRequestController extends Controller
         $this->CommonController = $CommonController;
         $this->HardcodedDataController = $HardcodedDataController;
         $this->EMPLOYEE_REQUEST_KEY = 'EMPLOYEE_REQUEST';
+    }
+
+    public function getEmployeeRequestById(string $id)
+    {
+        return EmployeeRequest::whereId($id)->firstOrFail();
     }
 
     public function getEmployeeRequestKey()
@@ -189,5 +195,82 @@ class EmployeeRequestController extends Controller
 
             return $this->CommonController->handleException($e);
         }
+    }
+
+    public function updateEmployeeRequest(Request $request)
+    {
+        Validator::make($request->all(), $this->getEmployeeRequestValidatorRules(false))->validate();
+
+        try {
+            DB::beginTransaction();
+            $existing = $this->getEmployeeRequestById($request['id']);
+
+            if (empty($request['password'])) {
+                $request['password'] = $existing->password;
+            } else {
+                $request['password'] = Hash::make($request['password']);
+            }
+
+            if (isset($existing)) {
+                $existing->update($request->all());
+                DB::commit();
+            } else {
+                throw new \Exception("Employee Request not found.", 1);
+            }
+
+            return to_route('users.employees.requests.viewLandingPage')
+                ->with('show', true)
+                ->with('type', 'default')
+                ->with('status', 'success')
+                ->with('message', 'Employee Request updated successfully.')
+                ->with('route', 'users.employees.requests.viewById')
+                ->with('id', $existing->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return $this->CommonController->handleException($e);
+        }
+    }
+
+    public function getEmployeeRequestValidatorRules(bool $isUnauthenticated)
+    {
+        $rules = [
+            'username' => 'required',
+            'email' => 'required|email',
+            'commencement_date' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'preferred_name' => 'required',
+            'identity_type' => 'required',
+            'identity_number' => 'required',
+            'mobile_number' => 'required',
+            'address_1' => 'required',
+            'address_2' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'postal_code' => 'required',
+            'country' => 'required',
+            'gender' => 'required',
+            'race' => 'required',
+            'date_of_birth' => 'required',
+            'nationality' => 'required',
+            'residency_status' => 'required',
+            'emergency_name' => 'required',
+            'emergency_relationship' => 'required',
+            'emergency_address_1' => 'required',
+            'emergency_address_2' => 'required',
+            'emergency_contact_number' => 'required',
+            'bank_name' => 'required',
+            'bank_account_number' => 'required',
+        ];
+
+        if ($isUnauthenticated) {
+            $rules['password'] = 'required';
+        } else {
+            $rules['id'] = 'required|exists:employee_requests,id';
+            $rules['status'] = 'required';
+        }
+
+        return $rules;
     }
 }

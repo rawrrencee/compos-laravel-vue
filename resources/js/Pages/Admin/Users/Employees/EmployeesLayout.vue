@@ -26,7 +26,7 @@ const secondaryNavigation = [
   },
   {
     name: 'Requests',
-    href: 'admin/users/employees/requests',
+    href: 'users.employees.requests.viewLandingPage',
   },
 ];
 </script>

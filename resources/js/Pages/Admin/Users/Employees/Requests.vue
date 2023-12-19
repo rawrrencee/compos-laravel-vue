@@ -91,8 +91,8 @@ const appliedFilterCount = computed(() => {
 // #endregion Computed variables
 
 // #region Functions
-const onEditEmployeeRequestSaveClicked = () => {
-  employeeRequestKeyForm.post(route('admin/users/employees/requests.key-update'), {
+const onEditEmployeeRequestKeySaveClicked = () => {
+  employeeRequestKeyForm.post(route('users.employees.requests.updateKey'), {
     onStart: () => (isLoading.value = true),
     onFinish: () => {
       isLoading.value = false;
@@ -101,6 +101,21 @@ const onEditEmployeeRequestSaveClicked = () => {
       }
     },
   });
+};
+
+const onEditEmployeeRequestSaveClicked = () => {
+  employeeRequestForm
+    .transform((data) => ({ ...data, id: props.viewEmployeeRequest?.id }))
+    .post(route('users.employees.requests.update'), {
+      only: ['viewEmployeeRequest', 'flash', 'paginatedResults', 'sortBy', 'orderBy', 'tableFilterOptions'],
+      onStart: () => {
+        isLoading.value = true;
+      },
+      onFinish: () => {
+        isViewRequestDialogOpen.value = false;
+        isLoading.value = false;
+      },
+    });
 };
 
 const onGoToPageClicked = (data) => {
@@ -165,7 +180,7 @@ const onToolbarBtnClicked = (event) => {
 
 const onViewItemClicked = (id) => {
   router.get(
-    route('admin/users/employees/requests/view'),
+    route('users.employees.requests.viewById'),
     { id },
     {
       onStart: () => {},
@@ -183,7 +198,7 @@ const onViewRequestCloseClicked = (val) => {
   if (props?.paginatedResults?.path) {
     onGoToPageClicked();
   } else {
-    router.get(route('admin/users/employees/requests'));
+    router.get(route('users.employees.requests.viewLandingPage'));
   }
 };
 // #endregion Functions
@@ -203,7 +218,7 @@ const onViewRequestCloseClicked = (val) => {
         <form
           class="flex flex-col gap-2"
           v-if="editEmployeeRequestKey"
-          @submit.prevent="onEditEmployeeRequestSaveClicked"
+          @submit.prevent="onEditEmployeeRequestKeySaveClicked"
         >
           <div class="flex flex-col gap-1">
             <input
@@ -508,7 +523,7 @@ const onViewRequestCloseClicked = (val) => {
                     <template v-else>
                       <span class="text-md font-semibold leading-6 text-gray-900">Status</span>
                       <div class="flex flex-row items-center gap-4">
-                        <ColouredBadge data-type="enum" :data="viewEmployeeRequest.status" />
+                        <ColouredBadge data-type="enum" :data="viewEmployeeRequest?.status" />
                         <button type="button" class="btn btn-outline btn-xs" @click="isEditingRequestStatus = true">
                           <div class="flex items-center gap-2">
                             <PencilIcon class="h-3 w-3" />
@@ -532,8 +547,9 @@ const onViewRequestCloseClicked = (val) => {
                     cancel-button-type="button"
                     cancel-button-text="Cancel"
                     save-button-type="button"
-                    save-button-text="Approve"
+                    save-button-text="Update"
                     @cancel-clicked="onViewRequestCloseClicked(false)"
+                    @save-clicked="onEditEmployeeRequestSaveClicked()"
                   />
                 </DialogPanel>
               </TransitionChild>
