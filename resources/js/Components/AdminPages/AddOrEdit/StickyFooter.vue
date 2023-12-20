@@ -19,6 +19,10 @@ defineProps({
     type: String,
     default: 'Save',
   },
+  showSaveButton: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 defineEmits(['cancelClicked', 'saveClicked']);
@@ -36,6 +40,7 @@ defineEmits(['cancelClicked', 'saveClicked']);
         </button>
       </template>
       <button
+        v-if="showSaveButton"
         :type="saveButtonType"
         class="btn btn-primary sm:max-w-[10rem] sm:grow"
         @click="saveButtonType === 'button' && $emit('saveClicked')"

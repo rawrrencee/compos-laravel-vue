@@ -1,10 +1,15 @@
 <script setup>
 import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest.js';
+import { watch } from 'vue';
 import GenericFormFields from './GenericFormFields.vue';
 
-defineProps({
+const props = defineProps({
   employeeRequestForm: Object,
-  authenticated: {
+  isLoggedIn: {
+    type: Boolean,
+    default: false,
+  },
+  requestKeyAuthenticated: {
     type: Boolean,
     default: true,
   },
@@ -14,6 +19,14 @@ defineProps({
   races: Array,
   residencyStatuses: Array,
 });
+
+watch(
+  () => props.employeeRequestForm.change_password,
+  () => {
+    // Whenever change_password changes, reset the password field
+    props.employeeRequestForm.password = '';
+  }
+);
 </script>
 
 <template>
@@ -52,7 +65,17 @@ defineProps({
         <div class="pb-10 text-lg font-semibold leading-6" v-if="field[0] === 'remarks'">Other Information</div>
       </template>
 
-      <template v-if="['country', 'nationality'].includes(field[0])">
+      <template v-if="field[0] === 'password' && isLoggedIn">
+        <GenericFormFields
+          :disabled="!employeeRequestForm.change_password"
+          :form="employeeRequestForm"
+          :label="field[1].label"
+          :name="field[1].name"
+          :type="field[1].type"
+        />
+        <GenericFormFields label="Change Password" name="change_password" type="checkbox" :form="employeeRequestForm" />
+      </template>
+      <template v-else-if="['country', 'nationality'].includes(field[0])">
         <GenericFormFields
           :data="{
             dropdown: {
@@ -66,7 +89,7 @@ defineProps({
               })),
             },
           }"
-          :disabled="!authenticated"
+          :disabled="!requestKeyAuthenticated"
           :form="employeeRequestForm"
           :label="field[1].label"
           :name="field[1].name"
@@ -94,7 +117,7 @@ defineProps({
               })),
             },
           }"
-          :disabled="!authenticated"
+          :disabled="!requestKeyAuthenticated"
           :form="employeeRequestForm"
           :label="field[1].label"
           :name="field[1].name"
@@ -103,7 +126,7 @@ defineProps({
       </template>
       <template v-else>
         <GenericFormFields
-          :disabled="!authenticated"
+          :disabled="!requestKeyAuthenticated"
           :form="employeeRequestForm"
           :label="field[1].label"
           :name="field[1].name"

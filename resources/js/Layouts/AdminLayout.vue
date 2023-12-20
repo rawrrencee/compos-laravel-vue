@@ -6,8 +6,8 @@ import AdminStickyTopBar from '@/Components/AdminLayout/AdminStickyTopBar.vue';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import {
   BanknotesIcon,
+  BriefcaseIcon,
   BuildingStorefrontIcon,
-  CalendarDaysIcon,
   ChartPieIcon,
   ClockIcon,
   CurrencyDollarIcon,
@@ -109,16 +109,20 @@ const adminNavigation = [
   {
     name: 'Users',
     icon: UserGroupIcon,
-    href: 'admin/users',
+    href: 'users',
     children: [
-      { name: 'Employees', href: 'admin/users/employees' },
-      { name: 'Customers', href: 'admin/users/customers' },
+      { name: 'Employees', href: 'users.employees.viewLandingPage' },
+      { name: 'Customers', href: 'users.customers.viewLandingPage' },
     ],
   },
   {
-    name: 'Timecards',
-    icon: CalendarDaysIcon,
-    href: 'admin/timecards',
+    name: 'Management',
+    icon: BriefcaseIcon,
+    href: 'management',
+    children: [
+      { name: 'Timecards', href: 'management.timecards.viewLandingPage' },
+      { name: 'Salaries', href: 'management.salaries.viewLandingPage' },
+    ],
   },
 ];
 // #endregion Page Variables

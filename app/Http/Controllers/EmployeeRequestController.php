@@ -152,10 +152,10 @@ class EmployeeRequestController extends Controller
             ->first();
 
         if (!isset($employeeRequest)) {
-            return redirect()->route('admin/users/employees/requests');
+            return $this->CommonController->handleException(new \Exception("Employee Request not found.", 1), 'default', 'retrieve');
         }
 
-        return Inertia::render('Admin/Users/Employees/Requests', [
+        $renderWith = [
             'employeeRequestStatuses' => $this->getEmployeeRequestStatuses(),
             'viewEmployeeRequest' => $employeeRequest,
             'countries' => $this->HardcodedDataController->getCountries(),
@@ -163,7 +163,13 @@ class EmployeeRequestController extends Controller
             'identityTypes' => $this->HardcodedDataController->getIdentityTypes(),
             'races' => $this->HardcodedDataController->getRaces(),
             'residencyStatuses' => $this->HardcodedDataController->getResidencyStatuses(),
-        ]);
+        ];
+
+        if ($employeeRequest->status === EmployeeRequestStatus::APPROVED->value) {
+            $renderWith['flash'] = ['show' => true, 'type' => 'default', 'status' => 'success', 'message' => 'Approved Employee Requests can no longer be modified.'];
+        }
+
+        return Inertia::render('Admin/Users/Employees/ViewRequest', $renderWith);
     }
 
     public function updateEmployeeRequestKey(Request $request)

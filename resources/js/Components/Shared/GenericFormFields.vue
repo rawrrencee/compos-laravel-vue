@@ -3,6 +3,7 @@ import { CalendarIcon } from '@heroicons/vue/24/outline';
 import { DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 import { ref } from 'vue';
+import GenericDropdown from './GenericDropdown.vue';
 
 defineProps({
   form: Object,
@@ -19,7 +20,12 @@ const popover = ref({
 </script>
 
 <template>
-  <label :for="name" class="block text-sm font-medium leading-6 text-gray-900">{{ label }}</label>
+  <label
+    :for="name"
+    class="block text-sm font-medium leading-6 text-gray-900"
+    v-if="!['checkbox', 'dropdown'].includes(type)"
+    >{{ label }}</label
+  >
   <div class="flex flex-col gap-1">
     <template v-if="['email', 'number', 'password', 'text'].includes(type)">
       <input
@@ -34,21 +40,7 @@ const popover = ref({
       />
     </template>
     <template v-else-if="type === 'dropdown'">
-      <select
-        class="select select-bordered w-full disabled:bg-gray-300"
-        :class="form.errors[name] ? 'border-error' : ''"
-        :disabled="disabled"
-        :name="name"
-        v-model="form[name]"
-        @input="() => form.clearErrors(name)"
-      >
-        <template v-if="data?.dropdown?.disabledSelect">
-          <option disabled selected>{{ data.dropdown.disabledSelect.label }}</option>
-        </template>
-        <option v-for="(opt, index) in data?.dropdown?.options ?? []" :key="opt.key ?? index" :value="opt.value">
-          {{ opt.text }}
-        </option>
-      </select>
+      <GenericDropdown :form="form" :name="name" :label="label" :disabled="disabled" :data="data" />
     </template>
     <template v-else-if="type === 'date'">
       <DatePicker
@@ -82,6 +74,14 @@ const popover = ref({
         v-model="form[name]"
         @input="() => form.clearErrors(name)"
       ></textarea>
+    </template>
+    <template v-else-if="type === 'checkbox'">
+      <div class="flex flex-row">
+        <label class="label flex cursor-pointer flex-row gap-2 text-sm font-medium leading-6 text-gray-900">
+          <input type="checkbox" :name="name" class="checkbox-primary checkbox" v-model="form[name]" />
+          <span class="label-text">{{ label }}</span>
+        </label>
+      </div>
     </template>
     <template v-else-if="type === 'toggle'">
       <input type="checkbox" :name="name" class="toggle toggle-primary" v-model="form[name]" />

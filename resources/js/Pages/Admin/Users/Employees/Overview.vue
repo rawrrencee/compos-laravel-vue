@@ -119,7 +119,7 @@ const people = [
   },
 ];
 
-const addNewUrl = 'admin/users/employees/add';
+const addNewUrl = 'users.employees.viewCreatePage';
 const selectedPeople = ref([]);
 const indeterminate = computed(() => selectedPeople.value.length > 0 && selectedPeople.value.length < people.length);
 const showEditDeleteBtn = computed(() => selectedPeople.value.length > 0);

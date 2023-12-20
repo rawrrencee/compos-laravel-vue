@@ -244,32 +244,27 @@ Route::middleware([
         Route::prefix('users')->group(function () {
             Route::get('/', function () {
                 return Inertia::render('Admin/Users/Users');
-            })->name('admin/users');
+            })->name('users');
 
             Route::prefix('employees')->group(function () {
                 Route::get('/', function () {
                     return Inertia::render('Admin/Users/Employees/Overview');
-                })->name('admin/users/employees');
+                })->name('users.employees.viewLandingPage');
                 Route::get('/add', function () {
                     return Inertia::render('Admin/Users/Employees/AddNewEmployee');
-                })->name('admin/users/employees/add');
-
-                Route::get('/salaries', function () {
+                })->name('users.employees.viewCreatePage');
+                Route::get('/contracts', function () {
                     return Inertia::render('Error/404');
-                })->name('admin/users/employees/salaries');
-
-                Route::get('/timecards', function () {
+                })->name('users.employees.contracts.viewLandingPage');
+                Route::get('/insurance', function () {
                     return Inertia::render('Error/404');
-                })->name('admin/users/employees/timecards');
-
+                })->name('users.employees.insurance.viewLandingPage');
                 Route::get('/designations', function () {
                     return Inertia::render('Error/404');
-                })->name('admin/users/employees/designations');
-
+                })->name('users.employees.designations.viewLandingPage');
                 Route::get('/permissions', function () {
                     return Inertia::render('Error/404');
-                })->name('admin/users/employees/permissions');
-
+                })->name('users.employees.permissions.viewLandingPage');
                 Route::get('/requests', [EmployeeRequestController::class, 'index'])->name('users.employees.requests.viewLandingPage');
                 Route::get('/requests/view', [EmployeeRequestController::class, 'view'])->name('users.employees.requests.viewById');
 
@@ -279,13 +274,25 @@ Route::middleware([
 
             Route::get('/customers', function () {
                 return Inertia::render('Error/404');
-            })->name('admin/users/customers');
+            })->name('users.customers.viewLandingPage');
         });
 
-        Route::prefix('timecards')->group(function () {
+        Route::prefix('management')->group(function () {
             Route::get('/', function () {
                 return Inertia::render('Error/404');
-            })->name('admin/timecards');
+            })->name('management');
+
+            Route::prefix('timecards')->group(function () {
+                Route::get('/', function () {
+                    return Inertia::render('Error/404');
+                })->name('management.timecards.viewLandingPage');
+            });
+
+            Route::prefix('salaries')->group(function () {
+                Route::get('/', function () {
+                    return Inertia::render('Error/404');
+                })->name('management.salaries.viewLandingPage');
+            });
         });
     });
 });

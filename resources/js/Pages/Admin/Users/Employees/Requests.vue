@@ -1,5 +1,4 @@
 <script setup>
-import StickyFooter from '@/Components/AdminPages/AddOrEdit/StickyFooter.vue';
 import ColouredBadge from '@/Components/AdminPages/ColouredBadge.vue';
 import NoResults from '@/Components/AdminPages/NoResults.vue';
 import TableMain from '@/Components/AdminPages/Overview/TableMain.vue';
@@ -7,10 +6,8 @@ import TablePagination from '@/Components/AdminPages/Overview/TablePagination.vu
 import TableSortableHeader from '@/Components/AdminPages/Overview/TableSortableHeader.vue';
 import TableStickyFooter from '@/Components/AdminPages/Overview/TableStickyFooter.vue';
 import TableToolbar from '@/Components/AdminPages/Overview/TableToolbar.vue';
-import EmployeeRequestFormFields from '@/Components/Shared/EmployeeRequestFormFields.vue';
-import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest.js';
 import EmployeesLayout from '@/Pages/Admin/Users/Employees/EmployeesLayout.vue';
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { TransitionRoot } from '@headlessui/vue';
 import { EyeIcon, KeyIcon, PencilIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
@@ -51,23 +48,11 @@ const tableHeaderTitles = [
   { key: 'status', title: 'Status' },
   { key: 'created_at', title: 'Created At' },
 ];
-const employeeRequestForm = useForm(
-  Object.assign(
-    {},
-    ...[
-      ...Array.from(EMPLOYEE_REQUEST_FIELD_MAP, ([key]) => ({ [key]: props.viewEmployeeRequest?.[key]?.trim() ?? '' })),
-      { username: props.viewEmployeeRequest?.username?.replace(/\s+/g, '') ?? '' },
-      { status: props.viewEmployeeRequest?.status },
-    ]
-  )
-);
 // #endregion Page Variables
 
 // #region Ref variables
 const editEmployeeRequestKey = ref(false);
 const isLoading = ref(false);
-const isViewRequestDialogOpen = ref(!!props.viewEmployeeRequest);
-const isEditingRequestStatus = ref(false);
 const selectedTableRows = ref([]);
 const showFilters = ref(false);
 const tableSortOptions = ref({
@@ -101,21 +86,6 @@ const onEditEmployeeRequestKeySaveClicked = () => {
       }
     },
   });
-};
-
-const onEditEmployeeRequestSaveClicked = () => {
-  employeeRequestForm
-    .transform((data) => ({ ...data, id: props.viewEmployeeRequest?.id }))
-    .post(route('users.employees.requests.update'), {
-      only: ['viewEmployeeRequest', 'flash', 'paginatedResults', 'sortBy', 'orderBy', 'tableFilterOptions'],
-      onStart: () => {
-        isLoading.value = true;
-      },
-      onFinish: () => {
-        isViewRequestDialogOpen.value = false;
-        isLoading.value = false;
-      },
-    });
 };
 
 const onGoToPageClicked = (data) => {
@@ -179,27 +149,7 @@ const onToolbarBtnClicked = (event) => {
 };
 
 const onViewItemClicked = (id) => {
-  router.get(
-    route('users.employees.requests.viewById'),
-    { id },
-    {
-      onStart: () => {},
-      onFinish: () => {
-        isViewRequestDialogOpen.value = true;
-      },
-      only: ['viewEmployeeRequest'],
-      preserveScroll: true,
-    }
-  );
-};
-
-const onViewRequestCloseClicked = (val) => {
-  isViewRequestDialogOpen.value = val;
-  if (props?.paginatedResults?.path) {
-    onGoToPageClicked();
-  } else {
-    router.get(route('users.employees.requests.viewLandingPage'));
-  }
+  router.get(route('users.employees.requests.viewById'), { id });
 };
 // #endregion Functions
 </script>
@@ -461,102 +411,5 @@ const onViewRequestCloseClicked = (val) => {
         </div>
       </div>
     </div>
-
-    <TransitionRoot as="template" :show="isViewRequestDialogOpen">
-      <Dialog as="div" class="relative z-50" @close="onViewRequestCloseClicked">
-        <TransitionChild
-          as="template"
-          enter="ease-out duration-300"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="ease-in duration-200"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-hidden">
-          <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex">
-              <TransitionChild
-                as="template"
-                enter="ease-out duration-300"
-                enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enter-to="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leave-from="opacity-100 translate-y-0 sm:scale-100"
-                leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <DialogPanel
-                  class="pointer-events-auto relative w-screen transform overflow-x-hidden overflow-y-scroll rounded-lg bg-white px-4 pt-5 text-left shadow-xl transition-all sm:m-8 sm:max-w-xl sm:px-6"
-                >
-                  <div class="flex items-start justify-between pb-6">
-                    <span class="text-lg font-semibold leading-6 text-gray-900"> View Employee Request </span>
-                    <div class="ml-3 flex h-7 items-center">
-                      <button
-                        type="button"
-                        class="relative rounded-md bg-white text-gray-400 hover:text-gray-500"
-                        @click="onViewRequestCloseClicked(false)"
-                      >
-                        <span class="absolute -inset-2.5" />
-                        <span class="sr-only">Close panel</span>
-                        <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <template v-if="isEditingRequestStatus">
-                      <label for="employeeRequestStatus" class="block text-sm font-medium leading-6 text-gray-900"
-                        >Status</label
-                      >
-                      <select
-                        id="employeeRequestStatus"
-                        class="select select-bordered w-full"
-                        v-model="employeeRequestForm.status"
-                      >
-                        <option v-for="(status, index) in employeeRequestStatuses" :key="index" :value="status">
-                          {{ status }}
-                        </option>
-                      </select>
-                    </template>
-                    <template v-else>
-                      <span class="text-md font-semibold leading-6 text-gray-900">Status</span>
-                      <div class="flex flex-row items-center gap-4">
-                        <ColouredBadge data-type="enum" :data="viewEmployeeRequest?.status" />
-                        <button type="button" class="btn btn-outline btn-xs" @click="isEditingRequestStatus = true">
-                          <div class="flex items-center gap-2">
-                            <PencilIcon class="h-3 w-3" />
-                            <span>Edit</span>
-                          </div>
-                        </button>
-                      </div>
-                    </template>
-                  </div>
-                  <div class="flex flex-col gap-4 pb-8">
-                    <EmployeeRequestFormFields
-                      :employee-request-form="employeeRequestForm"
-                      :countries="countries"
-                      :genders="genders"
-                      :races="races"
-                      :identity-types="identityTypes"
-                      :residency-statuses="residencyStatuses"
-                    />
-                  </div>
-                  <StickyFooter
-                    cancel-button-type="button"
-                    cancel-button-text="Cancel"
-                    save-button-type="button"
-                    save-button-text="Update"
-                    @cancel-clicked="onViewRequestCloseClicked(false)"
-                    @save-clicked="onEditEmployeeRequestSaveClicked()"
-                  />
-                </DialogPanel>
-              </TransitionChild>
-            </div>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
   </EmployeesLayout>
 </template>

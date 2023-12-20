@@ -4,29 +4,39 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 const secondaryNavigation = [
   {
     name: 'Overview',
-    href: 'admin/users/employees',
+    href: 'users.employees.viewLandingPage',
     children: [
       {
         name: 'Add New Employee',
-        href: 'admin/users/employees/add',
+        href: 'users.employees.viewCreatePage',
       },
     ],
   },
   {
-    name: 'Salaries',
-    href: 'admin/users/employees/salaries',
+    name: 'Contracts',
+    href: 'users.employees.contracts.viewLandingPage',
+  },
+  {
+    name: 'Insurance',
+    href: 'users.employees.insurance.viewLandingPage',
   },
   {
     name: 'Designations',
-    href: 'admin/users/employees/designations',
+    href: 'users.employees.designations.viewLandingPage',
   },
   {
     name: 'Permissions',
-    href: 'admin/users/employees/permissions',
+    href: 'users.employees.permissions.viewLandingPage',
   },
   {
     name: 'Requests',
     href: 'users.employees.requests.viewLandingPage',
+    children: [
+      {
+        name: 'View Request',
+        href: 'users.employees.requests.viewById',
+      },
+    ],
   },
 ];
 </script>
