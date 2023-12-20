@@ -2,6 +2,7 @@
 import StickyFooter from '@/Components/AdminPages/AddOrEdit/StickyFooter.vue';
 import ColouredBadge from '@/Components/AdminPages/ColouredBadge.vue';
 import EmployeeRequestFormFields from '@/Components/Shared/EmployeeRequestFormFields.vue';
+import GenericDropdown from '@/Components/Shared/GenericDropdown.vue';
 import { EMPLOYEE_REQUEST_FIELD_MAP } from '@/Constants/EmployeeRequest';
 import { EMPLOYEE_REQUEST_STATUS } from '@/Constants/EmployeeRequestStatus';
 import { PencilIcon } from '@heroicons/vue/24/outline';
@@ -82,18 +83,24 @@ const isEditingRequestStatus = ref(false);
         <div class="grid grid-cols-1 gap-x-6 gap-y-8 pb-12 sm:grid-cols-6">
           <div class="sm:col-span-4">
             <template v-if="isEditingRequestStatus">
-              <label for="employeeRequestStatus" class="block text-sm font-medium leading-6 text-gray-900"
-                >Status</label
-              >
-              <select
-                id="employeeRequestStatus"
-                class="select select-bordered w-full"
-                v-model="employeeRequestForm.status"
-              >
-                <option v-for="(status, index) in employeeRequestStatuses" :key="index" :value="status">
-                  {{ status }}
-                </option>
-              </select>
+              <GenericDropdown
+                :form="employeeRequestForm"
+                name="status"
+                label="Status"
+                :disabled="false"
+                :data="{
+                  dropdown: {
+                    disabledSelect: {
+                      label: `Select a status`,
+                    },
+                    options: employeeRequestStatuses?.map((c, i) => ({
+                      key: i,
+                      value: c,
+                      text: c,
+                    })),
+                  },
+                }"
+              />
             </template>
             <template v-else>
               <span class="text-md font-semibold leading-6 text-gray-900">Status</span>
