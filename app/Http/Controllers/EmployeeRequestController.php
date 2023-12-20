@@ -18,12 +18,14 @@ class EmployeeRequestController extends Controller
 {
     protected $CommonController;
     protected $HardcodedDataController;
+    protected $UserController;
     protected $EMPLOYEE_REQUEST_KEY;
 
-    public function __construct(CommonController $CommonController, HardcodedDataController $HardcodedDataController)
+    public function __construct(CommonController $CommonController, HardcodedDataController $HardcodedDataController, UserController $UserController)
     {
         $this->CommonController = $CommonController;
         $this->HardcodedDataController = $HardcodedDataController;
+        $this->UserController = $UserController;
         $this->EMPLOYEE_REQUEST_KEY = 'EMPLOYEE_REQUEST';
     }
 
@@ -210,6 +212,7 @@ class EmployeeRequestController extends Controller
         try {
             DB::beginTransaction();
             $existing = $this->getEmployeeRequestById($request['id']);
+            $existingStatus = $existing->status;
 
             if (empty($request['password'])) {
                 $request['password'] = $existing->password;
@@ -219,6 +222,15 @@ class EmployeeRequestController extends Controller
 
             if (isset($existing)) {
                 $existing->update($request->all());
+
+                if (
+                    $existingStatus !== EmployeeRequestStatus::APPROVED->value &&
+                    $request['status'] === EmployeeRequestStatus::APPROVED->value
+                ) {
+                    $user = $this->UserController->createUserFromEmployeeRequest($existing);
+                    $user->employeeInformation()->save($this->UserController->createEmployeeInformation($existing, $user));
+                }
+
                 DB::commit();
             } else {
                 throw new \Exception("Employee Request not found.", 1);

@@ -23,7 +23,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'user_type', 'email', 'password'
     ];
 
     /**
@@ -55,4 +55,9 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function employeeInformation()
+    {
+        return $this->hasMany(EmployeeInformation::class, 'user_id');
+    }
 }
